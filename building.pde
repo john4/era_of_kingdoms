@@ -1,21 +1,13 @@
-class Building extends Cell {
-    int buildingType;
-    float w, h;
+abstract class Building extends WorldlyObject {
+  int[] c = new int[3];
 
-    Building(int x, int y, int type, int gridsize) {
-        super(x, y, 6, gridsize);
-        buildingType = type;
-        w = h = 10;
-    }
+  Building(Cell initialLocation) {
+    super(initialLocation);
+    this.c = new int[]{20, 20, 20};
+  }
 
-    void show() {
-        switch(buildingType) {
-            case 0: // town center
-                fill(255, 0, 0);
-                break;
-        }
-
-        stroke(255, 255, 255);
-        rect(x, y, w * i, h * j);
-    }
+  void draw() {
+    stroke(c[0], c[1], c[2]);
+    rect(this.pos.x, this.pos.y, this.pos.x + w, this.pos.y + h);
+  }
 }
