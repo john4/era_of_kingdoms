@@ -1,13 +1,13 @@
 class Human extends WorldlyObject {
-  int[] color;
+  int[] c = new int[3];
   
   Human(Cell initialLocation) {
     super(initialLocation);
-    this.width = this.height = 5;
-    color = new int[]{20, 20, 20};
+    this.w = this.h = 5;
+    this.c = new int[]{20, 20, 20};
   }
   
   void draw() {
-    ellipse(this.pos.x, this.pos.y, this.width, this.width);
+    ellipse(this.pos.x, this.pos.y, this.w, this.w);
   }
 }
