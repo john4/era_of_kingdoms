@@ -1,10 +1,11 @@
 class Building extends Cell {
-
     int buildingType;
+    float w, h;
 
-    Building(int x, int y, int type) {
-        super(x, y, 6);
+    Building(int x, int y, int type, int gridsize) {
+        super(x, y, 6, gridsize);
         buildingType = type;
+        w = h = 10;
     }
 
     void show() {
@@ -15,6 +16,6 @@ class Building extends Cell {
         }
 
         stroke(255, 255, 255);
-        rect(x, y, gridsize * i, gridsize * j);
+        rect(x, y, w * i, h * j);
     }
 }
