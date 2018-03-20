@@ -1,35 +1,35 @@
 void mouseWheel(MouseEvent event) {
-    float e = event.getCount();
+  float e = event.getCount();
 
-    zoom += event.getAmount() / 10;
-    xo -= event.getAmount() * mouseX / 10;
-    yo -= event.getAmount() * mouseY / 10;
+  map.zoom += event.getAmount() / 10;
+  map.xo -= event.getAmount() * mouseX / 10;
+  map.yo -= event.getAmount() * mouseY / 10;
 }
 
 void keyPressed() {
-    if (key == 'r') {
-        angle = 0;
-        zoom = 1;
-        xo = 0;
-        yo = 0;
-    }
+  if (key == 'r') {
+    map.angle = 0;
+    map.zoom = 1;
+    map.xo = 0;
+    map.yo = 0;
+  }
 
-    if (key == ' ') {
-        setup();
-    }
+  if (key == ' ') {
+    setup();
+  }
 }
 
 void mouseDragged() {
-    if (mouseButton == LEFT) {
-        xo= xo + (mouseX - pmouseX);
-        yo = yo + (mouseY - pmouseY);
-    }
+  if (mouseButton == LEFT) {
+    map.xo = map.xo + (mouseX - pmouseX);
+    map.yo = map.yo + (mouseY - pmouseY);
+  }
 
-    if (mouseButton == RIGHT) {
-        if (pmouseY-mouseY > 0) {
-            angle -= .005;
-        } else {
-            angle += .005;
-        }
+  if (mouseButton == RIGHT) {
+    if (pmouseY-mouseY > 0) {
+      map.angle -= .005;
+    } else {
+      map.angle += .005;
     }
+  }
 }
