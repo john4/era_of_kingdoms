@@ -103,18 +103,6 @@ class Map {
         }
       }
     }
-
-    // Add town center to random grass cell
-    boolean placedTownCenter = false;
-
-    while (!placedTownCenter) {
-      int townRow = int(random(numRows));
-      int townCol = int(random(numCols));
-      if (cells[townRow][townCol].terraintype == 0) {
-        cells[townRow][townCol] = new Building(townRow, townCol, 0, gridsize);
-        placedTownCenter = true;
-      }
-    }
   }
 
   void countNeighbourtypes() {
