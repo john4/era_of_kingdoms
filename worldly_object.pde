@@ -10,11 +10,10 @@ abstract class WorldlyObject {
   
   WorldlyObject(Cell initialLocation) {
     loc = initialLocation;
-    pos = new PVector(initialLocation.x + initialLocation.i/2, initialLocation.y + initialLocation.j/2);
+    pos = new PVector(initialLocation.x + initialLocation.gridsize/2, initialLocation.y + initialLocation.gridsize/2);
     vel = new PVector(0,0);
     lastNonZeroVel = null;
-    w = initialLocation.i;
-    h = initialLocation.j;
+    w = h = initialLocation.gridsize - 2;
     impassable = true;
   }
   

@@ -7,7 +7,7 @@ abstract class Building extends WorldlyObject {
   }
 
   void draw() {
-    stroke(c[0], c[1], c[2]);
-    rect(this.pos.x, this.pos.y, this.pos.x + w, this.pos.y + h);
+    fill(c[0], c[1], c[2]);
+    rect(this.loc.x + 1, this.loc.y + 1, this.w, this.h);
   }
 }
