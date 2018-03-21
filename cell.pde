@@ -43,4 +43,28 @@ class Cell {
     noStroke();
     rect(x, y, gridsize, gridsize);
   }
+
+  String getTerrainName() {
+    switch(terraintype) {
+    case 0: //grass
+      return "grass";
+    case 1: // stone
+      return "stone";
+    case 2: //forest
+      return "forest";
+    case 3: // boundary
+      return "boundary";
+    case 4: // sand
+      return "sand";
+    case 5: // water
+      return "water";
+    default:
+      return "nothing";
+    }
+  }
+
+// Returns true if the given position is within the bounds of this cell
+  boolean isIn(float posX, float posY) {
+    return x < posX && posX < x + gridsize && y < posY && posY < y + gridsize;
+  }
 }
