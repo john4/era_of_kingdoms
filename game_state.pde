@@ -43,7 +43,7 @@ class GameState {
     targets.add(new PopulationTarget());
     targets.add(new SoldierTarget());
 
-    panels.add(new Panel(200-map.xo, cols*cellSize-200-map.yo,rows*cellSize-400, targets));
+    panels.add(new Panel(200, cols*cellSize-200,rows*cellSize-400, targets));
   }
 
   void step() {

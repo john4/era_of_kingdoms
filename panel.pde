@@ -11,29 +11,33 @@ class Panel  {
   }
 
   void draw() {
+    float posX = x - map.xo;
+    float posY = y - map.yo;
+
     if(isVisible) {
-      rect(x,y,width,200);
+      rect(posX,posY,width,200);
       fill(255,0,0);
       for (int i = 0;i<targets.size();i++) {
-        text(targets.get(i).name, x+10+i*60,y+30);
-        rect(x+10+i*60,y+30,40,40);
-        rect(x+10+i*60,y+130,40,40);
+        text(targets.get(i).getName(), posX+10+i*60,posY+30);
+        rect(posX+10+i*60,posY+30,40,40);
+        rect(posX+10+i*60,posY+130,40,40);
       }
-
-
     }
   }
 
   void click() {
+    float posX = x - map.xo;
+    float posY = y + map.yo;
+
     if(isVisible) {
       print("CLICK " + mouseX + " " + mouseY + "\n");
       for (int i = 0;i<targets.size();i++) {
-        if(x+10+i*60 < mouseX && mouseX < x+70+i*60 && y+30 < mouseY && mouseY < y +70) {
+        if(posX+10+i*60 < mouseX && mouseX < posX+70+i*60 && posY+30 < mouseY && mouseY < posY +70) {
           targets.get(i).increment();
           print("increment");
-        } else if(x+10+i*60 < mouseX && mouseX < x+70+i*60 && y+130 < mouseY && mouseY < y +170) {
+        } else if(posX+10+i*60 < mouseX && mouseX < posX+70+i*60 && posY+130 < mouseY && mouseY < posY +170) {
           targets.get(i).decrement();
-          print("decremnt");
+          print("decrement");
         }
       }
     }
