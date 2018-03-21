@@ -1,5 +1,5 @@
 class Stockpile extends Building {
   Stockpile(Cell initialLocation) {
-    super(initialLocation);
+    super(initialLocation, "Stockpile");
   }
 }

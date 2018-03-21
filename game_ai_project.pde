@@ -19,4 +19,22 @@ void setup() {
 void draw() {
   map.draw();
   state.draw();
+  drawInterface();
+}
+
+void drawInterface() {
+  textSize(14);
+  String terrain = "";
+  int x = mouseX/map.gridsize;
+  int y = mouseY/map.gridsize;
+  if(x < map.numRows && y < map.numCols) {
+    terrain = map.cells[x][y].getTerrainName();
+  }
+  for(Building building : state.buildings) {
+    if (building.loc.isIn(mouseX, mouseY)) {
+      terrain += ", " + building.getName();
+    }
+  }
+  String s = "(" + mouseX + ", " + mouseY + "), " + terrain;
+  text(s, mouseX + 10, mouseY-10);
 }

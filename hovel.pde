@@ -1,5 +1,5 @@
 class Hovel extends Building {
   Hovel(Cell initialLocation) {
-    super(initialLocation);
+    super(initialLocation, "Hovel");
   }
 }
