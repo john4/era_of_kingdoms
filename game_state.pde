@@ -2,6 +2,7 @@ class GameState {
   ArrayList<Building> buildings;
   ArrayList<Citizen> citizens;
   ArrayList<Soldier> soldiers;
+  ArrayList<Message> messages;
 
   int foodSupply;
   int lumberSupply;
@@ -12,6 +13,9 @@ class GameState {
     buildings = new ArrayList<Building>();
     citizens = new ArrayList<Citizen>();
     soldiers = new ArrayList<Soldier>();
+    messages = new ArrayList<Message>();
+    messages.add(new Message("Welcome to <insert name here>", 20));
+    messages.add(new Message("Need additional Pylons", 20));
 
     // Add town center to random grass cell
     while (true) {

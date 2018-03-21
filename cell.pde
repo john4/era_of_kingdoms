@@ -64,7 +64,7 @@ class Cell {
   }
 
 // Returns true if the given position is within the bounds of this cell
-  boolean isIn(int posX, int posY) {
-    return x < posX && posX < x + i && y < posY && posY < y + j;
+  boolean isIn(float posX, float posY) {
+    return x < posX && posX < x + gridsize && y < posY && posY < y + gridsize;
   }
 }
