@@ -6,28 +6,28 @@
 // John Martin, Arianna Tang, Nicholas Lailler
 //
 
-Map map;
+BoardMap boardMap;
 GameState state;
 boolean showControlPanel = true;
 
 void setup() {
   size(960, 540);
-  map = new Map(960, 540, 10);
-  map.generate();
+  boardMap = new BoardMap(960, 540, 10);
+  boardMap.generate();
   state = new GameState();
 }
 
 void draw() {
-  map.draw();
+  boardMap.draw();
   state.draw();
 }
 
 void mouseClicked() {
-  int cellSize = map.gridsize;
+  int cellSize = boardMap.gridsize;
   int x = mouseX/cellSize;
   int y = mouseY/cellSize;
-  int rows = map.numRows;
-  int cols = map.numCols;
+  int rows = boardMap.numRows;
+  int cols = boardMap.numCols;
   if(200 < mouseX && mouseX < 220 && cols*cellSize-20 < mouseY && mouseY < cols*cellSize) {
     state.panels.get(0).isVisible = !state.panels.get(0).isVisible;
   }
