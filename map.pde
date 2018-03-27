@@ -113,36 +113,36 @@ class BoardMap {
     for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < numCols; j++) {
         // north
-        if (i != 0) {
-          cells[i][j].north = cells[i-1][j];
+        if (j != 0) {
+          cells[i][j].north = cells[i][j-1];
           // northeast
-          if (j != 0) {
-            cells[i][j].northeast = cells[i-1][j-1];
+          if (i < numRows) {
+            cells[i][j].northeast = cells[i+1][j-1];
           }
           // northwest
-          if (j < numCols - 1) {
-            cells[i][j].northwest = cells[i-1][j+1];
+          if (i != 0) {
+            cells[i][j].northwest = cells[i-1][j-1];
           }
         }
         // south
-        if (i < numRows - 1) {
-          cells[i][j].south = cells[i+1][j];
+        if (j < numCols) {
+          cells[i][j].south = cells[i][j+1];
           // southeast
-          if (j != 0) {
-            cells[i][j].east = cells[i+1][j-1];
+          if (i < numRows) {
+            cells[i][j].east = cells[i+1][j+1];
           }
           // southwest
-          if (j < numCols - 1) {
-            cells[i][j].west = cells[i+1][j+1];
+          if (i != 0) {
+            cells[i][j].west = cells[i-1][j+1];
           }
         }
         // east
-        if (j != 0) {
-          cells[i][j].east = cells[i][j-1];
+        if (i < numRows) {
+          cells[i][j].east = cells[i+1][j];
         }
         // west
-        if (j < numCols - 1) {
-          cells[i][j].west = cells[i][j+1];
+        if (i != 0) {
+          cells[i][j].west = cells[i-1][j];
         }
       }
     }
