@@ -1,5 +1,10 @@
-class Map {
+import java.util.PriorityQueue;
+import java.util.Map;
+
+class BoardMap {
   Cell[][] cells;
+  PriorityQueue<PotentialPathNode> queue;
+  Map<Cell, Float> distanceTable;
   int numRows;
   int numCols; // should divide screensize x and y
   int gridsize;
@@ -7,7 +12,7 @@ class Map {
   float zoom = 1;
   float angle = 0;
 
-  Map(int w, int h, int cellSize) {
+  BoardMap(int w, int h, int cellSize) {
     gridsize = cellSize;
     xo = 0;
     yo = 0;
@@ -103,6 +108,44 @@ class Map {
         }
       }
     }
+    
+    // Finally, inform all cells of their neighbors
+    for (int i = 0; i < numRows; i++) {
+      for (int j = 0; j < numCols; j++) {
+        // north
+        if (j != 0) {
+          cells[i][j].north = cells[i][j-1];
+          // northeast
+          if (i < numRows - 1) {
+            cells[i][j].northeast = cells[i+1][j-1];
+          }
+          // northwest
+          if (i != 0) {
+            cells[i][j].northwest = cells[i-1][j-1];
+          }
+        }
+        // south
+        if (j < numCols - 1) {
+          cells[i][j].south = cells[i][j+1];
+          // southeast
+          if (i < numRows - 1) {
+            cells[i][j].southeast = cells[i+1][j+1];
+          }
+          // southwest
+          if (i != 0) {
+            cells[i][j].southwest = cells[i-1][j+1];
+          }
+        }
+        // east
+        if (i < numRows - 1) {
+          cells[i][j].east = cells[i+1][j];
+        }
+        // west
+        if (i != 0) {
+          cells[i][j].west = cells[i-1][j];
+        }
+      }
+    }
   }
 
   void countNeighbourtypes() {
@@ -126,6 +169,63 @@ class Map {
     }
   }
   
+  PotentialPathNode findPath(Cell from, Cell to) {
+    print(from.pos.x, ", ", from.pos.y, "   ", to.pos.x, ", ", to.pos.y);
+    // initialize
+    queue = new PriorityQueue<PotentialPathNode>();
+    distanceTable = new HashMap<Cell, Float>();
+    
+    queue.add(new PotentialPathNode(from, null, 0, to.euclideanDistanceTo(from)));
+    distanceTable.put(from, 0.0);
+    
+    for (int i = 0; i < numRows; i++) {
+      for (int j = 0; j < numCols; j++) {
+        distanceTable.put(cells[i][j], Float.POSITIVE_INFINITY);
+      }
+    }
+    
+    // attempt to find path
+    while (!queue.isEmpty()) {
+      PotentialPathNode n = queue.poll();
+      if (n.cell == to) {
+        return n;
+      }
+      if (n.cell.hasImpass()) {
+        continue;
+      }
+      //System.out.printf(Integer.toString(n.pt.i) + ", " + Integer.toString(n.pt.j) + "  ");
+      
+      // check for a cheaper existing path
+      if (distanceTable.get(n.cell) >= n.costSoFar) {
+        distanceTable.put(n.cell, n.costSoFar);
+        
+        // check all adjecent cells
+        findPathHelper(n, n.cell.northeast, to);
+        findPathHelper(n, n.cell.northwest, to);
+        findPathHelper(n, n.cell.southeast, to);
+        findPathHelper(n, n.cell.southwest, to);
+        findPathHelper(n, n.cell.north, to);
+        findPathHelper(n, n.cell.south, to);
+        findPathHelper(n, n.cell.east, to);
+        findPathHelper(n, n.cell.west, to);
+      }
+    }
+    
+    // failed to find path
+    return null;
+  }
+  
+  void findPathHelper(PotentialPathNode parentNode, Cell neighbor, Cell to) {
+    if (neighbor != null) {
+      queue.add(new PotentialPathNode(
+        neighbor,
+        parentNode,
+        parentNode.costSoFar + parentNode.cell.euclideanDistanceTo(neighbor),
+        to.euclideanDistanceTo(neighbor)
+      ));
+    }
+  }
+
   void draw() {
     background(52);
     translate(xo, yo);
@@ -133,9 +233,81 @@ class Map {
     rotate(angle);
 
     for (int i = 0; i < numRows; i++) {
-        for (int j = 0; j < numCols; j++) {
-            cells[i][j].show();
-        }
+      for (int j = 0; j < numCols; j++) {
+        cells[i][j].show();
+      }
     }
+    //stroke(0,100,200);
+    //for (int i = 0; i < numRows; i++) {
+    //  for (int j = 0; j < numCols; j++) {
+        
+    //    if (j != 0) {
+    //      line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].north.pos.x, cells[i][j].north.pos.y);
+    //       //northeast
+    //      if (i < numRows - 1) {
+    //        line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].northeast.pos.x, cells[i][j].northeast.pos.y);
+    //      }
+    //      // northwest
+    //      if (i != 0) {
+    //        line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].northwest.pos.x, cells[i][j].northwest.pos.y);
+    //      }
+    //    }
+    //    // south
+    //    if (j < numCols - 1) {
+    //      line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].south.pos.x, cells[i][j].south.pos.y);
+    //      // southeast
+    //      if (i < numRows - 1) {
+    //        line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].southeast.pos.x, cells[i][j].southeast.pos.y);
+    //      }
+    //      // southwest
+    //      if (i != 0) {
+    //        line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].southwest.pos.x, cells[i][j].southwest.pos.y);
+    //      }
+    //    }
+    //    // east
+    //    if (i < numRows - 1) {
+    //      line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].east.pos.x, cells[i][j].east.pos.y);
+    //    }
+    //    // west
+    //    if (i != 0) {
+    //      line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].west.pos.x, cells[i][j].west.pos.y);
+    //    }
+    //  }
+    //}
+  }
 }
+
+class PotentialPathNode implements Comparable<PotentialPathNode> {
+  Cell cell;
+  PotentialPathNode parent;
+  float costSoFar, heuristicCost;
+  
+  PotentialPathNode(Cell point, PotentialPathNode par, float cost, float heur) {
+    cell = point;
+    parent = par;
+    costSoFar = cost;
+    heuristicCost = heur;
+  }
+  
+  float getTotalCost() {
+    return costSoFar + heuristicCost;
+  }
+
+  int compareTo(PotentialPathNode o) {
+    if (getTotalCost() > o.getTotalCost()) {
+      return 1;
+    }
+    if (getTotalCost() < o.getTotalCost()) {
+      return -1;
+    }
+    return 0;
+  }
+  
+  void draw() {
+    stroke(0,100,200);
+    if (parent != null) {
+      line(cell.pos.x, cell.pos.y, parent.cell.pos.x, parent.cell.pos.y);
+      parent.draw();
+    }
+  }
 }

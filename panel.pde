@@ -11,8 +11,8 @@ class Panel  {
   }
 
   void draw() {
-    float posX = x - map.xo;
-    float posY = y - map.yo;
+    float posX = x - boardMap.xo;
+    float posY = y - boardMap.yo;
 
     if(isVisible) {
       rect(posX,posY,width,200);
@@ -26,8 +26,8 @@ class Panel  {
   }
 
   void click() {
-    float posX = x - map.xo;
-    float posY = y + map.yo;
+    float posX = x - boardMap.xo;
+    float posY = y + boardMap.yo;
 
     if(isVisible) {
       print("CLICK " + mouseX + " " + mouseY + "\n");

@@ -1,8 +1,11 @@
 class Cell {
-
+  ArrayList<Building> buildings = new ArrayList<Building>();
+  Cell north, south, east, west;
+  Cell northeast, northwest, southeast, southwest;
   int terraintype;          // value that determines the cell's type. Water, grass, forest, etc..
   int x, y;                 // the coordinates of the upper left corner of a cell
   int i, j;                 // i is width, j is height in grid
+  PVector pos;              // the position of the center of the cell
   int[] nb = new int[5];    // number of terraintypes the neighbours have
   int gridsize;
 
@@ -13,6 +16,7 @@ class Cell {
     terraintype = type;
     x = i * gridsize;
     y = j * gridsize;
+    pos = new PVector(x + gridsize/2, y + gridsize/2);
   }
 
   void show() {
@@ -66,5 +70,22 @@ class Cell {
 // Returns true if the given position is within the bounds of this cell
   boolean isIn(float posX, float posY) {
     return x < posX && posX < x + gridsize && y < posY && posY < y + gridsize;
+  }
+  
+  boolean hasImpass() {
+    for (Building building : buildings) {
+      if (building.impassable) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  float euclideanDistanceTo(Cell o) {
+    return this.euclideanDistanceTo(o.pos.x, o.pos.y);
+  }
+  
+  float euclideanDistanceTo(float x0, float y0) {
+    return (float) (Math.sqrt(Math.pow(pos.x - x0, 2) + Math.pow(pos.y - y0, 2))); 
   }
 }
