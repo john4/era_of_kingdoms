@@ -129,11 +129,11 @@ class BoardMap {
           cells[i][j].south = cells[i][j+1];
           // southeast
           if (i < numRows - 1) {
-            cells[i][j].east = cells[i+1][j+1];
+            cells[i][j].southeast = cells[i+1][j+1];
           }
           // southwest
           if (i != 0) {
-            cells[i][j].west = cells[i-1][j+1];
+            cells[i][j].southwest = cells[i-1][j+1];
           }
         }
         // east
@@ -237,6 +237,43 @@ class BoardMap {
         cells[i][j].show();
       }
     }
+    //stroke(0,100,200);
+    //for (int i = 0; i < numRows; i++) {
+    //  for (int j = 0; j < numCols; j++) {
+        
+    //    if (j != 0) {
+    //      line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].north.pos.x, cells[i][j].north.pos.y);
+    //       //northeast
+    //      if (i < numRows - 1) {
+    //        line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].northeast.pos.x, cells[i][j].northeast.pos.y);
+    //      }
+    //      // northwest
+    //      if (i != 0) {
+    //        line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].northwest.pos.x, cells[i][j].northwest.pos.y);
+    //      }
+    //    }
+    //    // south
+    //    if (j < numCols - 1) {
+    //      line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].south.pos.x, cells[i][j].south.pos.y);
+    //      // southeast
+    //      if (i < numRows - 1) {
+    //        line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].southeast.pos.x, cells[i][j].southeast.pos.y);
+    //      }
+    //      // southwest
+    //      if (i != 0) {
+    //        line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].southwest.pos.x, cells[i][j].southwest.pos.y);
+    //      }
+    //    }
+    //    // east
+    //    if (i < numRows - 1) {
+    //      line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].east.pos.x, cells[i][j].east.pos.y);
+    //    }
+    //    // west
+    //    if (i != 0) {
+    //      line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].west.pos.x, cells[i][j].west.pos.y);
+    //    }
+    //  }
+    //}
   }
 }
 
