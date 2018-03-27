@@ -116,7 +116,7 @@ class BoardMap {
         if (j != 0) {
           cells[i][j].north = cells[i][j-1];
           // northeast
-          if (i < numRows) {
+          if (i < numRows - 1) {
             cells[i][j].northeast = cells[i+1][j-1];
           }
           // northwest
@@ -125,10 +125,10 @@ class BoardMap {
           }
         }
         // south
-        if (j < numCols) {
+        if (j < numCols - 1) {
           cells[i][j].south = cells[i][j+1];
           // southeast
-          if (i < numRows) {
+          if (i < numRows - 1) {
             cells[i][j].east = cells[i+1][j+1];
           }
           // southwest
@@ -137,7 +137,7 @@ class BoardMap {
           }
         }
         // east
-        if (i < numRows) {
+        if (i < numRows - 1) {
           cells[i][j].east = cells[i+1][j];
         }
         // west
