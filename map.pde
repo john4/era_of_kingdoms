@@ -115,10 +115,26 @@ class BoardMap {
         // north
         if (i != 0) {
           cells[i][j].north = cells[i-1][j];
+          // northeast
+          if (j != 0) {
+            cells[i][j].northeast = cells[i-1][j-1];
+          }
+          // northwest
+          if (j < numCols - 1) {
+            cells[i][j].northwest = cells[i-1][j+1];
+          }
         }
         // south
         if (i < numRows - 1) {
           cells[i][j].south = cells[i+1][j];
+          // southeast
+          if (j != 0) {
+            cells[i][j].east = cells[i+1][j-1];
+          }
+          // southwest
+          if (j < numCols - 1) {
+            cells[i][j].west = cells[i+1][j+1];
+          }
         }
         // east
         if (j != 0) {
@@ -154,6 +170,7 @@ class BoardMap {
   }
   
   PotentialPathNode findPath(Cell from, Cell to) {
+    print(from.pos.x, ", ", from.pos.y, "   ", to.pos.x, ", ", to.pos.y);
     // initialize
     queue = new PriorityQueue<PotentialPathNode>();
     distanceTable = new HashMap<Cell, Float>();
@@ -170,19 +187,27 @@ class BoardMap {
     // attempt to find path
     while (!queue.isEmpty()) {
       PotentialPathNode n = queue.poll();
-      if (n.pt == to) {
+      if (n.cell == to) {
         return n;
       }
+      if (n.cell.hasImpass()) {
+        continue;
+      }
+      //System.out.printf(Integer.toString(n.pt.i) + ", " + Integer.toString(n.pt.j) + "  ");
       
       // check for a cheaper existing path
-      if (distanceTable.get(n.pt) >= n.costSoFar) {
-        distanceTable.put(n.pt, n.costSoFar);
+      if (distanceTable.get(n.cell) >= n.costSoFar) {
+        distanceTable.put(n.cell, n.costSoFar);
         
         // check all adjecent cells
-        findPathHelper(n, n.pt.north, to);
-        findPathHelper(n, n.pt.south, to);
-        findPathHelper(n, n.pt.east, to);
-        findPathHelper(n, n.pt.west, to);
+        findPathHelper(n, n.cell.northeast, to);
+        findPathHelper(n, n.cell.northwest, to);
+        findPathHelper(n, n.cell.southeast, to);
+        findPathHelper(n, n.cell.southwest, to);
+        findPathHelper(n, n.cell.north, to);
+        findPathHelper(n, n.cell.south, to);
+        findPathHelper(n, n.cell.east, to);
+        findPathHelper(n, n.cell.west, to);
       }
     }
     
@@ -195,8 +220,8 @@ class BoardMap {
       queue.add(new PotentialPathNode(
         neighbor,
         parentNode,
-        parentNode.costSoFar + parentNode.pt.euclideanDistanceTo(neighbor.pos.x, neighbor.pos.y),
-        to.euclideanDistanceTo(neighbor.pos.x, neighbor.pos.y)
+        parentNode.costSoFar + parentNode.cell.euclideanDistanceTo(neighbor),
+        to.euclideanDistanceTo(neighbor)
       ));
     }
   }
@@ -216,12 +241,12 @@ class BoardMap {
 }
 
 class PotentialPathNode implements Comparable<PotentialPathNode> {
-  Cell pt;
+  Cell cell;
   PotentialPathNode parent;
   float costSoFar, heuristicCost;
   
   PotentialPathNode(Cell point, PotentialPathNode par, float cost, float heur) {
-    pt = point;
+    cell = point;
     parent = par;
     costSoFar = cost;
     heuristicCost = heur;
@@ -230,7 +255,7 @@ class PotentialPathNode implements Comparable<PotentialPathNode> {
   float getTotalCost() {
     return costSoFar + heuristicCost;
   }
-  
+
   int compareTo(PotentialPathNode o) {
     if (getTotalCost() > o.getTotalCost()) {
       return 1;
@@ -239,5 +264,13 @@ class PotentialPathNode implements Comparable<PotentialPathNode> {
       return -1;
     }
     return 0;
+  }
+  
+  void draw() {
+    stroke(0,100,200);
+    if (parent != null) {
+      line(cell.pos.x, cell.pos.y, parent.cell.pos.x, parent.cell.pos.y);
+      parent.draw();
+    }
   }
 }

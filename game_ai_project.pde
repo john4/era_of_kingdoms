@@ -10,16 +10,23 @@ BoardMap boardMap;
 GameState state;
 boolean showControlPanel = true;
 
+// temp
+PotentialPathNode path;
+
 void setup() {
   size(960, 540);
   boardMap = new BoardMap(960, 540, 10);
   boardMap.generate();
   state = new GameState();
+  
+  // proof that A* at least doesn't crash...
+  path = boardMap.findPath(state.buildings.get(0).loc, boardMap.cells[30][40]);
 }
 
 void draw() {
   boardMap.draw();
   state.draw();
+  path.draw();
 }
 
 void mouseClicked() {

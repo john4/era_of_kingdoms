@@ -1,6 +1,7 @@
 class Cell {
   ArrayList<Building> buildings = new ArrayList<Building>();
   Cell north, south, east, west;
+  Cell northeast, northwest, southeast, southwest;
   int terraintype;          // value that determines the cell's type. Water, grass, forest, etc..
   int x, y;                 // the coordinates of the upper left corner of a cell
   int i, j;                 // i is width, j is height in grid
