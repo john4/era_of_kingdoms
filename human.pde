@@ -12,7 +12,8 @@ abstract class Human extends WorldlyObject {
   }
   
   void draw() {
-    stroke(c[0], c[1], c[2]);
+    stroke(0, 0, 0);
+    fill(c[0], c[1], c[2]);
     ellipse(this.pos.x, this.pos.y, this.w, this.w);
   }
   

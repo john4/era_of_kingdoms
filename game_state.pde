@@ -1,5 +1,5 @@
 class GameState {
-  int STEP_FOOD_DEPLETION = 100;
+  int STEP_FOOD_DEPLETION = 1000;
   
   ArrayList<Building> buildings;
   ArrayList<Citizen> citizens;
@@ -46,8 +46,8 @@ class GameState {
     int cols = boardMap.numCols;
 
     ArrayList<ITarget> targets = new ArrayList<ITarget>();
-    targets.add(new FoodTarget());
-    targets.add(new LumberTarget());
+    targets.add(new FarmerTarget());
+    targets.add(new LumberjackTarget());
     targets.add(new PopulationTarget());
     targets.add(new SoldierTarget());
 
@@ -58,7 +58,7 @@ class GameState {
     // Iterate states of all Humans, update game stats (food levels, etc.)
     
     // Food depletion
-    if (foodDepletionIndex >= gameStateIndex) {
+    if (gameStateIndex >= foodDepletionIndex) {
       int foodEaten = 1 + citizens.size() + (soldiers.size() * 2);
       foodSupply -= foodEaten;
       foodDepletionIndex += STEP_FOOD_DEPLETION;
@@ -110,8 +110,6 @@ class GameState {
     fill(0,255,255);
     rect(200-boardMap.xo, cols*cellSize-20-boardMap.yo,20,20);
 
-
-
     fill(0);
     text(cursor, mouseX + 10- boardMap.xo, mouseY + 2.5- boardMap.yo);
     text(resources, 20 - boardMap.xo,15 - boardMap.yo);
@@ -121,5 +119,21 @@ class GameState {
     }
 
     text(messages, rows*cellSize-190-boardMap.xo, 40 - boardMap.yo, 200, 1000);
+  }
+  
+  void addLumberjack() {
+    citizens.add(new Lumberjack(boardMap.cells[int(random(boardMap.numRows))][int(random(boardMap.numCols))], buildings.get(0)));
+  }
+  
+  void removeLumberjack() {
+    
+  }
+  
+  void addFarmer() {
+    citizens.add(new Farmer(boardMap.cells[int(random(boardMap.numRows))][int(random(boardMap.numCols))], buildings.get(0)));
+  }
+  
+  void removeFarmer() {
+    
   }
 }
