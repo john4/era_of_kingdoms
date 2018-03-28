@@ -1,9 +1,14 @@
 class GameState {
+  int STEP_FOOD_DEPLETION = 100;
+  
   ArrayList<Building> buildings;
   ArrayList<Citizen> citizens;
   ArrayList<Soldier> soldiers;
   ArrayList<Message> messages;
   ArrayList<Panel> panels;
+  
+  double gameStateIndex;
+  double foodDepletionIndex;
 
   int foodSupply;
   int lumberSupply;
@@ -16,6 +21,9 @@ class GameState {
     soldiers = new ArrayList<Soldier>();
     messages = new ArrayList<Message>();
     panels = new ArrayList<Panel>();
+    
+    gameStateIndex = 0;
+    foodDepletionIndex = STEP_FOOD_DEPLETION;
 
     // Add town center to random grass cell
     while (true) {
@@ -48,6 +56,15 @@ class GameState {
 
   void step() {
     // Iterate states of all Humans, update game stats (food levels, etc.)
+    
+    // Food depletion
+    if (foodDepletionIndex >= gameStateIndex) {
+      int foodEaten = 1 + citizens.size() + (soldiers.size() * 2);
+      foodSupply -= foodEaten;
+      foodDepletionIndex += STEP_FOOD_DEPLETION;
+    }
+    
+    gameStateIndex += 1;
   }
 
   void draw() {
