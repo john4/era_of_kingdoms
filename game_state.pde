@@ -1,12 +1,20 @@
 class GameState {
+  int STEP_FOOD_DEPLETION = 1000;
+  int STEP_BIRTH = 2000;
+  
   ArrayList<Building> buildings;
   ArrayList<Citizen> citizens;
   ArrayList<Soldier> soldiers;
   ArrayList<Message> messages;
   ArrayList<Panel> panels;
+  
+  double gameStateIndex;
+  double foodDepletionIndex;
+  double birthIndex;
 
   int foodSupply;
   int lumberSupply;
+  int populationCapacity;
 
   GameState() {
     // Assumes map has been generated
@@ -16,6 +24,10 @@ class GameState {
     soldiers = new ArrayList<Soldier>();
     messages = new ArrayList<Message>();
     panels = new ArrayList<Panel>();
+    
+    gameStateIndex = 0;
+    foodDepletionIndex = STEP_FOOD_DEPLETION;
+    birthIndex = 0;
 
     // Add town center to random grass cell
     while (true) {
@@ -31,6 +43,7 @@ class GameState {
 
     foodSupply = 12;
     lumberSupply = 12;
+    populationCapacity = 2;
 
     messages.add(new Message("Welcome to <insert name here>", 20));
     messages.add(new Message("Need additional Pylons", 20));
@@ -40,8 +53,8 @@ class GameState {
     int cols = boardMap.numCols;
 
     ArrayList<ITarget> targets = new ArrayList<ITarget>();
-    targets.add(new FoodTarget());
-    targets.add(new LumberTarget());
+    targets.add(new FarmerTarget());
+    targets.add(new LumberjackTarget());
     targets.add(new PopulationTarget());
     targets.add(new SoldierTarget());
 
@@ -50,6 +63,22 @@ class GameState {
 
   void step() {
     // Iterate states of all Humans, update game stats (food levels, etc.)
+    
+    // Food depletion
+    if (gameStateIndex >= foodDepletionIndex) {
+      int foodEaten = citizens.size() + (soldiers.size() * 2);
+      foodSupply -= foodEaten;
+      foodDepletionIndex += STEP_FOOD_DEPLETION;
+    }
+    
+    // Births
+    // TODO: add new citizens at hovels if we have any
+    if (citizens.size() < populationCapacity && gameStateIndex >= birthIndex) {
+      citizens.add(new FreeCitizen(boardMap.cells[int(random(boardMap.numRows))][int(random(boardMap.numCols))], buildings.get(0)));
+      birthIndex += STEP_BIRTH;
+    }
+    
+    gameStateIndex += 1;
   }
 
   void draw() {
@@ -95,8 +124,6 @@ class GameState {
     fill(0,255,255);
     rect(200-boardMap.xo, cols*cellSize-20-boardMap.yo,20,20);
 
-
-
     fill(0);
     text(cursor, mouseX + 10- boardMap.xo, mouseY + 2.5- boardMap.yo);
     text(resources, 20 - boardMap.xo,15 - boardMap.yo);
@@ -106,5 +133,39 @@ class GameState {
     }
 
     text(messages, rows*cellSize-190-boardMap.xo, 40 - boardMap.yo, 200, 1000);
+  }
+  
+  // Get the first unoccupied citizen, else null
+  Citizen getFreeCitizen() {
+    for (Citizen citizen : citizens) {
+      if (citizen.isFree()) {
+        return citizen;
+      }
+    }
+    return null;
+  }
+  
+  void addLumberjack() {
+    Citizen freeCitizen = getFreeCitizen();
+    if (freeCitizen != null) {
+      citizens.add(new Lumberjack(freeCitizen.loc, buildings.get(0)));
+      citizens.remove(freeCitizen);
+    }
+  }
+  
+  void removeLumberjack() {
+    
+  }
+  
+  void addFarmer() {
+    Citizen freeCitizen = getFreeCitizen();
+    if (freeCitizen != null) {
+      citizens.add(new Farmer(freeCitizen.loc, buildings.get(0)));
+      citizens.remove(freeCitizen);
+    }
+  }
+  
+  void removeFarmer() {
+    
   }
 }

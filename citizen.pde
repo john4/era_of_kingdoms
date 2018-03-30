@@ -4,4 +4,8 @@ class Citizen extends Human {
   Citizen(Cell initialLocation, Building buildingAssignment) {
     super(initialLocation, buildingAssignment);
   }
+  
+  boolean isFree() {
+    return false;
+  }
 }
