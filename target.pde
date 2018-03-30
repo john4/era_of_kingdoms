@@ -1,8 +1,6 @@
 interface ITarget {
   void increment();
-
   void decrement();
-
   String getName();
 }
 
@@ -18,31 +16,31 @@ abstract class ATarget implements ITarget {
   }
 }
 
-class FoodTarget extends ATarget implements ITarget {
-  FoodTarget() {
-    super("Food");
+class LumberjackTarget extends ATarget implements ITarget {
+  LumberjackTarget() {
+    super("Lumberjack");
   }
 
   void increment() {
-    state.foodSupply++;
+    state.addLumberjack();
   }
 
   void decrement() {
-    state.foodSupply--;
+    state.removeLumberjack();
   }
 }
 
-class LumberTarget extends ATarget implements ITarget {
-  LumberTarget(){
-    super("Lumber");
+class FarmerTarget extends ATarget implements ITarget {
+  FarmerTarget(){
+    super("Farmer");
   }
 
   void increment() {
-    state.lumberSupply++;
+    state.addFarmer();
   }
 
   void decrement() {
-    state.lumberSupply--;
+    state.removeFarmer();
   }
 }
 

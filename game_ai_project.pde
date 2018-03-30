@@ -23,6 +23,7 @@ void setup() {
 void draw() {
   boardMap.draw();
   state.draw();
+  state.step();
 }
 
 void mouseClicked() {
