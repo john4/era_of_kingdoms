@@ -27,6 +27,8 @@ class GameState {
       }
     }
 
+    citizens.add(new Citizen(buildings.get(0).loc, buildings.get(0)));
+
     foodSupply = 12;
     lumberSupply = 12;
 
