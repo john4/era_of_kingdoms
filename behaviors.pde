@@ -84,10 +84,22 @@ class Wander extends Task {
 
     h.moveTo(target.pos.x, target.pos.y);
 
+    // TODO: A*
     // PotentialPathNode path = boardMap.findPath(h.loc, target);
     // path.draw();
     // Cell target = boardMap.findPath(h.
 
     return SUCCESS;
+  }
+}
+
+class Gather extends Task {
+  Gather(Blackboard bb, int terrain) {
+    this.blackboard = bb;
+    this.blackboard.put("Terrain", terrain);
+  }
+
+  int execute() {
+    return FAIL;
   }
 }

@@ -153,7 +153,13 @@ class GameState {
   }
 
   void removeLumberjack() {
-
+    for (Citizen citizen : citizens) {
+      if (citizen instanceof Lumberjack) {
+        citizens.add(new FreeCitizen(citizen.loc, buildings.get(0)));
+        citizens.remove(citizen);
+        break;
+      }
+    }
   }
 
   void addFarmer() {
@@ -165,6 +171,12 @@ class GameState {
   }
 
   void removeFarmer() {
-
+    for (Citizen citizen : citizens) {
+      if (citizen instanceof Farmer) {
+        citizens.add(new FreeCitizen(citizen.loc, buildings.get(0)));
+        citizens.remove(citizen);
+        break;
+      }
+    }
   }
 }
