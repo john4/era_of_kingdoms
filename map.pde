@@ -11,6 +11,8 @@ class BoardMap {
   float xo, yo;
   float zoom = 1;
   float angle = 0;
+  int w;
+  int h;
 
   BoardMap(int w, int h, int cellSize) {
     gridsize = cellSize;
@@ -19,9 +21,11 @@ class BoardMap {
     numCols = h / cellSize;
     numRows = w / cellSize;
     cells = new Cell[numRows][numCols];
+
+    this.w = w;
+    this.h = h;
   }
-  
-  
+
   void generate() {
     // Make grid with grass and border
     for (int i = 0; i < numRows; i++) {
@@ -108,7 +112,7 @@ class BoardMap {
         }
       }
     }
-    
+
     // Finally, inform all cells of their neighbors
     for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < numCols; j++) {
@@ -148,6 +152,18 @@ class BoardMap {
     }
   }
 
+  // Get cell from x,y position.
+  Cell cellAtPos(PVector pos) {
+    if (pos.x <= this.w - CELL_SIZE && pos.y <= this.h - CELL_SIZE && pos.x >= 0 && pos.y >= 0) {
+      int i = floor(pos.x / this.gridsize);
+      int j = floor(pos.y / this.gridsize);
+      Cell c = this.cells[i][j];
+      return c;
+    }
+    System.out.println("Invalid position " + pos.x + ", " + pos.y + " in cellAtPos");
+    return null;
+  }
+
   void countNeighbourtypes() {
     for (int i = 1; i < numRows - 1; i++) {
 
@@ -168,22 +184,22 @@ class BoardMap {
       }
     }
   }
-  
+
   PotentialPathNode findPath(Cell from, Cell to) {
     print(from.pos.x, ", ", from.pos.y, "   ", to.pos.x, ", ", to.pos.y);
     // initialize
     queue = new PriorityQueue<PotentialPathNode>();
     distanceTable = new HashMap<Cell, Float>();
-    
+
     queue.add(new PotentialPathNode(from, null, 0, to.euclideanDistanceTo(from)));
     distanceTable.put(from, 0.0);
-    
+
     for (int i = 0; i < numRows; i++) {
       for (int j = 0; j < numCols; j++) {
         distanceTable.put(cells[i][j], Float.POSITIVE_INFINITY);
       }
     }
-    
+
     // attempt to find path
     while (!queue.isEmpty()) {
       PotentialPathNode n = queue.poll();
@@ -194,11 +210,11 @@ class BoardMap {
         continue;
       }
       //System.out.printf(Integer.toString(n.pt.i) + ", " + Integer.toString(n.pt.j) + "  ");
-      
+
       // check for a cheaper existing path
       if (distanceTable.get(n.cell) >= n.costSoFar) {
         distanceTable.put(n.cell, n.costSoFar);
-        
+
         // check all adjecent cells
         findPathHelper(n, n.cell.northeast, to);
         findPathHelper(n, n.cell.northwest, to);
@@ -210,11 +226,11 @@ class BoardMap {
         findPathHelper(n, n.cell.west, to);
       }
     }
-    
+
     // failed to find path
     return null;
   }
-  
+
   void findPathHelper(PotentialPathNode parentNode, Cell neighbor, Cell to) {
     if (neighbor != null) {
       queue.add(new PotentialPathNode(
@@ -240,7 +256,7 @@ class BoardMap {
     //stroke(0,100,200);
     //for (int i = 0; i < numRows; i++) {
     //  for (int j = 0; j < numCols; j++) {
-        
+
     //    if (j != 0) {
     //      line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].north.pos.x, cells[i][j].north.pos.y);
     //       //northeast
@@ -281,14 +297,14 @@ class PotentialPathNode implements Comparable<PotentialPathNode> {
   Cell cell;
   PotentialPathNode parent;
   float costSoFar, heuristicCost;
-  
+
   PotentialPathNode(Cell point, PotentialPathNode par, float cost, float heur) {
     cell = point;
     parent = par;
     costSoFar = cost;
     heuristicCost = heur;
   }
-  
+
   float getTotalCost() {
     return costSoFar + heuristicCost;
   }
@@ -302,7 +318,7 @@ class PotentialPathNode implements Comparable<PotentialPathNode> {
     }
     return 0;
   }
-  
+
   void draw() {
     stroke(0,100,200);
     if (parent != null) {
