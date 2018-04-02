@@ -21,11 +21,12 @@ abstract class Human extends WorldlyObject {
 
     this.blackboard = new Blackboard();
     this.blackboard.put("Human", this);
-    this.btree = new Wander(this.blackboard, 50);
+    this.btree = new Wander(this.blackboard, 25);
   }
 
   void draw() {
     this.btree.execute();
+
     noStroke();
     fill(c[0], c[1], c[2]);
     ellipse(this.pos.x, this.pos.y, this.w, this.w);
