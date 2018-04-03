@@ -1,3 +1,5 @@
+final int GATHER_SPEED = 1;  // how many seconds to gather 1 unit
+
 class Wander extends Task {
   Wander(Blackboard bb, int radius) {
     this.blackboard = bb;
@@ -101,6 +103,74 @@ class Wander extends Task {
   }
 }
 
+class Plant extends Task {
+  Plant(Blackboard bb) {
+    this.blackboard = bb;
+    this.blackboard.put("Crop", null);
+    this.blackboard.put("Target", null);
+  }
+
+  int execute() {
+    Crop crop = (Crop) this.blackboard.get("Crop");
+    Farmer f = (Farmer) this.blackboard.get("Human");
+
+    // If we have somewhere to farm from, don't plant any more crops
+    if (crop != null) {
+      return SUCCESS;
+    }
+
+    // Move to the nearest grass cell to our farm
+    Cell target = (Cell) this.blackboard.get("Target");
+    if (target == null) {
+      target = f.assignedBuilding.loc.findClosestOfType(0);
+      this.blackboard.put("Target", target);
+    }
+
+    // TODO: look for crops that have lost their farmer and take those
+
+    if (!target.isIn(f.pos.x, f.pos.y)) {
+      f.moveTo(target.pos.x, target.pos.y);
+    } else {    // Plant some freaking crops
+      Crop newCrop = new Crop(target);
+      newCrop.farmer = f;
+      f.crop = newCrop;
+      state.buildings.add(newCrop);
+      this.blackboard.put("Crop", newCrop);
+    }
+
+    return FAIL;
+  }
+}
+
+class Harvest extends Task {
+  Harvest(Blackboard bb) {
+    this.blackboard = bb;
+    this.blackboard.put("LastGather", -1);
+  }
+
+  int execute() {
+    Farmer f = (Farmer) this.blackboard.get("Human");
+
+    int carrying = f.carryWeight;
+    if (carrying >= f.CARRY_CAPACITY) {
+      return SUCCESS;
+    }
+
+    if (f.loc == f.crop.loc) {
+      int lastGather = (int) this.blackboard.get("LastGather");
+
+      if (millis() - lastGather >= GATHER_SPEED * 1000) {
+        f.setCarryWeight(carrying + 1);
+        this.blackboard.put("LastGather", millis());
+      }
+    } else {
+      f.moveTo(f.crop.pos.x, f.crop.pos.y);
+    }
+
+    return FAIL;
+  }
+}
+
 class Gather extends Task {
   Gather(Blackboard bb, int terrain) {
     this.blackboard = bb;
@@ -132,7 +202,7 @@ class Gather extends Task {
 
       c.moveTo(target.pos.x, target.pos.y);
     } else {   // Gather slowly
-      if (millis() - lastGather >= 1000) {
+      if (millis() - lastGather >= GATHER_SPEED * 1000) {
         c.setCarryWeight(carrying + 1);
         this.blackboard.put("LastGather", millis());
       }

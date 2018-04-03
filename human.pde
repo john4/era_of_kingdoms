@@ -1,8 +1,8 @@
 
 
 abstract class Human extends WorldlyObject {
-  float TARGET_RADIUS = 5;
-  float SLOW_RADIUS = 10;
+  float TARGET_RADIUS = 2;
+  float SLOW_RADIUS = 5;
   float MAX_SPEED = 0.1;
   float MAX_ACCELERATION = 0.01;
 

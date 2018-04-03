@@ -35,6 +35,7 @@ class GameState {
       int townCol = int(random(boardMap.numCols));
       if (boardMap.cells[townRow][townCol].terraintype == 0) {
         buildings.add(new TownSquare(boardMap.cells[townRow][townCol]));
+        buildings.add(new Farm(boardMap.cells[townRow - 2][townCol - 2]));
         break;
       }
     }
@@ -165,7 +166,7 @@ class GameState {
   void addFarmer() {
     Citizen freeCitizen = getFreeCitizen();
     if (freeCitizen != null) {
-      citizens.add(new Farmer(freeCitizen.loc, buildings.get(0)));
+      citizens.add(new Farmer(freeCitizen.loc, buildings.get(1)));
       citizens.remove(freeCitizen);
     }
   }

@@ -50,17 +50,17 @@ class Cell {
 
   String getTerrainName() {
     switch(terraintype) {
-    case 0: //grass
+    case 0:
       return "grass";
-    case 1: // stone
+    case 1:
       return "stone";
-    case 2: //forest
+    case 2:
       return "forest";
-    case 3: // boundary
+    case 3:
       return "boundary";
-    case 4: // sand
+    case 4:
       return "sand";
-    case 5: // water
+    case 5:
       return "water";
     default:
       return "nothing";
@@ -106,18 +106,24 @@ class Cell {
   Cell findClosestOfType(int terrain) {
     ArrayList<Cell> openSet = new ArrayList<Cell>();
     ArrayList<Cell> closedSet = new ArrayList<Cell>();
+    ArrayList<Cell> cellsWithBuildings = new ArrayList<Cell>();
+
+    for (Building b : state.buildings) {
+      cellsWithBuildings.add(b.loc);
+    }
+
     openSet.add(this);
 
     while (openSet.size() > 0) {
       Cell toCheck = openSet.get(0);
       openSet.remove(0);
 
-      if (toCheck.terraintype == terrain) {
+      if (toCheck.terraintype == terrain && !cellsWithBuildings.contains(toCheck)) {
         return toCheck;
       }
 
       for (Cell neighbor : toCheck.getNeighbors()) {
-        if (closedSet.contains(neighbor)) {
+        if (closedSet.contains(neighbor) || cellsWithBuildings.contains(neighbor)) {
           continue;
         }
 
