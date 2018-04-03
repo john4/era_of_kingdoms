@@ -1,6 +1,6 @@
 class Lumberjack extends Citizen {
-  Lumberjack(Cell initialLocation, Building buildingAssignment) {
-    super(initialLocation, buildingAssignment);
+  Lumberjack(Cell initialLocation, Building buildingAssignment, PlayerState ownerState) {
+    super(initialLocation, buildingAssignment, ownerState);
     this.c = new int[]{69,44,0};
 
     Task[] gatherSequenceItems = new Task[2];

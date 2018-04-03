@@ -134,7 +134,7 @@ class Plant extends Task {
       Crop newCrop = new Crop(target);
       newCrop.farmer = f;
       f.crop = newCrop;
-      state.buildings.add(newCrop);
+      f.ownerState.buildings.add(newCrop);
       this.blackboard.put("Crop", newCrop);
     }
 
@@ -231,10 +231,10 @@ class DropOff extends Task {
       // Once we're there, drop off our stuff
       switch (resource) {
         case "Lumber":
-          state.lumberSupply += c.carryWeight;
+          c.ownerState.lumberSupply += c.carryWeight;
           break;
         case "Food":
-          state.foodSupply += c.carryWeight;
+          c.ownerState.foodSupply += c.carryWeight;
           break;
       }
 

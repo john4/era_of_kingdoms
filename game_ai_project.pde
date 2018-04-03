@@ -8,6 +8,7 @@
 
 BoardMap boardMap;
 GameState state;
+UserInterface userInterface;
 boolean showControlPanel = true;
 final int CELL_SIZE = 10;
 
@@ -19,12 +20,14 @@ void setup() {
   boardMap = new BoardMap(960, 540, CELL_SIZE);
   boardMap.generate();
   state = new GameState();
+  userInterface = new UserInterface();
 }
 
 void draw() {
   boardMap.draw();
   state.draw();
   state.step();
+  userInterface.draw(state.humanPlayer);
 }
 
 void mouseClicked() {
@@ -34,10 +37,10 @@ void mouseClicked() {
   int rows = boardMap.numRows;
   int cols = boardMap.numCols;
   if(200 < mouseX && mouseX < 220 && cols*cellSize-20 < mouseY && mouseY < cols*cellSize) {
-    state.panels.get(0).isVisible = !state.panels.get(0).isVisible;
+    userInterface.panels.get(0).isVisible = !userInterface.panels.get(0).isVisible;
   }
 
-  for(Panel panel: state.panels) {
+  for(Panel panel: userInterface.panels) {
     panel.click();
   }
 }

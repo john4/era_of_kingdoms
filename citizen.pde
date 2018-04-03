@@ -4,8 +4,8 @@ class Citizen extends Human {
   boolean isCarryingSupply;
   int carryWeight;
 
-  Citizen(Cell initialLocation, Building buildingAssignment) {
-    super(initialLocation, buildingAssignment);
+  Citizen(Cell initialLocation, Building buildingAssignment, PlayerState ownerState) {
+    super(initialLocation, buildingAssignment, ownerState);
     this.carryWeight = 0;
   }
 
