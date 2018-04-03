@@ -67,9 +67,13 @@ class Cell {
     }
   }
 
-// Returns true if the given position is within the bounds of this cell
+  // Returns true if the given position is within the bounds of this cell
   boolean isIn(float posX, float posY) {
     return x < posX && posX < x + gridsize && y < posY && posY < y + gridsize;
+  }
+
+  void addBuilding(Building building) {
+    buildings.add(building);
   }
 
   boolean hasImpass() {
