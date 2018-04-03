@@ -1,5 +1,3 @@
-
-
 abstract class Human extends WorldlyObject {
   float TARGET_RADIUS = 2;
   float SLOW_RADIUS = 5;
@@ -8,16 +6,18 @@ abstract class Human extends WorldlyObject {
 
   int[] c = new int[3];
   int health;
+  PlayerState ownerState;
   Building assignedBuilding;
   Blackboard blackboard;
   Task btree;
 
-  Human(Cell initialLocation, Building buildingAssignment) {
+  Human(Cell initialLocation, Building buildingAssignment, PlayerState ownerState) {
     super(initialLocation);
     this.w = this.h = 4;
     this.c = new int[]{20, 20, 20};
     this.health = 100;
     this.assignedBuilding = buildingAssignment;
+    this.ownerState = ownerState;
 
     this.blackboard = new Blackboard();
     this.blackboard.put("Human", this);

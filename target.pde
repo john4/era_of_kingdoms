@@ -22,11 +22,11 @@ class LumberjackTarget extends ATarget implements ITarget {
   }
 
   void increment() {
-    state.addLumberjack();
+    state.humanPlayer.addLumberjack();
   }
 
   void decrement() {
-    state.removeLumberjack();
+    state.humanPlayer.removeLumberjack();
   }
 }
 
@@ -36,11 +36,11 @@ class FarmerTarget extends ATarget implements ITarget {
   }
 
   void increment() {
-    state.addFarmer();
+    state.humanPlayer.addFarmer();
   }
 
   void decrement() {
-    state.removeFarmer();
+    state.humanPlayer.removeFarmer();
   }
 }
 

@@ -1,8 +1,8 @@
 class Farmer extends Citizen {
   Crop crop;
 
-  Farmer(Cell initialLocation, Building buildingAssignment) {
-    super(initialLocation, buildingAssignment);
+  Farmer(Cell initialLocation, Building buildingAssignment, PlayerState ownerState) {
+    super(initialLocation, buildingAssignment, ownerState);
     this.c = new int[]{176,56,30};
     this.crop = null;
     this.btree = new Plant(this.blackboard);

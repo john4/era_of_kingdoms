@@ -108,7 +108,7 @@ class Cell {
     ArrayList<Cell> closedSet = new ArrayList<Cell>();
     ArrayList<Cell> cellsWithBuildings = new ArrayList<Cell>();
 
-    for (Building b : state.buildings) {
+    for (Building b : state.getBuildings()) {
       cellsWithBuildings.add(b.loc);
     }
 
