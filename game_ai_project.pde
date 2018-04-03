@@ -21,6 +21,8 @@ void setup() {
   boardMap.generate();
   state = new GameState();
   userInterface = new UserInterface();
+
+  path = boardMap.findPath(state.getBuildings().get(0).loc, state.getBuildings().get(2).loc);
 }
 
 void draw() {
@@ -28,6 +30,7 @@ void draw() {
   state.draw();
   state.step();
   userInterface.draw(state.humanPlayer);
+  path.draw();
 }
 
 void mouseClicked() {

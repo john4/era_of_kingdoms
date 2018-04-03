@@ -186,7 +186,6 @@ class BoardMap {
   }
 
   PotentialPathNode findPath(Cell from, Cell to) {
-    print(from.pos.x, ", ", from.pos.y, "   ", to.pos.x, ", ", to.pos.y);
     // initialize
     queue = new PriorityQueue<PotentialPathNode>();
     distanceTable = new HashMap<Cell, Float>();
@@ -209,10 +208,9 @@ class BoardMap {
       if (n.cell.hasImpass()) {
         continue;
       }
-      //System.out.printf(Integer.toString(n.pt.i) + ", " + Integer.toString(n.pt.j) + "  ");
 
       // check for a cheaper existing path
-      if (distanceTable.get(n.cell) >= n.costSoFar) {
+      if (distanceTable.get(n.cell) > n.costSoFar) {
         distanceTable.put(n.cell, n.costSoFar);
 
         // check all adjecent cells
@@ -228,6 +226,7 @@ class BoardMap {
     }
 
     // failed to find path
+    print("no path available");
     return null;
   }
 
