@@ -50,17 +50,17 @@ class Cell {
 
   String getTerrainName() {
     switch(terraintype) {
-    case 0: //grass
+    case 0:
       return "grass";
-    case 1: // stone
+    case 1:
       return "stone";
-    case 2: //forest
+    case 2:
       return "forest";
-    case 3: // boundary
+    case 3:
       return "boundary";
-    case 4: // sand
+    case 4:
       return "sand";
-    case 5: // water
+    case 5:
       return "water";
     default:
       return "nothing";
@@ -71,7 +71,7 @@ class Cell {
   boolean isIn(float posX, float posY) {
     return x < posX && posX < x + gridsize && y < posY && posY < y + gridsize;
   }
-  
+
   boolean hasImpass() {
     for (Building building : buildings) {
       if (building.impassable) {
@@ -80,12 +80,61 @@ class Cell {
     }
     return false;
   }
-  
+
   float euclideanDistanceTo(Cell o) {
     return this.euclideanDistanceTo(o.pos.x, o.pos.y);
   }
-  
+
   float euclideanDistanceTo(float x0, float y0) {
-    return (float) (Math.sqrt(Math.pow(pos.x - x0, 2) + Math.pow(pos.y - y0, 2))); 
+    return (float) (Math.sqrt(Math.pow(pos.x - x0, 2) + Math.pow(pos.y - y0, 2)));
+  }
+
+  ArrayList<Cell> getNeighbors() {
+    ArrayList<Cell> neighbors = new ArrayList<Cell>();
+    neighbors.add(this.north);
+    neighbors.add(this.south);
+    neighbors.add(this.east);
+    neighbors.add(this.west);
+    neighbors.add(this.northeast);
+    neighbors.add(this.northwest);
+    neighbors.add(this.southeast);
+    neighbors.add(this.southwest);
+    return neighbors;
+  }
+
+  /** Breadth-first find closest cell of type terrain */
+  Cell findClosestOfType(int terrain) {
+    ArrayList<Cell> openSet = new ArrayList<Cell>();
+    ArrayList<Cell> closedSet = new ArrayList<Cell>();
+    ArrayList<Cell> cellsWithBuildings = new ArrayList<Cell>();
+
+    for (Building b : state.buildings) {
+      cellsWithBuildings.add(b.loc);
+    }
+
+    openSet.add(this);
+
+    while (openSet.size() > 0) {
+      Cell toCheck = openSet.get(0);
+      openSet.remove(0);
+
+      if (toCheck.terraintype == terrain && !cellsWithBuildings.contains(toCheck)) {
+        return toCheck;
+      }
+
+      for (Cell neighbor : toCheck.getNeighbors()) {
+        if (closedSet.contains(neighbor) || cellsWithBuildings.contains(neighbor)) {
+          continue;
+        }
+
+        if (!openSet.contains(neighbor)) {
+          openSet.add(neighbor);
+        }
+      }
+
+      closedSet.add(toCheck);
+    }
+
+    return null;
   }
 }

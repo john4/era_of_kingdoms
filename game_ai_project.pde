@@ -9,13 +9,14 @@
 BoardMap boardMap;
 GameState state;
 boolean showControlPanel = true;
+final int CELL_SIZE = 10;
 
 // temp
 PotentialPathNode path;
 
 void setup() {
   size(960, 540);
-  boardMap = new BoardMap(960, 540, 10);
+  boardMap = new BoardMap(960, 540, CELL_SIZE);
   boardMap.generate();
   state = new GameState();
 }
@@ -35,7 +36,7 @@ void mouseClicked() {
   if(200 < mouseX && mouseX < 220 && cols*cellSize-20 < mouseY && mouseY < cols*cellSize) {
     state.panels.get(0).isVisible = !state.panels.get(0).isVisible;
   }
-  
+
   for(Panel panel: state.panels) {
     panel.click();
   }
