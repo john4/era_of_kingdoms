@@ -1,73 +1,136 @@
-interface ITarget {
-  void increment();
-  void decrement();
-  String getName();
-}
 
-abstract class ATarget implements ITarget {
+abstract class ATarget {
   String name;
 
   ATarget(String name) {
     this.name = name;
   }
 
+  abstract void clicked();
+
   String getName() {
     return this.name;
   }
 }
 
-class LumberjackTarget extends ATarget implements ITarget {
-  LumberjackTarget() {
-    super("Lumberjack");
+class AddLumberjackTarget extends ATarget {
+  AddLumberjackTarget() {
+    super("+ Lumberjack");
   }
 
-  void increment() {
+  void clicked() {
     state.humanPlayer.addLumberjack();
   }
+}
 
-  void decrement() {
+class RemoveLumberjackTarget extends ATarget {
+  RemoveLumberjackTarget() {
+    super("- Lumberjack");
+  }
+
+  void clicked() {
     state.humanPlayer.removeLumberjack();
   }
 }
 
-class FarmerTarget extends ATarget implements ITarget {
-  FarmerTarget(){
-    super("Farmer");
+class AddFarmerTarget extends ATarget {
+  AddFarmerTarget(){
+    super("+ Farmer");
   }
 
-  void increment() {
+  void clicked() {
     state.humanPlayer.addFarmer();
   }
+}
 
-  void decrement() {
+class RemoveFarmerTarget extends ATarget {
+  RemoveFarmerTarget() {
+    super("- Farmer");
+  }
+
+  void clicked() {
     state.humanPlayer.removeFarmer();
   }
 }
 
-class PopulationTarget extends ATarget implements ITarget {
-  PopulationTarget() {
-    super("Population");
+class AddSoldierTarget extends ATarget {
+  AddSoldierTarget() {
+    super("+ Soldier");
   }
 
-  void increment() {
-    // increase population
-  }
-
-  void decrement() {
-    // decrease population
+  void clicked() {
+    state.humanPlayer.addSoldier();
   }
 }
 
-class SoldierTarget extends ATarget implements ITarget {
-  SoldierTarget() {
-    super("Soldiers");
+class RemoveSoldierTarget extends ATarget {
+  RemoveSoldierTarget() {
+    super("- Soldier");
   }
 
-  void increment() {
-    // increase soldiers
+  void clicked() {
+    state.humanPlayer.removeSoldier();
+  }
+}
+
+class AddMinerTarget extends ATarget {
+    AddMinerTarget() {
+      super("+ Miner");
+    }
+
+    void clicked() {
+      state.humanPlayer.addMiner();
+    }
+
+    void decrement() {
+      state.humanPlayer.removeMiner();
+    }
+}
+
+class RemoveMinerTarget extends ATarget {
+    RemoveMinerTarget() {
+      super("- Miner");
+    }
+
+    void clicked() {
+      state.humanPlayer.removeMiner();
+    }
+}
+
+class BuildFarmTarget extends ATarget {
+  BuildFarmTarget() {
+    super("+ Farm");
   }
 
-  void decrement() {
-    // decrease soldiers
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.FARM;
+  }
+}
+
+class BuildHovelTarget extends ATarget {
+  BuildHovelTarget() {
+    super("+ Hovel");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.HOVEL;
+  }
+}
+class BuildSawmillTarget extends ATarget {
+  BuildSawmillTarget() {
+    super("+ Sawmill");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.SAWMILL;
+  }
+}
+class BuildStockpileTarget extends ATarget {
+  BuildStockpileTarget() {
+    super("+ Stockpile");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.STOCKPILE;
   }
 }

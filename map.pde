@@ -164,6 +164,23 @@ class BoardMap {
     return null;
   }
 
+  boolean validBuildingSpot(Cell c) {
+    ArrayList<Building> allBuildings = state.getBuildings();
+
+    for (Building building : allBuildings) {
+      if (building.loc == c) {
+        return false;
+      }
+    }
+
+    if (c.terraintype != 0) {
+      return false;
+    }
+
+    return true;
+
+  }
+
   void countNeighbourtypes() {
     for (int i = 1; i < numRows - 1; i++) {
 

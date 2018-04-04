@@ -1,6 +1,7 @@
 class PlayerState {
   int STEP_FOOD_DEPLETION = 1000;
   int STEP_BIRTH = 2000;
+  // int STEP_BIRTH = 100;  // for testing purposes
 
   ArrayList<Building> buildings;
   ArrayList<Citizen> citizens;
@@ -12,6 +13,9 @@ class PlayerState {
   int foodSupply;
   int lumberSupply;
   int populationCapacity;
+  int oreSupply;
+
+  BuildingCode placingBuilding;
 
   PlayerState() {
     // Assumes map has been generated
@@ -36,7 +40,8 @@ class PlayerState {
 
     foodSupply = 12;
     lumberSupply = 12;
-    populationCapacity = 2;
+    populationCapacity = 5;
+    placingBuilding = BuildingCode.NONE;
 
     int cellSize = boardMap.gridsize;
     int rows = boardMap.numRows;
@@ -55,7 +60,7 @@ class PlayerState {
 
     // Births
     // TODO: add new citizens at hovels if we have any
-    if (citizens.size() < populationCapacity && gameStateIndex >= birthIndex) {
+    if (citizens.size() + soldiers.size() < populationCapacity && gameStateIndex >= birthIndex) {
       citizens.add(new FreeCitizen(buildings.get(0).loc, buildings.get(0), this));
       // citizens.add(new FreeCitizen(boardMap.cells[int(random(boardMap.numRows))][int(random(boardMap.numCols))], buildings.get(0)));
       birthIndex += STEP_BIRTH;
@@ -73,6 +78,28 @@ class PlayerState {
     }
     for (Soldier soldier : soldiers) {
       soldier.draw();
+    }
+  }
+
+  void placeBuilding(Cell loc) {
+    this.addBuilding(this.placingBuilding, loc);
+    this.placingBuilding = BuildingCode.NONE;
+  }
+
+  void addBuilding(BuildingCode b, Cell loc) {
+    switch (b) {
+      case FARM:
+        this.buildings.add(new Farm(loc));
+        break;
+      case HOVEL:
+        this.buildings.add(new Hovel(loc));
+        break;
+      case SAWMILL:
+        this.buildings.add(new Sawmill(loc));
+        break;
+      case STOCKPILE:
+        this.buildings.add(new Stockpile(loc));
+        break;
     }
   }
 
@@ -115,6 +142,38 @@ class PlayerState {
   void removeFarmer() {
     for (Citizen citizen : citizens) {
       if (citizen instanceof Farmer) {
+        citizens.add(new FreeCitizen(citizen.loc, buildings.get(0), this));
+        citizens.remove(citizen);
+        break;
+      }
+    }
+  }
+
+  void addSoldier() {
+    Citizen freeCitizen = getFreeCitizen();
+    if (freeCitizen != null) {
+      soldiers.add(new Soldier(freeCitizen.loc, buildings.get(0), this));
+      citizens.remove(freeCitizen);
+    }
+  }
+
+  void removeSoldier() {
+    Soldier s = soldiers.get(0);
+    citizens.add(new FreeCitizen(s.loc, buildings.get(0), this));
+    soldiers.remove(s);
+  }
+
+  void addMiner() {
+    Citizen freeCitizen = getFreeCitizen();
+    if (freeCitizen != null) {
+      citizens.add(new Miner(freeCitizen.loc, buildings.get(0), this));
+      citizens.remove(freeCitizen);
+    }
+  }
+
+  void removeMiner() {
+    for (Citizen citizen : citizens) {
+      if (citizen instanceof Miner) {
         citizens.add(new FreeCitizen(citizen.loc, buildings.get(0), this));
         citizens.remove(citizen);
         break;
