@@ -42,6 +42,13 @@ void mouseClicked() {
   int rows = boardMap.numRows;
   int cols = boardMap.numCols;
 
+  if (state.humanPlayer.placingBuilding != BuildingCode.NONE) {
+    Cell hoveredCell = boardMap.cellAtPos(new PVector(mouseX, mouseY));
+    if (boardMap.validBuildingSpot(hoveredCell)) {
+      state.humanPlayer.placeBuilding(hoveredCell);
+    }
+  }
+
   for (Panel panel : userInterface.panels) {
     if (panel.inPanelToggle(mouseX, mouseY)) {
       panel.toggleVisible();
@@ -50,10 +57,4 @@ void mouseClicked() {
     panel.click();
   }
 
-  if (state.humanPlayer.placingBuilding != BuildingCode.NONE) {
-    Cell hoveredCell = boardMap.cellAtPos(new PVector(mouseX, mouseY));
-    if (boardMap.validBuildingSpot(hoveredCell)) {
-      state.humanPlayer.placeBuilding(hoveredCell);
-    }
-  }
 }
