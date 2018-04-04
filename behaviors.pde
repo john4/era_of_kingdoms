@@ -236,6 +236,9 @@ class DropOff extends Task {
         case "Food":
           c.ownerState.foodSupply += c.carryWeight;
           break;
+        case "Ore":
+          c.ownerState.oreSupply += c.carryWeight;
+          break;
       }
 
       c.setCarryWeight(0);

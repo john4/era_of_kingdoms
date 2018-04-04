@@ -12,6 +12,7 @@ class PlayerState {
   int foodSupply;
   int lumberSupply;
   int populationCapacity;
+  int oreSupply;
 
   PlayerState() {
     // Assumes map has been generated
@@ -36,6 +37,7 @@ class PlayerState {
 
     foodSupply = 12;
     lumberSupply = 12;
+
     populationCapacity = 2;
 
     int cellSize = boardMap.gridsize;
@@ -55,7 +57,7 @@ class PlayerState {
 
     // Births
     // TODO: add new citizens at hovels if we have any
-    if (citizens.size() < populationCapacity && gameStateIndex >= birthIndex) {
+    if (citizens.size() + soldiers.size() < populationCapacity && gameStateIndex >= birthIndex) {
       citizens.add(new FreeCitizen(buildings.get(0).loc, buildings.get(0), this));
       // citizens.add(new FreeCitizen(boardMap.cells[int(random(boardMap.numRows))][int(random(boardMap.numCols))], buildings.get(0)));
       birthIndex += STEP_BIRTH;
@@ -115,6 +117,38 @@ class PlayerState {
   void removeFarmer() {
     for (Citizen citizen : citizens) {
       if (citizen instanceof Farmer) {
+        citizens.add(new FreeCitizen(citizen.loc, buildings.get(0), this));
+        citizens.remove(citizen);
+        break;
+      }
+    }
+  }
+
+  void addSoldier() {
+    Citizen freeCitizen = getFreeCitizen();
+    if (freeCitizen != null) {
+      soldiers.add(new Soldier(freeCitizen.loc, buildings.get(0), this));
+      citizens.remove(freeCitizen);
+    }
+  }
+
+  void removeSoldier() {
+    Soldier s = soldiers.get(0);
+    citizens.add(new FreeCitizen(s.loc, buildings.get(0), this));
+    soldiers.remove(s);
+  }
+
+  void addMiner() {
+    Citizen freeCitizen = getFreeCitizen();
+    if (freeCitizen != null) {
+      citizens.add(new Miner(freeCitizen.loc, buildings.get(1), this));
+      citizens.remove(freeCitizen);
+    }
+  }
+
+  void removeMiner() {
+    for (Citizen citizen : citizens) {
+      if (citizen instanceof Miner) {
         citizens.add(new FreeCitizen(citizen.loc, buildings.get(0), this));
         citizens.remove(citizen);
         break;

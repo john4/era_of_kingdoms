@@ -12,6 +12,7 @@ class UserInterface {
     ArrayList<ITarget> targets = new ArrayList<ITarget>();
     targets.add(new FarmerTarget());
     targets.add(new LumberjackTarget());
+    targets.add(new MinerTarget());
     targets.add(new PopulationTarget());
     targets.add(new SoldierTarget());
 
@@ -35,7 +36,26 @@ class UserInterface {
       }
     }
     String cursor = "(" + (mouseX- boardMap.xo) + ", " + (mouseY- boardMap.yo) + "), " + terrain;
-    String resources = "Food: " + state.foodSupply + "  Lumber: " + state.lumberSupply + "  Population: " + state.citizens.size() + "  Soldiers: " + state.soldiers.size();
+
+    int lumberjackCount = 0;
+    int farmerCount = 0;
+    int minerCount = 0;
+
+    for (Citizen c : state.citizens) {
+      if (c instanceof Lumberjack) {
+        lumberjackCount++;
+      } else if (c instanceof Farmer) {
+        farmerCount++;
+      } else if (c instanceof Miner) {
+        minerCount++;
+      }
+    }
+
+    String resources = "Food: " + state.foodSupply + "  Lumber: " + state.lumberSupply +
+      "  Population: " + (state.citizens.size() + state.soldiers.size()) + "  Farmers: " +
+      farmerCount + "  Lumberjacks: " + lumberjackCount + "  Miners: " + minerCount +
+      "  Soldiers: " + state.soldiers.size();
+
     fill(255);
     rect(-boardMap.xo,-boardMap.yo, rows*cellSize,20);
     rect(mouseX + 10- boardMap.xo, mouseY-10- boardMap.yo, cursor.length() * 8,20);

@@ -64,10 +64,24 @@ class SoldierTarget extends ATarget implements ITarget {
   }
 
   void increment() {
-    // increase soldiers
+    state.humanPlayer.addSoldier();
   }
 
   void decrement() {
-    // decrease soldiers
+    state.humanPlayer.removeSoldier();
   }
+}
+
+class MinerTarget extends ATarget implements ITarget {
+    MinerTarget() {
+      super("Miners");
+    }
+
+    void increment() {
+      state.humanPlayer.addMiner();
+    }
+
+    void decrement() {
+      state.humanPlayer.removeMiner();
+    }
 }
