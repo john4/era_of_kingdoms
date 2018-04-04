@@ -89,7 +89,6 @@ abstract class Human extends WorldlyObject {
     if(c.hasImpass()){
       ray.rotate(PI + random(-PI/8,PI/8));
       ray.setMag(.4);
-      println(ray);
       this.vel.add(ray);
     }
 
