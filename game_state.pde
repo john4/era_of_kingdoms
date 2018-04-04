@@ -30,8 +30,8 @@ class GameState {
 
   ArrayList<Building> getBuildings() {
     ArrayList<Building> results = new ArrayList<Building>();
-    results.addAll(humanPlayer.buildings);
-    results.addAll(computerPlayer.buildings);
+    results.addAll(humanPlayer.getBuildings());
+    results.addAll(computerPlayer.getBuildings());
     return results;
   }
 }
