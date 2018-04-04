@@ -4,9 +4,7 @@
 // Final Project
 //
 // John Martin, Arianna Tang, Nicholas Lailler
-//
 
-import java.util.ConcurrentModificationException;
 
 BoardMap boardMap;
 GameState state;
