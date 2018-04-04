@@ -1,6 +1,7 @@
 class PlayerState {
   int STEP_FOOD_DEPLETION = 1000;
-  int STEP_BIRTH = 2000;
+  // int STEP_BIRTH = 2000;
+  int STEP_BIRTH = 100;
 
   ArrayList<Building> buildings;
   ArrayList<Citizen> citizens;
@@ -38,7 +39,7 @@ class PlayerState {
     foodSupply = 12;
     lumberSupply = 12;
 
-    populationCapacity = 2;
+    populationCapacity = 5;
 
     int cellSize = boardMap.gridsize;
     int rows = boardMap.numRows;

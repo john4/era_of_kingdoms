@@ -1,10 +1,12 @@
+final int TARGET_SIZE = 40;
+
 class Panel  {
   float x, y, width; // positional values
   boolean isVisible;
-  ArrayList<ITarget> targets;
+  ArrayList<ATarget> targets;
   int[] c = new int[3];
 
-  Panel(float x, float y, float width, ArrayList<ITarget> targets, int r, int g, int b) {
+  Panel(float x, float y, float width, ArrayList<ATarget> targets, int r, int g, int b) {
     this.x = x;
     this.y = y;
     this.width = width;
@@ -21,10 +23,15 @@ class Panel  {
       fill(255, 255, 255);
       rect(posX, posY, width, 200);
       fill(255, 0, 0);
-      for (int i = 0; i < targets.size(); i++) {
+
+      for (int i = 0; i < targets.size(); i += 2) {
         text(targets.get(i).getName(), posX + 10 + i * 60, posY + 30);
-        rect(posX+10+i*60,posY+30,40,40);
-        rect(posX+10+i*60,posY+130,40,40);
+        rect(posX+10+i*60,posY+30, TARGET_SIZE, TARGET_SIZE);
+      }
+
+      for (int i = 1; i < targets.size(); i+= 2) {
+        text(targets.get(i).getName(), posX + 10 + (i - 1) * 60, posY + 100);
+        rect(posX + 10 + (i - 1) * 60, posY + 100, TARGET_SIZE, TARGET_SIZE);
       }
     }
 
@@ -36,15 +43,19 @@ class Panel  {
     float posX = x - boardMap.xo;
     float posY = y + boardMap.yo;
 
-    if(isVisible) {
-      print("CLICK " + mouseX + " " + mouseY + "\n");
-      for (int i = 0; i < targets.size(); i++) {
-        if (posX + 10 + i * 60 < mouseX && mouseX < posX + 70 + i * 60 && posY + 30 < mouseY && mouseY < posY + 70) {
-          targets.get(i).increment();
-          print("increment");
-        } else if(posX + 10 + i * 60 < mouseX && mouseX < posX + 70 + i * 60 && posY + 130 < mouseY && mouseY < posY + 170) {
-          targets.get(i).decrement();
-          print("decrement");
+    if (isVisible) {
+      // print("CLICK " + mouseX + " " + mouseY + "\n");
+      for (int i = 0; i < targets.size(); i += 2) {
+        if (posX + 10 + i * 60 < mouseX && mouseX < posX + 70 + i * 60 && posY + 30 < mouseY && mouseY < posY + 30 + TARGET_SIZE) {
+          System.out.println("Clicked a top button");
+          targets.get(i).clicked();
+        }
+      }
+
+      for (int i = 1; i < targets.size(); i += 2) {
+        if (posX + 10 + (i - 1) * 60 < mouseX && mouseX < posX + 70 + (i - 1) * 60 && posY + 100 < mouseY && mouseY < posY + 100 + TARGET_SIZE) {
+          System.out.println("Clicked a bottom button");
+          targets.get(i).clicked();
         }
       }
     }
@@ -56,6 +67,12 @@ class Panel  {
   }
 
   void toggleVisible() {
+    for (Panel panel : userInterface.panels) {
+      if (panel != this) {
+        panel.isVisible = false;
+      }
+    }
+
     this.isVisible = !this.isVisible;
   }
 }

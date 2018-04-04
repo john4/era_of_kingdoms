@@ -9,15 +9,18 @@ class UserInterface {
     messages.add(new Message("Welcome to <insert name here>", 20));
     messages.add(new Message("Need additional Pylons", 20));
 
-    ArrayList<ITarget> targets = new ArrayList<ITarget>();
-    targets.add(new FarmerTarget());
-    targets.add(new LumberjackTarget());
-    targets.add(new MinerTarget());
-    targets.add(new PopulationTarget());
-    targets.add(new SoldierTarget());
+    ArrayList<ATarget> targets = new ArrayList<ATarget>();
+    targets.add(new AddFarmerTarget());
+    targets.add(new RemoveFarmerTarget());
+    targets.add(new AddLumberjackTarget());
+    targets.add(new RemoveLumberjackTarget());
+    targets.add(new AddMinerTarget());
+    targets.add(new RemoveMinerTarget());
+    targets.add(new AddSoldierTarget());
+    targets.add(new RemoveSoldierTarget());
 
-    ArrayList<ITarget> buildTargets = new ArrayList<ITarget>();
-    buildTargets.add(new FarmerTarget());
+    ArrayList<ATarget> buildTargets = new ArrayList<ATarget>();
+    buildTargets.add(new AddFarmerTarget());
 
     panels.add(new Panel(200, boardMap.numCols*boardMap.gridsize-200,boardMap.numRows*boardMap.gridsize-400, targets, 0, 0, 255));
     panels.add(new Panel(400, boardMap.numCols * boardMap.gridsize - 200, boardMap.numRows * boardMap.gridsize - 400, buildTargets, 255, 0, 0));
@@ -44,6 +47,7 @@ class UserInterface {
     int lumberjackCount = 0;
     int farmerCount = 0;
     int minerCount = 0;
+    int freeCitizenCount = 0;
 
     for (Citizen c : state.citizens) {
       if (c instanceof Lumberjack) {
@@ -52,12 +56,14 @@ class UserInterface {
         farmerCount++;
       } else if (c instanceof Miner) {
         minerCount++;
+      } else if (c.isFree()) {
+        freeCitizenCount++;
       }
     }
 
     String resources = "Food: " + state.foodSupply + "  Lumber: " + state.lumberSupply +
-      "  Ore: " + state.oreSupply + "  Population: " + (state.citizens.size() +
-      state.soldiers.size()) + "  Farmers: " + farmerCount + "  Lumberjacks: " + lumberjackCount +
+      "  Ore: " + state.oreSupply + "  Population: " + (state.citizens.size() + state.soldiers.size()) +
+      "  Free Citizens: " + freeCitizenCount + "  Farmers: " + farmerCount + "  Lumberjacks: " + lumberjackCount +
       "  Miners: " + minerCount + "  Soldiers: " + state.soldiers.size();
 
     fill(255);
