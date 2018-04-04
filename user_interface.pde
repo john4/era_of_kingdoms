@@ -20,7 +20,10 @@ class UserInterface {
     targets.add(new RemoveSoldierTarget());
 
     ArrayList<ATarget> buildTargets = new ArrayList<ATarget>();
-    buildTargets.add(new AddFarmerTarget());
+    buildTargets.add(new BuildFarmTarget());
+    buildTargets.add(new BuildHovelTarget());
+    buildTargets.add(new BuildSawmillTarget());
+    buildTargets.add(new BuildStockpileTarget());
 
     panels.add(new Panel(200, boardMap.numCols*boardMap.gridsize-200,boardMap.numRows*boardMap.gridsize-400, targets, 0, 0, 255));
     panels.add(new Panel(400, boardMap.numCols * boardMap.gridsize - 200, boardMap.numRows * boardMap.gridsize - 400, buildTargets, 255, 0, 0));
@@ -34,8 +37,9 @@ class UserInterface {
     int y = mouseY/cellSize;
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
+    Cell hoveredCell = boardMap.cells[x][y];
     if(x >= 0 && x < rows && y >= 0 && y < cols) {
-      terrain = boardMap.cells[x][y].getTerrainName();
+      terrain = hoveredCell.getTerrainName();
     }
     for(Building building : state.buildings) {
       if (building.loc.isIn(mouseX-boardMap.xo,mouseY-boardMap.yo)) {
@@ -85,5 +89,14 @@ class UserInterface {
     }
 
     text(messageStr, rows*cellSize-190-boardMap.xo, 40 - boardMap.yo, 200, 1000);
+
+    if (state.placingBuilding != BuildingCode.NONE) {
+      fill(255, 255, 255);
+      if (!boardMap.validBuildingSpot(hoveredCell)) {
+        fill(255, 0, 0);
+      }
+
+      rect(hoveredCell.x + 1, hoveredCell.y + 1, 8, 8);
+    }
   }
 }

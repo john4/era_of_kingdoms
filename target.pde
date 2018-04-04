@@ -96,3 +96,41 @@ class RemoveMinerTarget extends ATarget {
       state.humanPlayer.removeMiner();
     }
 }
+
+class BuildFarmTarget extends ATarget {
+  BuildFarmTarget() {
+    super("+ Farm");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.FARM;
+  }
+}
+
+class BuildHovelTarget extends ATarget {
+  BuildHovelTarget() {
+    super("+ Hovel");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.HOVEL;
+  }
+}
+class BuildSawmillTarget extends ATarget {
+  BuildSawmillTarget() {
+    super("+ Sawmill");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.SAWMILL;
+  }
+}
+class BuildStockpileTarget extends ATarget {
+  BuildStockpileTarget() {
+    super("+ Stockpile");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.STOCKPILE;
+  }
+}

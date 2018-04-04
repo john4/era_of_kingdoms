@@ -44,17 +44,14 @@ class Panel  {
     float posY = y + boardMap.yo;
 
     if (isVisible) {
-      // print("CLICK " + mouseX + " " + mouseY + "\n");
       for (int i = 0; i < targets.size(); i += 2) {
         if (posX + 10 + i * 60 < mouseX && mouseX < posX + 70 + i * 60 && posY + 30 < mouseY && mouseY < posY + 30 + TARGET_SIZE) {
-          System.out.println("Clicked a top button");
           targets.get(i).clicked();
         }
       }
 
       for (int i = 1; i < targets.size(); i += 2) {
         if (posX + 10 + (i - 1) * 60 < mouseX && mouseX < posX + 70 + (i - 1) * 60 && posY + 100 < mouseY && mouseY < posY + 100 + TARGET_SIZE) {
-          System.out.println("Clicked a bottom button");
           targets.get(i).clicked();
         }
       }
@@ -75,8 +72,4 @@ class Panel  {
 
     this.isVisible = !this.isVisible;
   }
-}
-
-interface IPanel {
-
 }

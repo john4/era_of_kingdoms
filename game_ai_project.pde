@@ -34,15 +34,13 @@ void draw() {
 }
 
 void mouseClicked() {
+  System.out.println("Click");
+
   int cellSize = boardMap.gridsize;
   int x = mouseX/cellSize;
   int y = mouseY/cellSize;
   int rows = boardMap.numRows;
   int cols = boardMap.numCols;
-
-  // if(200 < mouseX && mouseX < 220 && cols*cellSize-20 < mouseY && mouseY < cols*cellSize) {
-  //   userInterface.panels.get(0).isVisible = !userInterface.panels.get(0).isVisible;
-  // }
 
   for (Panel panel : userInterface.panels) {
     if (panel.inPanelToggle(mouseX, mouseY)) {
@@ -50,5 +48,12 @@ void mouseClicked() {
     }
 
     panel.click();
+  }
+
+  if (state.humanPlayer.placingBuilding != BuildingCode.NONE) {
+    Cell hoveredCell = boardMap.cellAtPos(new PVector(mouseX, mouseY));
+    if (boardMap.validBuildingSpot(hoveredCell)) {
+      state.humanPlayer.placeBuilding(hoveredCell);
+    }
   }
 }

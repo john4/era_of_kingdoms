@@ -15,11 +15,7 @@ class Wander extends Task {
 
   /** Select a random cell on the map within the home circle */
   Cell pickNewDestination() {
-    System.out.println("Possible cell coords:");
     ArrayList<Cell> possibleCells = (ArrayList<Cell>) this.blackboard.get("HomeCircle");
-    for (Cell c : possibleCells) {
-      System.out.println(c.pos.x + ", " + c.pos.y);
-    }
     float r = random(possibleCells.size() - 1);
     return possibleCells.get((int) r);
   }

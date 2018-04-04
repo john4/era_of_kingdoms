@@ -1,7 +1,7 @@
 class PlayerState {
   int STEP_FOOD_DEPLETION = 1000;
-  // int STEP_BIRTH = 2000;
-  int STEP_BIRTH = 100;
+  int STEP_BIRTH = 2000;
+  // int STEP_BIRTH = 100;  // for testing purposes
 
   ArrayList<Building> buildings;
   ArrayList<Citizen> citizens;
@@ -14,6 +14,8 @@ class PlayerState {
   int lumberSupply;
   int populationCapacity;
   int oreSupply;
+
+  BuildingCode placingBuilding;
 
   PlayerState() {
     // Assumes map has been generated
@@ -38,8 +40,8 @@ class PlayerState {
 
     foodSupply = 12;
     lumberSupply = 12;
-
     populationCapacity = 5;
+    placingBuilding = BuildingCode.NONE;
 
     int cellSize = boardMap.gridsize;
     int rows = boardMap.numRows;
@@ -76,6 +78,28 @@ class PlayerState {
     }
     for (Soldier soldier : soldiers) {
       soldier.draw();
+    }
+  }
+
+  void placeBuilding(Cell loc) {
+    this.addBuilding(this.placingBuilding, loc);
+    this.placingBuilding = BuildingCode.NONE;
+  }
+
+  void addBuilding(BuildingCode b, Cell loc) {
+    switch (b) {
+      case FARM:
+        this.buildings.add(new Farm(loc));
+        break;
+      case HOVEL:
+        this.buildings.add(new Hovel(loc));
+        break;
+      case SAWMILL:
+        this.buildings.add(new Sawmill(loc));
+        break;
+      case STOCKPILE:
+        this.buildings.add(new Stockpile(loc));
+        break;
     }
   }
 
