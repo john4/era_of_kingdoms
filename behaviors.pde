@@ -247,3 +247,86 @@ class DropOff extends Task {
     return FAIL;
   }
 }
+
+class TargetEnemy extends Task {
+  TargetEnemy(Blackboard bb, int radius) {
+    this.blackboard = bb;
+    this.blackboard.put("Radius", radius);
+  }
+
+  int execute() {
+    Soldier s = (Soldier) this.blackboard.get("Human");
+    int r = (int) this.blackboard.get("Radius");
+
+    // Already have a live target?
+    Human mark = (Human) s.blackboard.get("Mark");
+    if (mark != null && mark.health > 0) {
+      if (state.humanPlayer.combatMode == CombatMode.DEFENSIVE && s.assignedBuilding.loc.euclideanDistanceTo(mark.loc) > r) {
+        s.blackboard.put("Mark", null);
+      }
+
+      return SUCCESS;
+    }
+
+    mark = null;
+
+    // Picking an enemy prioritizes soldiers over citizens, closest first
+    ArrayList<Soldier> enemySoldiers = state.computerPlayer.soldiers;
+    ArrayList<Citizen> enemyCitizens = state.computerPlayer.citizens;
+
+    float shortestDistance = 99999;
+
+    if (enemySoldiers.size() > 0) {
+      mark = enemySoldiers.get(0);
+      shortestDistance = s.loc.euclideanDistanceTo(mark.loc);
+
+      for (Soldier enemySoldier : enemySoldiers) {
+        if (s.assignedBuilding.loc.euclideanDistanceTo(enemySoldier.loc) < shortestDistance) {
+          mark = enemySoldier;
+        }
+      }
+    }
+
+    if (state.humanPlayer.combatMode == CombatMode.DEFENSIVE && shortestDistance > r) {
+      mark = null;
+    }
+
+    if (mark == null && enemyCitizens.size() > 0) {
+      mark = enemyCitizens.get(0);
+      shortestDistance = s.loc.euclideanDistanceTo(mark.loc);
+
+      for (Citizen enemyCitizen : enemyCitizens) {
+        if (s.assignedBuilding.loc.euclideanDistanceTo(enemyCitizen.loc) < shortestDistance) {
+          mark = enemyCitizen;
+        }
+      }
+    }
+
+    if (state.humanPlayer.combatMode == CombatMode.DEFENSIVE && shortestDistance > r) {
+      mark = null;
+    }
+
+    s.blackboard.put("Mark", mark);
+
+    return mark == null ? FAIL : SUCCESS;
+  }
+}
+
+// TODO: soldiers should probably give up at some point
+class AttackEnemy extends Task {
+  AttackEnemy(Blackboard bb) {
+    this.blackboard = bb;
+  }
+
+  int execute() {
+    Soldier s = (Soldier) this.blackboard.get("Human");
+    Human mark = (Human) s.blackboard.get("Mark");
+
+    if (mark == null) {
+      return FAIL;
+    }
+
+    s.moveTo(mark.pos.x, mark.pos.y);
+    return SUCCESS;
+  }
+}

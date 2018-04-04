@@ -16,6 +16,7 @@ class PlayerState {
   int oreSupply;
 
   BuildingCode placingBuilding;
+  CombatMode combatMode;
 
   PlayerState() {
     // Assumes map has been generated
@@ -33,7 +34,6 @@ class PlayerState {
       int townCol = int(random(boardMap.numCols));
       if (boardMap.cells[townRow][townCol].terraintype == 0) {
         buildings.add(new TownSquare(boardMap.cells[townRow][townCol]));
-        buildings.add(new Farm(boardMap.cells[townRow - 2][townCol - 2]));
         break;
       }
     }
@@ -41,7 +41,9 @@ class PlayerState {
     foodSupply = 12;
     lumberSupply = 12;
     populationCapacity = 5;
+
     placingBuilding = BuildingCode.NONE;
+    combatMode = CombatMode.DEFENSIVE;
 
     int cellSize = boardMap.gridsize;
     int rows = boardMap.numRows;
@@ -66,6 +68,8 @@ class PlayerState {
       birthIndex += STEP_BIRTH;
     }
 
+    this.handleHealth();
+
     gameStateIndex += 1;
   }
 
@@ -78,6 +82,55 @@ class PlayerState {
     }
     for (Soldier soldier : soldiers) {
       soldier.draw();
+    }
+  }
+
+  void setCombatMode(CombatMode cm) {
+    this.combatMode = cm;
+  }
+
+  /**
+   *  If any of our people are in the same cell as an enemy soldier, take damage.
+   *  If any of our people reach health 0, they die.
+   */
+  void handleHealth() {
+    ArrayList<Cell> enemySoldierLocs = new ArrayList<Cell>();
+
+    for (Soldier soldier : state.getSoldiers()) {
+      if (!this.soldiers.contains(soldier)) {
+        enemySoldierLocs.add(soldier.loc);
+      }
+    }
+
+    ArrayList<Citizen> deadCitizens = new ArrayList<Citizen>();
+    ArrayList<Soldier> deadSoldiers = new ArrayList<Soldier>();
+
+    for (Citizen citizen : this.citizens) {
+      if (enemySoldierLocs.contains(citizen.loc)) {
+        citizen.health -= 0.5;
+      }
+
+      if (citizen.health <= 0) {
+        deadCitizens.add(citizen);
+      }
+    }
+
+    for (Soldier soldier : this.soldiers) {
+      if (enemySoldierLocs.contains(soldier.loc)) {
+        soldier.health -= 0.5;
+      }
+
+      if (soldier.health <= 0) {
+        deadSoldiers.add(soldier);
+      }
+    }
+
+    for (Citizen c : deadCitizens) {
+      this.citizens.remove(c);
+    }
+
+    for (Soldier s : deadSoldiers) {
+      this.soldiers.remove(s);
     }
   }
 

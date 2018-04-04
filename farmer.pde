@@ -5,7 +5,6 @@ class Farmer extends Citizen {
     super(initialLocation, buildingAssignment, ownerState);
     this.c = new int[]{176,56,30};
     this.crop = null;
-    this.btree = new Plant(this.blackboard);
 
     Task[] farmerSequenceItems = new Task[3];
     farmerSequenceItems[0] = new Plant(this.blackboard);

@@ -34,4 +34,11 @@ class GameState {
     results.addAll(computerPlayer.buildings);
     return results;
   }
+
+  ArrayList<Soldier> getSoldiers() {
+    ArrayList<Soldier> results = new ArrayList<Soldier>();
+    results.addAll(humanPlayer.soldiers);
+    results.addAll(computerPlayer.soldiers);
+    return results;
+  }
 }

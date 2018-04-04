@@ -18,6 +18,8 @@ class UserInterface {
     targets.add(new RemoveMinerTarget());
     targets.add(new AddSoldierTarget());
     targets.add(new RemoveSoldierTarget());
+    targets.add(new SetSoldierOffensiveTarget());
+    targets.add(new SetSoldierDefensiveTarget());
 
     ArrayList<ATarget> buildTargets = new ArrayList<ATarget>();
     buildTargets.add(new BuildFarmTarget());

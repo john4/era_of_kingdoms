@@ -22,6 +22,6 @@ class Crop extends Building {
   }
 
   void draw() {
-    image(this.img, this.loc.x + 1, this.loc.y + 1);
+    image(this.img, this.loc.x, this.loc.y, 10, 10);
   }
 }
