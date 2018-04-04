@@ -76,10 +76,10 @@ class Cell {
     buildings.add(building);
   }
 
-  boolean hasImpass() {
+  boolean hasImpass(Building b) {
     for (Building building : buildings) {
       if (building.impassable) {
-        return true;
+        return !building.equals(b);
       }
     }
     return false;
@@ -121,7 +121,7 @@ class Cell {
     while (openSet.size() > 0) {
       Cell toCheck = openSet.get(0);
       openSet.remove(0);
-      
+
       if (toCheck == null) {
         continue;
       }

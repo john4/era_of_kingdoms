@@ -222,7 +222,7 @@ class BoardMap {
       if (n.cell == to) {
         return n;
       }
-      if (n.cell.hasImpass() && n.cell != from) {
+      if (n.cell.hasImpass(null) && n.cell != from) {
         continue;
       }
 

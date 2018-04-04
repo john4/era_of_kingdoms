@@ -20,6 +20,7 @@ class Crop extends Building {
     super(initialLocation, "Crop");
     this.img = loadImage("carrot.png");
     this.farmer = null;
+    this.impassable = false;
   }
 
   void draw() {
