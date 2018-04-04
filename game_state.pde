@@ -18,6 +18,12 @@ class GameState {
   }
 
   void draw() {
+    if (state.humanPlayer.placingBuilding != BuildingCode.NONE) {
+      for (Panel p : userInterface.panels) {
+        p.isVisible = false;
+      }
+    }
+
     humanPlayer.draw();
     computerPlayer.draw();
   }

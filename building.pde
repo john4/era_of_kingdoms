@@ -18,3 +18,7 @@ abstract class Building extends WorldlyObject {
     return this.name;
   }
 }
+
+enum BuildingCode {
+  NONE, FARM, HOVEL, SAWMILL, STOCKPILE;
+}

@@ -121,6 +121,10 @@ class Cell {
     while (openSet.size() > 0) {
       Cell toCheck = openSet.get(0);
       openSet.remove(0);
+      
+      if (toCheck == null) {
+        continue;
+      }
 
       if (toCheck.terraintype == terrain && !cellsWithBuildings.contains(toCheck)) {
         return toCheck;
