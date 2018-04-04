@@ -198,6 +198,7 @@ class Gather extends Task {
 
       if (target == null) {
         target = c.loc.findClosestOfType(terrain);
+        this.blackboard.put("Target", target);
       }
 
       c.moveTo(target.pos.x, target.pos.y);

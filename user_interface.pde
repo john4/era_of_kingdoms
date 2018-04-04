@@ -52,9 +52,9 @@ class UserInterface {
     }
 
     String resources = "Food: " + state.foodSupply + "  Lumber: " + state.lumberSupply +
-      "  Population: " + (state.citizens.size() + state.soldiers.size()) + "  Farmers: " +
-      farmerCount + "  Lumberjacks: " + lumberjackCount + "  Miners: " + minerCount +
-      "  Soldiers: " + state.soldiers.size();
+      "  Ore: " + state.oreSupply + "  Population: " + (state.citizens.size() +
+      state.soldiers.size()) + "  Farmers: " + farmerCount + "  Lumberjacks: " + lumberjackCount +
+      "  Miners: " + minerCount + "  Soldiers: " + state.soldiers.size();
 
     fill(255);
     rect(-boardMap.xo,-boardMap.yo, rows*cellSize,20);

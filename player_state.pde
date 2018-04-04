@@ -141,7 +141,7 @@ class PlayerState {
   void addMiner() {
     Citizen freeCitizen = getFreeCitizen();
     if (freeCitizen != null) {
-      citizens.add(new Miner(freeCitizen.loc, buildings.get(1), this));
+      citizens.add(new Miner(freeCitizen.loc, buildings.get(0), this));
       citizens.remove(freeCitizen);
     }
   }
