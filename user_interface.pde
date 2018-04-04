@@ -16,7 +16,11 @@ class UserInterface {
     targets.add(new PopulationTarget());
     targets.add(new SoldierTarget());
 
-    panels.add(new Panel(200, boardMap.numCols*boardMap.gridsize-200,boardMap.numRows*boardMap.gridsize-400, targets));
+    ArrayList<ITarget> buildTargets = new ArrayList<ITarget>();
+    buildTargets.add(new FarmerTarget());
+
+    panels.add(new Panel(200, boardMap.numCols*boardMap.gridsize-200,boardMap.numRows*boardMap.gridsize-400, targets, 0, 0, 255));
+    panels.add(new Panel(400, boardMap.numCols * boardMap.gridsize - 200, boardMap.numRows * boardMap.gridsize - 400, buildTargets, 255, 0, 0));
   }
 
   void draw(PlayerState state) {
@@ -60,13 +64,11 @@ class UserInterface {
     rect(-boardMap.xo,-boardMap.yo, rows*cellSize,20);
     rect(mouseX + 10- boardMap.xo, mouseY-10- boardMap.yo, cursor.length() * 8,20);
     rect(rows*cellSize-200-boardMap.xo,40-boardMap.yo,200,max(messages.size()*60, 40));
+
     // control panel
     for(Panel panel : panels) {
       panel.draw();
     }
-
-    fill(0,255,255);
-    rect(200-boardMap.xo, cols*cellSize-20-boardMap.yo,20,20);
 
     fill(0);
     text(cursor, mouseX + 10- boardMap.xo, mouseY + 2.5- boardMap.yo);

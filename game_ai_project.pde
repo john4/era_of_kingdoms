@@ -39,11 +39,16 @@ void mouseClicked() {
   int y = mouseY/cellSize;
   int rows = boardMap.numRows;
   int cols = boardMap.numCols;
-  if(200 < mouseX && mouseX < 220 && cols*cellSize-20 < mouseY && mouseY < cols*cellSize) {
-    userInterface.panels.get(0).isVisible = !userInterface.panels.get(0).isVisible;
-  }
 
-  for(Panel panel: userInterface.panels) {
+  // if(200 < mouseX && mouseX < 220 && cols*cellSize-20 < mouseY && mouseY < cols*cellSize) {
+  //   userInterface.panels.get(0).isVisible = !userInterface.panels.get(0).isVisible;
+  // }
+
+  for (Panel panel : userInterface.panels) {
+    if (panel.inPanelToggle(mouseX, mouseY)) {
+      panel.toggleVisible();
+    }
+
     panel.click();
   }
 }
