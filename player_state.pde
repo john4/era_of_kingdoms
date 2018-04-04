@@ -47,7 +47,7 @@ class PlayerState {
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
   }
-
+int c = 0;
   void step(double gameStateIndex) {
     // Iterate states of all Humans, update game stats (food levels, etc.)
 
@@ -60,10 +60,14 @@ class PlayerState {
 
     // Births
     // TODO: add new citizens at hovels if we have any
-    if (citizens.size() + soldiers.size() < populationCapacity && gameStateIndex >= birthIndex) {
+    if (true || citizens.size() + soldiers.size() < populationCapacity && gameStateIndex >= birthIndex) {
+      if(c>30) {
+        return;
+      }
       citizens.add(new FreeCitizen(buildings.get(0).loc, buildings.get(0), this));
       // citizens.add(new FreeCitizen(boardMap.cells[int(random(boardMap.numRows))][int(random(boardMap.numCols))], buildings.get(0)));
       birthIndex += STEP_BIRTH;
+      c++;
     }
 
     gameStateIndex += 1;
