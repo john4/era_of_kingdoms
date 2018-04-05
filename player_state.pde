@@ -245,8 +245,9 @@ class PlayerState {
 
   void addSoldier() {
     Citizen freeCitizen = getFreeCitizen();
-    if (freeCitizen != null) {
-      soldiers.add(new Soldier(freeCitizen.loc, getTownSquare(), this));
+    if (freeCitizen != null && buildings.get(BuildingCode.BARRACKS).size() > 0) {
+      Barracks targetBarracks = (Barracks) buildings.get(BuildingCode.BARRACKS).get(rng.nextInt(buildings.get(BuildingCode.BARRACKS).size()));
+      soldiers.add(new Soldier(freeCitizen.loc, targetBarracks, this));
       citizens.remove(freeCitizen);
     }
   }
@@ -259,8 +260,9 @@ class PlayerState {
 
   void addMiner() {
     Citizen freeCitizen = getFreeCitizen();
-    if (freeCitizen != null) {
-      citizens.add(new Miner(freeCitizen.loc, getTownSquare(), this));
+    if (freeCitizen != null && buildings.get(BuildingCode.FOUNDRY).size() > 0) {
+      Foundry targetFoundry = (Foundry) buildings.get(BuildingCode.FOUNDRY).get(rng.nextInt(buildings.get(BuildingCode.FOUNDRY).size()));
+      citizens.add(new Miner(freeCitizen.loc, targetFoundry, this));
       citizens.remove(freeCitizen);
     }
   }
