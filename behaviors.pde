@@ -285,13 +285,13 @@ class DropOff extends Task {
       // Once we're there, drop off our stuff
       switch (resource) {
         case "Lumber":
-          c.ownerState.lumberSupply += c.carryWeight;
+          c.ownerState.adjustResource(ResourceCode.LUMBER, c.carryWeight);
           break;
         case "Food":
           c.ownerState.foodSupply += c.carryWeight;
           break;
         case "Metal":
-          c.ownerState.metalSupply += c.carryWeight;
+          c.ownerState.adjustResource(ResourceCode.METAL, c.carryWeight);
           break;
       }
 

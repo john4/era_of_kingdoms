@@ -131,7 +131,7 @@ class BuildFarmTarget extends ATarget {
   }
 
   void clicked() {
-    state.humanPlayer.placingBuilding = BuildingCode.FARM;
+    state.humanPlayer.requestPlacingBuilding(BuildingCode.FARM);
   }
 }
 
@@ -141,7 +141,7 @@ class BuildHovelTarget extends ATarget {
   }
 
   void clicked() {
-    state.humanPlayer.placingBuilding = BuildingCode.HOVEL;
+    state.humanPlayer.requestPlacingBuilding(BuildingCode.HOVEL);
   }
 }
 
@@ -151,7 +151,7 @@ class BuildSawmillTarget extends ATarget {
   }
 
   void clicked() {
-    state.humanPlayer.placingBuilding = BuildingCode.SAWMILL;
+    state.humanPlayer.requestPlacingBuilding(BuildingCode.SAWMILL);
   }
 }
 
@@ -161,7 +161,7 @@ class BuildStockpileTarget extends ATarget {
   }
 
   void clicked() {
-    state.humanPlayer.placingBuilding = BuildingCode.STOCKPILE;
+    state.humanPlayer.requestPlacingBuilding(BuildingCode.STOCKPILE);
   }
 }
 

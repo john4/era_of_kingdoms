@@ -69,8 +69,8 @@ class UserInterface {
       }
     }
 
-    String resources = "Food: " + state.foodSupply + "  Lumber: " + state.lumberSupply +
-      "  Metal: " + state.metalSupply + "  Population Capacity: " + state.populationCapacity +
+    String resources = "Food: " + state.foodSupply + "  Lumber: " + state.resourceSupply.get(ResourceCode.LUMBER) +
+      "  Metal: " + state.resourceSupply.get(ResourceCode.METAL) + "  Population Capacity: " + state.populationCapacity +
       "  Free Citizens: " + freeCitizenCount + "  Farmers: " + farmerCount + "  Lumberjacks: " + lumberjackCount +
       "  Miners: " + minerCount + "  Soldiers: " + state.soldiers.size();
 

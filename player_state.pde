@@ -1,9 +1,10 @@
 class PlayerState {
-  int STEP_FOOD_DEPLETION = 1000;
-  int STEP_BIRTH = 2000;
-  int HOVEL_CAPACITY = 3;
+  final int STEP_FOOD_DEPLETION = 1000;
+  final int STEP_BIRTH = 2000;
+  final int HOVEL_CAPACITY = 2;
   // int STEP_BIRTH = 100;  // for testing purposes
 
+  HashMap<BuildingCode, HashMap<ResourceCode, Integer>> BUILDING_COSTS = new BuildingCosts().costs;
   HashMap<BuildingCode, ArrayList<Building>> buildings;
   ArrayList<Citizen> citizens;
   ArrayList<Soldier> soldiers;
@@ -12,9 +13,8 @@ class PlayerState {
   double birthIndex;
 
   int foodSupply;
-  int lumberSupply;
   int populationCapacity;
-  int metalSupply;
+  HashMap<ResourceCode, Integer> resourceSupply;
 
   BuildingCode placingBuilding;
   CombatMode combatMode;
@@ -43,7 +43,10 @@ class PlayerState {
     }
 
     foodSupply = 12;
-    lumberSupply = 12;
+    resourceSupply = new HashMap<ResourceCode, Integer>();
+    resourceSupply.put(ResourceCode.LUMBER, 18);
+    resourceSupply.put(ResourceCode.METAL, 6);
+
     updatePopulationCapacity();
     placingBuilding = BuildingCode.NONE;
     combatMode = CombatMode.DEFENSIVE;
@@ -89,6 +92,26 @@ class PlayerState {
     for (Soldier soldier : soldiers) {
       soldier.draw();
     }
+  }
+
+  void adjustResource(ResourceCode resource, int value) {
+    resourceSupply.put(resource, resourceSupply.get(resource) + value);
+  }
+
+  boolean requestPlacingBuilding(BuildingCode buildingCode) {
+    HashMap<ResourceCode, Integer> cost = BUILDING_COSTS.get(buildingCode);
+
+    for (ResourceCode c : ResourceCode.values()) {
+      if (resourceSupply.get(c) < cost.get(c)) {
+        return false;
+      }
+    }
+
+    for (ResourceCode c : ResourceCode.values()) {
+      adjustResource(c, -cost.get(c));
+    }
+    this.placingBuilding = buildingCode;
+    return true;
   }
 
   void setCombatMode(CombatMode cm) {
@@ -278,6 +301,6 @@ class PlayerState {
   }
 
   void updatePopulationCapacity() {
-    populationCapacity = HOVEL_CAPACITY * buildings.get(BuildingCode.HOVEL).size() + 2;
+    populationCapacity = HOVEL_CAPACITY * buildings.get(BuildingCode.HOVEL).size();
   }
 }
