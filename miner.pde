@@ -5,7 +5,7 @@ class Miner extends Citizen {
 
     Task[] gatherSequenceItems = new Task[2];
     gatherSequenceItems[0] = new Gather(this.blackboard, 1);
-    gatherSequenceItems[1] = new DropOff(this.blackboard, "Ore");
+    gatherSequenceItems[1] = new DropOff(this.blackboard, "Metal");
     this.btree = new Sequence(this.blackboard, gatherSequenceItems);
   }
 

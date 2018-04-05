@@ -167,6 +167,43 @@ class Harvest extends Task {
   }
 }
 
+class Process extends Task {
+  Process(Blackboard bb) {
+    this.blackboard = bb;
+    this.blackboard.put("ProcessingTimeSpent", 0);
+    this.blackboard.put("ProcessingLastTick", millis());
+  }
+
+  int execute() {
+    Citizen c = (Citizen) this.blackboard.get("Human");
+    Cell target = c.assignedBuilding.loc;
+    int timeSpent = (int) this.blackboard.get("ProcessingTimeSpent");
+    int lastTick = (int) this.blackboard.get("ProcessingLastTick");
+
+    if (timeSpent > 10 || c.blackboard.get("Stage") == "DropOff") {
+      this.blackboard.put("ProcessingTimeSpent", 0);
+      c.blackboard.put("Stage", "DropOff");
+      return SUCCESS;
+    }
+
+    // Check to see if we've arrived at home cell
+    PVector direction = PVector.sub(target.pos, c.pos);
+    float distance = direction.mag();
+
+    // If we're there, wait until we've finished processing our stuff
+    if (distance < c.TARGET_RADIUS) {
+      if (millis() - lastTick >= GATHER_SPEED * 1000) {
+        this.blackboard.put("ProcessingLastTick", millis());
+        this.blackboard.put("ProcessingTimeSpent", timeSpent + 1);
+        return FAIL;
+      }
+    }
+
+    c.moveTo(target.pos.x, target.pos.y);
+    return FAIL;
+  }
+}
+
 class Gather extends Task {
   Gather(Blackboard bb, int terrain) {
     this.blackboard = bb;
@@ -218,6 +255,7 @@ class DropOff extends Task {
   int execute() {
     Citizen c = (Citizen) this.blackboard.get("Human");
     String resource = (String) this.blackboard.get("Resource");
+    // TODO: we want to go to the correct / nearest stockpile
     Cell target = c.assignedBuilding.loc;
 
     // Check to see if we've arrived at home cell
@@ -233,12 +271,13 @@ class DropOff extends Task {
         case "Food":
           c.ownerState.foodSupply += c.carryWeight;
           break;
-        case "Ore":
-          c.ownerState.oreSupply += c.carryWeight;
+        case "Metal":
+          c.ownerState.metalSupply += c.carryWeight;
           break;
       }
 
       c.setCarryWeight(0);
+      c.blackboard.put("Stage", "Gather");
       return SUCCESS;
     }
 
