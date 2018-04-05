@@ -13,6 +13,10 @@ abstract class ATarget {
   }
 }
 
+/************************************************************************
+ * Citizen Panel Targets                                                *
+ ************************************************************************/
+
 class AddLumberjackTarget extends ATarget {
   AddLumberjackTarget() {
     super("+ Lumberjack");
@@ -97,6 +101,30 @@ class RemoveMinerTarget extends ATarget {
     }
 }
 
+class SetSoldierOffensiveTarget extends ATarget {
+  SetSoldierOffensiveTarget() {
+    super("Offensive Mode");
+  }
+
+  void clicked() {
+    state.humanPlayer.setCombatMode(CombatMode.OFFENSIVE);
+  }
+}
+
+class SetSoldierDefensiveTarget extends ATarget {
+  SetSoldierDefensiveTarget() {
+    super("Defensive Mode");
+  }
+
+  void clicked() {
+    state.humanPlayer.setCombatMode(CombatMode.DEFENSIVE);
+  }
+}
+
+/************************************************************************
+ * Build Panel Targets                                                  *
+ ************************************************************************/
+
 class BuildFarmTarget extends ATarget {
   BuildFarmTarget() {
     super("+ Farm");
@@ -116,6 +144,7 @@ class BuildHovelTarget extends ATarget {
     state.humanPlayer.placingBuilding = BuildingCode.HOVEL;
   }
 }
+
 class BuildSawmillTarget extends ATarget {
   BuildSawmillTarget() {
     super("+ Sawmill");
@@ -125,6 +154,7 @@ class BuildSawmillTarget extends ATarget {
     state.humanPlayer.placingBuilding = BuildingCode.SAWMILL;
   }
 }
+
 class BuildStockpileTarget extends ATarget {
   BuildStockpileTarget() {
     super("+ Stockpile");
@@ -132,5 +162,25 @@ class BuildStockpileTarget extends ATarget {
 
   void clicked() {
     state.humanPlayer.placingBuilding = BuildingCode.STOCKPILE;
+  }
+}
+
+class BuildBarracksTarget extends ATarget {
+  BuildBarracksTarget() {
+    super("+ Barracks");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.BARRACKS;
+  }
+}
+
+class BuildFoundryTarget extends ATarget {
+  BuildFoundryTarget() {
+    super("+ Foundry");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.FOUNDRY;
   }
 }

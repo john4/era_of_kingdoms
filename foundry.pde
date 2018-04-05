@@ -1,9 +1,9 @@
-class Sawmill extends Building {
+class Foundry extends Building {
   PImage img;
 
-  Sawmill(Cell initialLocation) {
+  Foundry(Cell initialLocation) {
     super(initialLocation, "Sawmill");
-    this.img = loadImage("sawblade.png");
+    this.img = loadImage("pick.png");
   }
 
   void draw() {
