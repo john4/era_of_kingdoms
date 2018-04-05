@@ -4,7 +4,7 @@
 // Final Project
 //
 // John Martin, Arianna Tang, Nicholas Lailler
-//
+
 
 import java.util.Random;
 
@@ -21,6 +21,7 @@ PotentialPathNode path;
 
 void setup() {
   size(960, 540);
+  noSmooth();
   boardMap = new BoardMap(960, 540, CELL_SIZE);
   boardMap.generate();
   state = new GameState();

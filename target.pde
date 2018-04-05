@@ -13,6 +13,10 @@ abstract class ATarget {
   }
 }
 
+/************************************************************************
+ * Citizen Panel Targets                                                *
+ ************************************************************************/
+
 class AddLumberjackTarget extends ATarget {
   AddLumberjackTarget() {
     super("+ Lumberjack");
@@ -97,13 +101,37 @@ class RemoveMinerTarget extends ATarget {
     }
 }
 
+class SetSoldierOffensiveTarget extends ATarget {
+  SetSoldierOffensiveTarget() {
+    super("Offensive Mode");
+  }
+
+  void clicked() {
+    state.humanPlayer.setCombatMode(CombatMode.OFFENSIVE);
+  }
+}
+
+class SetSoldierDefensiveTarget extends ATarget {
+  SetSoldierDefensiveTarget() {
+    super("Defensive Mode");
+  }
+
+  void clicked() {
+    state.humanPlayer.setCombatMode(CombatMode.DEFENSIVE);
+  }
+}
+
+/************************************************************************
+ * Build Panel Targets                                                  *
+ ************************************************************************/
+
 class BuildFarmTarget extends ATarget {
   BuildFarmTarget() {
     super("+ Farm");
   }
 
   void clicked() {
-    state.humanPlayer.placingBuilding = BuildingCode.FARM;
+    state.humanPlayer.requestPlacingBuilding(BuildingCode.FARM);
   }
 }
 
@@ -113,24 +141,46 @@ class BuildHovelTarget extends ATarget {
   }
 
   void clicked() {
-    state.humanPlayer.placingBuilding = BuildingCode.HOVEL;
+    state.humanPlayer.requestPlacingBuilding(BuildingCode.HOVEL);
   }
 }
+
 class BuildSawmillTarget extends ATarget {
   BuildSawmillTarget() {
     super("+ Sawmill");
   }
 
   void clicked() {
-    state.humanPlayer.placingBuilding = BuildingCode.SAWMILL;
+    state.humanPlayer.requestPlacingBuilding(BuildingCode.SAWMILL);
   }
 }
+
 class BuildStockpileTarget extends ATarget {
   BuildStockpileTarget() {
     super("+ Stockpile");
   }
 
   void clicked() {
-    state.humanPlayer.placingBuilding = BuildingCode.STOCKPILE;
+    state.humanPlayer.requestPlacingBuilding(BuildingCode.STOCKPILE);
+  }
+}
+
+class BuildBarracksTarget extends ATarget {
+  BuildBarracksTarget() {
+    super("+ Barracks");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.BARRACKS;
+  }
+}
+
+class BuildFoundryTarget extends ATarget {
+  BuildFoundryTarget() {
+    super("+ Foundry");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.FOUNDRY;
   }
 }

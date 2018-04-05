@@ -2,22 +2,36 @@ class GameState {
   PlayerState humanPlayer;
   PlayerState computerPlayer;
   double gameStateIndex;
+  boolean isGameOver;
 
   GameState() {
-    humanPlayer = new PlayerState();
-    computerPlayer = new PlayerState();
+    humanPlayer = new PlayerState(new int[] { 255, 215, 0 });
+    computerPlayer = new PlayerState(new int[] { 128, 0, 0 });
 
     gameStateIndex = 0;
+    isGameOver = false;
   }
 
   void step() {
-    humanPlayer.step(gameStateIndex);
-    computerPlayer.step(gameStateIndex);
+    if (!isGameOver) {
+      humanPlayer.step(gameStateIndex);
+      computerPlayer.step(gameStateIndex);
 
-    gameStateIndex += 1;
+      if (humanPlayer.foodSupply < 1) {
+        isGameOver = true;
+      }
+
+      gameStateIndex += 1;
+    }
   }
 
   void draw() {
+    if (isGameOver) {
+      textSize(4);
+      text("YOUR PEOPLE STARVED", width / 2, height / 2);
+      return;
+    }
+
     if (state.humanPlayer.placingBuilding != BuildingCode.NONE) {
       for (Panel p : userInterface.panels) {
         p.isVisible = false;
@@ -32,6 +46,13 @@ class GameState {
     ArrayList<Building> results = new ArrayList<Building>();
     results.addAll(humanPlayer.getBuildings());
     results.addAll(computerPlayer.getBuildings());
+    return results;
+  }
+
+  ArrayList<Soldier> getSoldiers() {
+    ArrayList<Soldier> results = new ArrayList<Soldier>();
+    results.addAll(humanPlayer.soldiers);
+    results.addAll(computerPlayer.soldiers);
     return results;
   }
 }

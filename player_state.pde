@@ -1,9 +1,10 @@
 class PlayerState {
-  int STEP_FOOD_DEPLETION = 1000;
-  int STEP_BIRTH = 2000;
-  int HOVEL_CAPACITY = 3;
+  final int STEP_FOOD_DEPLETION = 1000;
+  final int STEP_BIRTH = 2000;
+  final int HOVEL_CAPACITY = 2;
   // int STEP_BIRTH = 100;  // for testing purposes
 
+  HashMap<BuildingCode, HashMap<ResourceCode, Integer>> BUILDING_COSTS = new BuildingCosts().costs;
   HashMap<BuildingCode, ArrayList<Building>> buildings;
   ArrayList<Citizen> citizens;
   ArrayList<Soldier> soldiers;
@@ -12,13 +13,13 @@ class PlayerState {
   double birthIndex;
 
   int foodSupply;
-  int lumberSupply;
   int populationCapacity;
-  int oreSupply;
+  HashMap<ResourceCode, Integer> resourceSupply;
 
   BuildingCode placingBuilding;
+  CombatMode combatMode;
 
-  PlayerState() {
+  PlayerState(int[] rgb) {
     // Assumes map has been generated
     // Place town square, add initial Humans and supplies
     buildings = new HashMap<BuildingCode, ArrayList<Building>>();
@@ -36,16 +37,19 @@ class PlayerState {
       int townRow = int(random(boardMap.numRows));
       int townCol = int(random(boardMap.numCols));
       if (boardMap.cells[townRow][townCol].terraintype == 0) {
-        buildings.get(BuildingCode.TOWNSQUARE).add(new TownSquare(boardMap.cells[townRow][townCol]));
-        // buildings.add(new Farm(boardMap.cells[townRow - 2][townCol - 2]));
+        buildings.get(BuildingCode.TOWNSQUARE).add(new TownSquare(boardMap.cells[townRow][townCol], rgb));
         break;
       }
     }
 
     foodSupply = 12;
-    lumberSupply = 12;
+    resourceSupply = new HashMap<ResourceCode, Integer>();
+    resourceSupply.put(ResourceCode.LUMBER, 18);
+    resourceSupply.put(ResourceCode.METAL, 6);
+
     updatePopulationCapacity();
     placingBuilding = BuildingCode.NONE;
+    combatMode = CombatMode.DEFENSIVE;
 
     int cellSize = boardMap.gridsize;
     int rows = boardMap.numRows;
@@ -74,6 +78,8 @@ class PlayerState {
       // c++;
     }
 
+    this.handleHealth();
+
     gameStateIndex += 1;
   }
 
@@ -86,6 +92,75 @@ class PlayerState {
     }
     for (Soldier soldier : soldiers) {
       soldier.draw();
+    }
+  }
+
+  void adjustResource(ResourceCode resource, int value) {
+    resourceSupply.put(resource, resourceSupply.get(resource) + value);
+  }
+
+  boolean requestPlacingBuilding(BuildingCode buildingCode) {
+    HashMap<ResourceCode, Integer> cost = BUILDING_COSTS.get(buildingCode);
+
+    for (ResourceCode c : ResourceCode.values()) {
+      if (resourceSupply.get(c) < cost.get(c)) {
+        return false;
+      }
+    }
+
+    for (ResourceCode c : ResourceCode.values()) {
+      adjustResource(c, -cost.get(c));
+    }
+    this.placingBuilding = buildingCode;
+    return true;
+  }
+
+  void setCombatMode(CombatMode cm) {
+    this.combatMode = cm;
+  }
+
+  /**
+   *  If any of our people are in the same cell as an enemy soldier, take damage.
+   *  If any of our people reach health 0, they die.
+   */
+  void handleHealth() {
+    ArrayList<Cell> enemySoldierLocs = new ArrayList<Cell>();
+
+    for (Soldier soldier : state.getSoldiers()) {
+      if (!this.soldiers.contains(soldier)) {
+        enemySoldierLocs.add(soldier.loc);
+      }
+    }
+
+    ArrayList<Citizen> deadCitizens = new ArrayList<Citizen>();
+    ArrayList<Soldier> deadSoldiers = new ArrayList<Soldier>();
+
+    for (Citizen citizen : this.citizens) {
+      if (enemySoldierLocs.contains(citizen.loc)) {
+        citizen.health -= 0.5;
+      }
+
+      if (citizen.health <= 0) {
+        deadCitizens.add(citizen);
+      }
+    }
+
+    for (Soldier soldier : this.soldiers) {
+      if (enemySoldierLocs.contains(soldier.loc)) {
+        soldier.health -= 0.5;
+      }
+
+      if (soldier.health <= 0) {
+        deadSoldiers.add(soldier);
+      }
+    }
+
+    for (Citizen c : deadCitizens) {
+      this.citizens.remove(c);
+    }
+
+    for (Soldier s : deadSoldiers) {
+      this.soldiers.remove(s);
     }
   }
 
@@ -111,10 +186,16 @@ class PlayerState {
         newBuilding = new Stockpile(loc);
         break;
       case TOWNSQUARE:
-        newBuilding = new TownSquare(loc);
+        newBuilding = new TownSquare(loc, new int[] { 255, 255, 255 });
         break;
       case CROP:
         newBuilding = new Crop(loc);
+        break;
+      case FOUNDRY:
+        newBuilding = new Foundry(loc);
+        break;
+      case BARRACKS:
+        newBuilding = new Barracks(loc);
         break;
       default:
         return null;
@@ -188,8 +269,9 @@ class PlayerState {
 
   void addSoldier() {
     Citizen freeCitizen = getFreeCitizen();
-    if (freeCitizen != null) {
-      soldiers.add(new Soldier(freeCitizen.loc, getTownSquare(), this));
+    if (freeCitizen != null && buildings.get(BuildingCode.BARRACKS).size() > 0) {
+      Barracks targetBarracks = (Barracks) buildings.get(BuildingCode.BARRACKS).get(rng.nextInt(buildings.get(BuildingCode.BARRACKS).size()));
+      soldiers.add(new Soldier(freeCitizen.loc, targetBarracks, this));
       citizens.remove(freeCitizen);
     }
   }
@@ -202,8 +284,9 @@ class PlayerState {
 
   void addMiner() {
     Citizen freeCitizen = getFreeCitizen();
-    if (freeCitizen != null) {
-      citizens.add(new Miner(freeCitizen.loc, getTownSquare(), this));
+    if (freeCitizen != null && buildings.get(BuildingCode.FOUNDRY).size() > 0) {
+      Foundry targetFoundry = (Foundry) buildings.get(BuildingCode.FOUNDRY).get(rng.nextInt(buildings.get(BuildingCode.FOUNDRY).size()));
+      citizens.add(new Miner(freeCitizen.loc, targetFoundry, this));
       citizens.remove(freeCitizen);
     }
   }
@@ -219,6 +302,6 @@ class PlayerState {
   }
 
   void updatePopulationCapacity() {
-    populationCapacity = HOVEL_CAPACITY * buildings.get(BuildingCode.HOVEL).size() + 2;
+    populationCapacity = HOVEL_CAPACITY * buildings.get(BuildingCode.HOVEL).size();
   }
 }

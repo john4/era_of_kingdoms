@@ -166,6 +166,43 @@ class Harvest extends Task {
   }
 }
 
+class Process extends Task {
+  Process(Blackboard bb) {
+    this.blackboard = bb;
+    this.blackboard.put("ProcessingTimeSpent", 0);
+    this.blackboard.put("ProcessingLastTick", millis());
+  }
+
+  int execute() {
+    Citizen c = (Citizen) this.blackboard.get("Human");
+    Cell target = c.assignedBuilding.loc;
+    int timeSpent = (int) this.blackboard.get("ProcessingTimeSpent");
+    int lastTick = (int) this.blackboard.get("ProcessingLastTick");
+
+    if (timeSpent > 10 || c.blackboard.get("Stage") == "DropOff") {
+      this.blackboard.put("ProcessingTimeSpent", 0);
+      c.blackboard.put("Stage", "DropOff");
+      return SUCCESS;
+    }
+
+    // Check to see if we've arrived at home cell
+    PVector direction = PVector.sub(target.pos, c.pos);
+    float distance = direction.mag();
+
+    // If we're there, wait until we've finished processing our stuff
+    if (distance < c.TARGET_RADIUS) {
+      if (millis() - lastTick >= GATHER_SPEED * 1000) {
+        this.blackboard.put("ProcessingLastTick", millis());
+        this.blackboard.put("ProcessingTimeSpent", timeSpent + 1);
+        return FAIL;
+      }
+    }
+
+    c.moveTo(target.pos.x, target.pos.y);
+    return FAIL;
+  }
+}
+
 class Gather extends Task {
   Gather(Blackboard bb, int terrain) {
     this.blackboard = bb;
@@ -212,12 +249,33 @@ class DropOff extends Task {
   DropOff(Blackboard bb, String resource) {
     this.blackboard = bb;
     this.blackboard.put("Resource", resource);
+    this.blackboard.put("Target", null);
   }
 
   int execute() {
     Citizen c = (Citizen) this.blackboard.get("Human");
     String resource = (String) this.blackboard.get("Resource");
-    Cell target = c.assignedBuilding.loc;
+    Cell target = (Cell) this.blackboard.get("Target");
+
+    if (target == null) {
+      // We want to go to the correct / nearest stockpile
+      ArrayList<Building> stockpiles = c.ownerState.buildings.get(BuildingCode.STOCKPILE);
+      float dist = 999999;
+      float newDist = 999999;
+
+      for (Building b : stockpiles) {
+        newDist = b.loc.euclideanDistanceTo(c.loc);
+
+        if (newDist < dist) {
+          dist = newDist;
+          target = b.loc;
+        }
+      }
+    }
+
+    if (target == null) {
+      return FAIL;
+    }
 
     // Check to see if we've arrived at home cell
     PVector direction = PVector.sub(target.pos, c.pos);
@@ -227,22 +285,107 @@ class DropOff extends Task {
       // Once we're there, drop off our stuff
       switch (resource) {
         case "Lumber":
-          c.ownerState.lumberSupply += c.carryWeight;
+          c.ownerState.adjustResource(ResourceCode.LUMBER, c.carryWeight);
           break;
         case "Food":
           c.ownerState.foodSupply += c.carryWeight;
           break;
-        case "Ore":
-          c.ownerState.oreSupply += c.carryWeight;
+        case "Metal":
+          c.ownerState.adjustResource(ResourceCode.METAL, c.carryWeight);
           break;
       }
 
       c.setCarryWeight(0);
+      c.blackboard.put("Stage", "Gather");
+      this.blackboard.put("Target", null);
       return SUCCESS;
     }
 
     // If not, keep movin
     c.moveTo(target.pos.x, target.pos.y);
     return FAIL;
+  }
+}
+
+class TargetEnemy extends Task {
+  TargetEnemy(Blackboard bb, int radius) {
+    this.blackboard = bb;
+    this.blackboard.put("Radius", radius);
+  }
+
+  int execute() {
+    Soldier s = (Soldier) this.blackboard.get("Human");
+    int r = (int) this.blackboard.get("Radius");
+
+    // Already have a live target?
+    Human mark = (Human) s.blackboard.get("Mark");
+    if (mark != null && mark.health > 0) {
+      if (state.humanPlayer.combatMode == CombatMode.DEFENSIVE && s.assignedBuilding.loc.euclideanDistanceTo(mark.loc) > r) {
+        s.blackboard.put("Mark", null);
+      }
+
+      return SUCCESS;
+    }
+
+    mark = null;
+
+    // Picking an enemy prioritizes soldiers over citizens, closest first
+    ArrayList<Soldier> enemySoldiers = state.computerPlayer.soldiers;
+    ArrayList<Citizen> enemyCitizens = state.computerPlayer.citizens;
+
+    float shortestDistance = 99999;
+
+    if (enemySoldiers.size() > 0) {
+      mark = enemySoldiers.get(0);
+      shortestDistance = s.loc.euclideanDistanceTo(mark.loc);
+
+      for (Soldier enemySoldier : enemySoldiers) {
+        if (s.assignedBuilding.loc.euclideanDistanceTo(enemySoldier.loc) < shortestDistance) {
+          mark = enemySoldier;
+        }
+      }
+    }
+
+    if (state.humanPlayer.combatMode == CombatMode.DEFENSIVE && shortestDistance > r) {
+      mark = null;
+    }
+
+    if (mark == null && enemyCitizens.size() > 0) {
+      mark = enemyCitizens.get(0);
+      shortestDistance = s.loc.euclideanDistanceTo(mark.loc);
+
+      for (Citizen enemyCitizen : enemyCitizens) {
+        if (s.assignedBuilding.loc.euclideanDistanceTo(enemyCitizen.loc) < shortestDistance) {
+          mark = enemyCitizen;
+        }
+      }
+    }
+
+    if (state.humanPlayer.combatMode == CombatMode.DEFENSIVE && shortestDistance > r) {
+      mark = null;
+    }
+
+    s.blackboard.put("Mark", mark);
+
+    return mark == null ? FAIL : SUCCESS;
+  }
+}
+
+// TODO: soldiers should probably give up at some point
+class AttackEnemy extends Task {
+  AttackEnemy(Blackboard bb) {
+    this.blackboard = bb;
+  }
+
+  int execute() {
+    Soldier s = (Soldier) this.blackboard.get("Human");
+    Human mark = (Human) s.blackboard.get("Mark");
+
+    if (mark == null) {
+      return FAIL;
+    }
+
+    s.moveTo(mark.pos.x, mark.pos.y);
+    return SUCCESS;
   }
 }
