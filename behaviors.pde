@@ -127,10 +127,9 @@ class Plant extends Task {
     if (!target.isIn(f.pos.x, f.pos.y)) {
       f.moveTo(target.pos.x, target.pos.y);
     } else {    // Plant some freaking crops
-      Crop newCrop = new Crop(target);
+      Crop newCrop = (Crop) f.ownerState.addBuilding(BuildingCode.CROP, target);
       newCrop.farmer = f;
       f.crop = newCrop;
-      f.ownerState.buildings.add(newCrop);
       this.blackboard.put("Crop", newCrop);
     }
 
