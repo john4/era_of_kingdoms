@@ -4,6 +4,7 @@ class Stockpile extends Building {
   Stockpile(Cell initialLocation) {
     super(initialLocation, "Stockpile");
     this.img = loadImage("crate.png");
+    this.impassable = false;
   }
 
   void draw() {
