@@ -2,10 +2,11 @@ abstract class Building extends WorldlyObject {
   int[] c = new int[3];
   String name;
 
-  Building(Cell initialLocation, String name) {
-    super(initialLocation);
+  Building(Cell location, String name) {
+    super(location);
     this.c = new int[]{20, 20, 20};
     this.name = name;
+    location.addBuilding(this);
   }
 
   void draw() {

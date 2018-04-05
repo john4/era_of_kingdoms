@@ -67,15 +67,19 @@ class Cell {
     }
   }
 
-// Returns true if the given position is within the bounds of this cell
+  // Returns true if the given position is within the bounds of this cell
   boolean isIn(float posX, float posY) {
     return x < posX && posX < x + gridsize && y < posY && posY < y + gridsize;
   }
 
-  boolean hasImpass() {
+  void addBuilding(Building building) {
+    buildings.add(building);
+  }
+
+  boolean hasImpass(Building b) {
     for (Building building : buildings) {
       if (building.impassable) {
-        return true;
+        return !building.equals(b);
       }
     }
     return false;
@@ -117,7 +121,7 @@ class Cell {
     while (openSet.size() > 0) {
       Cell toCheck = openSet.get(0);
       openSet.remove(0);
-      
+
       if (toCheck == null) {
         continue;
       }

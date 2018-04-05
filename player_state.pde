@@ -55,7 +55,7 @@ class PlayerState {
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
   }
-
+// int c = 0;
   void step(double gameStateIndex) {
     // Iterate states of all Humans, update game stats (food levels, etc.)
 
@@ -75,6 +75,7 @@ class PlayerState {
       Hovel targetHovel = (Hovel) buildings.get(BuildingCode.HOVEL).get(rng.nextInt(buildings.get(BuildingCode.HOVEL).size()));
       citizens.add(new FreeCitizen(targetHovel.loc, this.getTownSquare(), this));
       birthIndex += STEP_BIRTH;
+      // c++;
     }
 
     this.handleHealth();

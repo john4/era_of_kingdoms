@@ -3,6 +3,7 @@ class Sawmill extends Building {
 
   Sawmill(Cell initialLocation) {
     super(initialLocation, "Sawmill");
+    this.impassable = true;
     this.img = loadImage("sawblade.png");
   }
 

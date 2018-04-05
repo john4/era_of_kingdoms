@@ -79,6 +79,20 @@ abstract class Human extends WorldlyObject {
       acceleration.mult(MAX_ACCELERATION);
     }
 
+    // Calculate new position
+    PVector pos = this.pos.copy();
+    PVector ray = this.vel.copy();
+    ray.setMag(CELL_SIZE/2);
+
+    pos.add(ray);
+    Cell c = boardMap.cellAtPos(pos);
+    if(c.hasImpass(assignedBuilding)){
+      ray.rotate(PI/2 + random(-PI/16,PI/16));
+      ray.setMag(.2);
+      this.vel.add(ray);
+    }
+
+
     // Calculate new character velocity
     this.vel.add(acceleration);
 
@@ -87,5 +101,6 @@ abstract class Human extends WorldlyObject {
 
     // Update this character's cell location
     this.loc = boardMap.cellAtPos(this.pos);
+
   }
 }

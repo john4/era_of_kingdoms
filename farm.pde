@@ -3,6 +3,7 @@ class Farm extends Building {
 
   Farm(Cell initialLocation) {
     super(initialLocation, "Farm");
+    this.impassable = true;
     this.img = loadImage("farm.png");
   }
 
@@ -19,6 +20,7 @@ class Crop extends Building {
     super(initialLocation, "Crop");
     this.img = loadImage("carrot.png");
     this.farmer = null;
+    this.impassable = false;
   }
 
   void draw() {
