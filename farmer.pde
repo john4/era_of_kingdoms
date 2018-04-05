@@ -5,12 +5,12 @@ class Farmer extends Citizen {
     super(initialLocation, buildingAssignment, ownerState);
     this.c = new int[]{176,56,30};
     this.crop = null;
-    this.btree = new Plant(this.blackboard);
 
-    Task[] farmerSequenceItems = new Task[3];
+    Task[] farmerSequenceItems = new Task[4];
     farmerSequenceItems[0] = new Plant(this.blackboard);
     farmerSequenceItems[1] = new Harvest(this.blackboard);
-    farmerSequenceItems[2] = new DropOff(this.blackboard, "Food");
+    farmerSequenceItems[2] = new Process(this.blackboard);
+    farmerSequenceItems[3] = new DropOff(this.blackboard, "Food");
     this.btree = new Sequence(this.blackboard, farmerSequenceItems);
   }
 

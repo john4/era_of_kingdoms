@@ -17,8 +17,9 @@ class PlayerState {
   HashMap<ResourceCode, Integer> resourceSupply;
 
   BuildingCode placingBuilding;
+  CombatMode combatMode;
 
-  PlayerState() {
+  PlayerState(int[] rgb) {
     // Assumes map has been generated
     // Place town square, add initial Humans and supplies
     buildings = new HashMap<BuildingCode, ArrayList<Building>>();
@@ -36,7 +37,7 @@ class PlayerState {
       int townRow = int(random(boardMap.numRows));
       int townCol = int(random(boardMap.numCols));
       if (boardMap.cells[townRow][townCol].terraintype == 0) {
-        buildings.get(BuildingCode.TOWNSQUARE).add(new TownSquare(boardMap.cells[townRow][townCol]));
+        buildings.get(BuildingCode.TOWNSQUARE).add(new TownSquare(boardMap.cells[townRow][townCol], rgb));
         break;
       }
     }
@@ -44,10 +45,11 @@ class PlayerState {
     foodSupply = 12;
     resourceSupply = new HashMap<ResourceCode, Integer>();
     resourceSupply.put(ResourceCode.LUMBER, 18);
-    resourceSupply.put(ResourceCode.ORE, 6);
+    resourceSupply.put(ResourceCode.METAL, 6);
 
     updatePopulationCapacity();
     placingBuilding = BuildingCode.NONE;
+    combatMode = CombatMode.DEFENSIVE;
 
     int cellSize = boardMap.gridsize;
     int rows = boardMap.numRows;
@@ -74,6 +76,8 @@ class PlayerState {
       citizens.add(new FreeCitizen(targetHovel.loc, this.getTownSquare(), this));
       birthIndex += STEP_BIRTH;
     }
+
+    this.handleHealth();
 
     gameStateIndex += 1;
   }
@@ -110,6 +114,55 @@ class PlayerState {
     return true;
   }
 
+  void setCombatMode(CombatMode cm) {
+    this.combatMode = cm;
+  }
+
+  /**
+   *  If any of our people are in the same cell as an enemy soldier, take damage.
+   *  If any of our people reach health 0, they die.
+   */
+  void handleHealth() {
+    ArrayList<Cell> enemySoldierLocs = new ArrayList<Cell>();
+
+    for (Soldier soldier : state.getSoldiers()) {
+      if (!this.soldiers.contains(soldier)) {
+        enemySoldierLocs.add(soldier.loc);
+      }
+    }
+
+    ArrayList<Citizen> deadCitizens = new ArrayList<Citizen>();
+    ArrayList<Soldier> deadSoldiers = new ArrayList<Soldier>();
+
+    for (Citizen citizen : this.citizens) {
+      if (enemySoldierLocs.contains(citizen.loc)) {
+        citizen.health -= 0.5;
+      }
+
+      if (citizen.health <= 0) {
+        deadCitizens.add(citizen);
+      }
+    }
+
+    for (Soldier soldier : this.soldiers) {
+      if (enemySoldierLocs.contains(soldier.loc)) {
+        soldier.health -= 0.5;
+      }
+
+      if (soldier.health <= 0) {
+        deadSoldiers.add(soldier);
+      }
+    }
+
+    for (Citizen c : deadCitizens) {
+      this.citizens.remove(c);
+    }
+
+    for (Soldier s : deadSoldiers) {
+      this.soldiers.remove(s);
+    }
+  }
+
   void placeBuilding(Cell loc) {
     this.addBuilding(this.placingBuilding, loc);
     this.placingBuilding = BuildingCode.NONE;
@@ -132,10 +185,16 @@ class PlayerState {
         newBuilding = new Stockpile(loc);
         break;
       case TOWNSQUARE:
-        newBuilding = new TownSquare(loc);
+        newBuilding = new TownSquare(loc, new int[] { 255, 255, 255 });
         break;
       case CROP:
         newBuilding = new Crop(loc);
+        break;
+      case FOUNDRY:
+        newBuilding = new Foundry(loc);
+        break;
+      case BARRACKS:
+        newBuilding = new Barracks(loc);
         break;
       default:
         return null;
@@ -209,8 +268,9 @@ class PlayerState {
 
   void addSoldier() {
     Citizen freeCitizen = getFreeCitizen();
-    if (freeCitizen != null) {
-      soldiers.add(new Soldier(freeCitizen.loc, getTownSquare(), this));
+    if (freeCitizen != null && buildings.get(BuildingCode.BARRACKS).size() > 0) {
+      Barracks targetBarracks = (Barracks) buildings.get(BuildingCode.BARRACKS).get(rng.nextInt(buildings.get(BuildingCode.BARRACKS).size()));
+      soldiers.add(new Soldier(freeCitizen.loc, targetBarracks, this));
       citizens.remove(freeCitizen);
     }
   }
@@ -223,8 +283,9 @@ class PlayerState {
 
   void addMiner() {
     Citizen freeCitizen = getFreeCitizen();
-    if (freeCitizen != null) {
-      citizens.add(new Miner(freeCitizen.loc, getTownSquare(), this));
+    if (freeCitizen != null && buildings.get(BuildingCode.FOUNDRY).size() > 0) {
+      Foundry targetFoundry = (Foundry) buildings.get(BuildingCode.FOUNDRY).get(rng.nextInt(buildings.get(BuildingCode.FOUNDRY).size()));
+      citizens.add(new Miner(freeCitizen.loc, targetFoundry, this));
       citizens.remove(freeCitizen);
     }
   }

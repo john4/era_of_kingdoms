@@ -19,11 +19,11 @@ abstract class Building extends WorldlyObject {
 }
 
 enum BuildingCode {
-  NONE, FARM, CROP, HOVEL, SAWMILL, STOCKPILE, TOWNSQUARE;
+  NONE, FARM, CROP, HOVEL, SAWMILL, STOCKPILE, TOWNSQUARE, FOUNDRY, BARRACKS;
 }
 
 enum ResourceCode {
-  LUMBER, ORE;
+  LUMBER, METAL;
 }
 
 class BuildingCosts {
@@ -32,19 +32,19 @@ class BuildingCosts {
   BuildingCosts() {
     HashMap<ResourceCode, Integer> free = new HashMap<ResourceCode, Integer>();
     free.put(ResourceCode.LUMBER, 0);
-    free.put(ResourceCode.ORE, 0);
+    free.put(ResourceCode.METAL, 0);
 
     HashMap<ResourceCode, Integer> farm = new HashMap<ResourceCode, Integer>();
     farm.put(ResourceCode.LUMBER, 12);
-    farm.put(ResourceCode.ORE, 0);
+    farm.put(ResourceCode.METAL, 0);
 
     HashMap<ResourceCode, Integer> sawmill = new HashMap<ResourceCode, Integer>();
     sawmill.put(ResourceCode.LUMBER, 16);
-    sawmill.put(ResourceCode.ORE, 4);
+    sawmill.put(ResourceCode.METAL, 4);
 
     HashMap<ResourceCode, Integer> hovel = new HashMap<ResourceCode, Integer>();
     hovel.put(ResourceCode.LUMBER, 4);
-    hovel.put(ResourceCode.ORE, 0);
+    hovel.put(ResourceCode.METAL, 0);
 
 
     costs = new HashMap<BuildingCode, HashMap<ResourceCode, Integer>>();

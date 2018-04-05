@@ -5,8 +5,8 @@ class GameState {
   boolean isGameOver;
 
   GameState() {
-    humanPlayer = new PlayerState();
-    computerPlayer = new PlayerState();
+    humanPlayer = new PlayerState(new int[] { 255, 215, 0 });
+    computerPlayer = new PlayerState(new int[] { 128, 0, 0 });
 
     gameStateIndex = 0;
     isGameOver = false;
@@ -28,7 +28,7 @@ class GameState {
   void draw() {
     if (isGameOver) {
       textSize(4);
-      text("YOUR PEOPLE STARVED", this.pos.x, this.pos.y);
+      text("YOUR PEOPLE STARVED", width / 2, height / 2);
       return;
     }
 
@@ -46,6 +46,13 @@ class GameState {
     ArrayList<Building> results = new ArrayList<Building>();
     results.addAll(humanPlayer.getBuildings());
     results.addAll(computerPlayer.getBuildings());
+    return results;
+  }
+
+  ArrayList<Soldier> getSoldiers() {
+    ArrayList<Soldier> results = new ArrayList<Soldier>();
+    results.addAll(humanPlayer.soldiers);
+    results.addAll(computerPlayer.soldiers);
     return results;
   }
 }
