@@ -167,6 +167,12 @@ class PlayerState {
       case CROP:
         newBuilding = new Crop(loc);
         break;
+      case FOUNDRY:
+        newBuilding = new Foundry(loc);
+        break;
+      case BARRACKS:
+        newBuilding = new Barracks(loc);
+        break;
       default:
         return null;
     }

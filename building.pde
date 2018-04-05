@@ -19,5 +19,5 @@ abstract class Building extends WorldlyObject {
 }
 
 enum BuildingCode {
-  NONE, FARM, CROP, HOVEL, SAWMILL, STOCKPILE, TOWNSQUARE;
+  NONE, FARM, CROP, HOVEL, SAWMILL, STOCKPILE, TOWNSQUARE, FOUNDRY, BARRACKS;
 }

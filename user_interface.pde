@@ -26,6 +26,8 @@ class UserInterface {
     buildTargets.add(new BuildHovelTarget());
     buildTargets.add(new BuildSawmillTarget());
     buildTargets.add(new BuildStockpileTarget());
+    buildTargets.add(new BuildBarracksTarget());
+    buildTargets.add(new BuildFoundryTarget());
 
     panels.add(new Panel(200, boardMap.numCols*boardMap.gridsize-200,boardMap.numRows*boardMap.gridsize-400, targets, 0, 0, 255));
     panels.add(new Panel(400, boardMap.numCols * boardMap.gridsize - 200, boardMap.numRows * boardMap.gridsize - 400, buildTargets, 255, 0, 0));

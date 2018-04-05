@@ -164,3 +164,23 @@ class BuildStockpileTarget extends ATarget {
     state.humanPlayer.placingBuilding = BuildingCode.STOCKPILE;
   }
 }
+
+class BuildBarracksTarget extends ATarget {
+  BuildBarracksTarget() {
+    super("+ Barracks");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.BARRACKS;
+  }
+}
+
+class BuildFoundryTarget extends ATarget {
+  BuildFoundryTarget() {
+    super("+ Foundry");
+  }
+
+  void clicked() {
+    state.humanPlayer.placingBuilding = BuildingCode.FOUNDRY;
+  }
+}
