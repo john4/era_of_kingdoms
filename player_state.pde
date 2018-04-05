@@ -217,11 +217,8 @@ class PlayerState {
       }
     }
   }
-<<<<<<< HEAD
-=======
 
   void updatePopulationCapacity() {
     populationCapacity = HOVEL_CAPACITY * buildings.get(BuildingCode.HOVEL).size() + 2;
   }
->>>>>>> master
 }
