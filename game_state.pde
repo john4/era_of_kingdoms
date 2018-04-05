@@ -2,22 +2,36 @@ class GameState {
   PlayerState humanPlayer;
   PlayerState computerPlayer;
   double gameStateIndex;
+  boolean isGameOver;
 
   GameState() {
     humanPlayer = new PlayerState();
     computerPlayer = new PlayerState();
 
     gameStateIndex = 0;
+    isGameOver = false;
   }
 
   void step() {
-    humanPlayer.step(gameStateIndex);
-    computerPlayer.step(gameStateIndex);
+    if (!isGameOver) {
+      humanPlayer.step(gameStateIndex);
+      computerPlayer.step(gameStateIndex);
 
-    gameStateIndex += 1;
+      if (humanPlayer.foodSupply < 1) {
+        isGameOver = true;
+      }
+
+      gameStateIndex += 1;
+    }
   }
 
   void draw() {
+    if (isGameOver) {
+      textSize(4);
+      text("YOUR PEOPLE STARVED", this.pos.x, this.pos.y);
+      return;
+    }
+
     if (state.humanPlayer.placingBuilding != BuildingCode.NONE) {
       for (Panel p : userInterface.panels) {
         p.isVisible = false;
