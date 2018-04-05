@@ -63,16 +63,6 @@ class PlayerState {
     }
 
     // Births
-<<<<<<< HEAD
-    // TODO: add new citizens at hovels if we have any
-    // add a true here and uncomment counter code to quickly generate citizens
-    if (citizens.size() + soldiers.size() < populationCapacity && gameStateIndex >= birthIndex) {
-      // if(c>30) {
-      //   return;
-      // }
-      citizens.add(new FreeCitizen(buildings.get(0).loc, buildings.get(0), this));
-      // citizens.add(new FreeCitizen(boardMap.cells[int(random(boardMap.numRows))][int(random(boardMap.numCols))], buildings.get(0)));
-=======
     if (
       citizens.size() + soldiers.size() < populationCapacity &&  // population isn't at capacity
       gameStateIndex >= birthIndex &&  // enough time has elapsed for a birth
@@ -80,7 +70,6 @@ class PlayerState {
     ) {
       Hovel targetHovel = (Hovel) buildings.get(BuildingCode.HOVEL).get(rng.nextInt(buildings.get(BuildingCode.HOVEL).size()));
       citizens.add(new FreeCitizen(targetHovel.loc, this.getTownSquare(), this));
->>>>>>> master
       birthIndex += STEP_BIRTH;
       // c++;
     }
