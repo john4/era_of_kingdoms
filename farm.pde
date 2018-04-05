@@ -1,13 +1,13 @@
 class Farm extends Building {
+  PImage img;
+
   Farm(Cell initialLocation) {
     super(initialLocation, "Farm");
+    this.img = loadImage("farm.png");
   }
 
   void draw() {
-    super.draw();
-    fill(255, 255, 255);
-    textSize(4);
-    text("F", this.pos.x, this.pos.y);
+    image(this.img, this.loc.x + 1, this.loc.y + 1);
   }
 }
 

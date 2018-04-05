@@ -14,12 +14,12 @@ class PlayerState {
   int foodSupply;
   int lumberSupply;
   int populationCapacity;
-  int oreSupply;
+  int metalSupply;
 
   BuildingCode placingBuilding;
   CombatMode combatMode;
 
-  PlayerState() {
+  PlayerState(int[] rgb) {
     // Assumes map has been generated
     // Place town square, add initial Humans and supplies
     buildings = new HashMap<BuildingCode, ArrayList<Building>>();
@@ -37,7 +37,7 @@ class PlayerState {
       int townRow = int(random(boardMap.numRows));
       int townCol = int(random(boardMap.numCols));
       if (boardMap.cells[townRow][townCol].terraintype == 0) {
-        buildings.get(BuildingCode.TOWNSQUARE).add(new TownSquare(boardMap.cells[townRow][townCol]));
+        buildings.get(BuildingCode.TOWNSQUARE).add(new TownSquare(boardMap.cells[townRow][townCol], rgb));
         break;
       }
     }
@@ -162,7 +162,7 @@ class PlayerState {
         newBuilding = new Stockpile(loc);
         break;
       case TOWNSQUARE:
-        newBuilding = new TownSquare(loc);
+        newBuilding = new TownSquare(loc, new int[] { 255, 255, 255 });
         break;
       case CROP:
         newBuilding = new Crop(loc);

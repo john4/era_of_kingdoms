@@ -249,13 +249,33 @@ class DropOff extends Task {
   DropOff(Blackboard bb, String resource) {
     this.blackboard = bb;
     this.blackboard.put("Resource", resource);
+    this.blackboard.put("Target", null);
   }
 
   int execute() {
     Citizen c = (Citizen) this.blackboard.get("Human");
     String resource = (String) this.blackboard.get("Resource");
-    // TODO: we want to go to the correct / nearest stockpile
-    Cell target = c.assignedBuilding.loc;
+    Cell target = (Cell) this.blackboard.get("Target");
+
+    if (target == null) {
+      // We want to go to the correct / nearest stockpile
+      ArrayList<Building> stockpiles = c.ownerState.buildings.get(BuildingCode.STOCKPILE);
+      float dist = 999999;
+      float newDist = 999999;
+
+      for (Building b : stockpiles) {
+        newDist = b.loc.euclideanDistanceTo(c.loc);
+
+        if (newDist < dist) {
+          dist = newDist;
+          target = b.loc;
+        }
+      }
+    }
+
+    if (target == null) {
+      return FAIL;
+    }
 
     // Check to see if we've arrived at home cell
     PVector direction = PVector.sub(target.pos, c.pos);
@@ -277,6 +297,7 @@ class DropOff extends Task {
 
       c.setCarryWeight(0);
       c.blackboard.put("Stage", "Gather");
+      this.blackboard.put("Target", null);
       return SUCCESS;
     }
 

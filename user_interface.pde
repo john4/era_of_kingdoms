@@ -68,7 +68,7 @@ class UserInterface {
     }
 
     String resources = "Food: " + state.foodSupply + "  Lumber: " + state.lumberSupply +
-      "  Metal: " + state.metalSupply + "  Population: " + (state.citizens.size() + state.soldiers.size()) +
+      "  Metal: " + state.metalSupply + "  Population Capacity: " + state.populationCapacity +
       "  Free Citizens: " + freeCitizenCount + "  Farmers: " + farmerCount + "  Lumberjacks: " + lumberjackCount +
       "  Miners: " + minerCount + "  Soldiers: " + state.soldiers.size();
 

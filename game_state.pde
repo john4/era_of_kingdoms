@@ -4,8 +4,8 @@ class GameState {
   double gameStateIndex;
 
   GameState() {
-    humanPlayer = new PlayerState();
-    computerPlayer = new PlayerState();
+    humanPlayer = new PlayerState(new int[] { 255, 215, 0 });
+    computerPlayer = new PlayerState(new int[] { 128, 0, 0 });
 
     gameStateIndex = 0;
   }
