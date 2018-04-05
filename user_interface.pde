@@ -43,7 +43,7 @@ class UserInterface {
     if(x >= 0 && x < rows && y >= 0 && y < cols) {
       terrain = hoveredCell.getTerrainName();
     }
-    for(Building building : state.buildings) {
+    for(Building building : state.getBuildings()) {
       if (building.loc.isIn(mouseX-boardMap.xo,mouseY-boardMap.yo)) {
         terrain += ", " + building.getName();
       }

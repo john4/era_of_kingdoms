@@ -6,11 +6,15 @@
 // John Martin, Arianna Tang, Nicholas Lailler
 
 
+import java.util.Random;
+
 BoardMap boardMap;
 GameState state;
 UserInterface userInterface;
 boolean showControlPanel = true;
 final int CELL_SIZE = 10;
+
+Random rng = new Random();
 
 // temp
 PotentialPathNode path;
