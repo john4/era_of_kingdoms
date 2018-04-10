@@ -38,6 +38,7 @@ class UserInterface {
     int y = mouseY/cellSize;
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
+
     Cell hoveredCell = boardMap.cells[x][y];
     if(x >= 0 && x < rows && y >= 0 && y < cols) {
       terrain = hoveredCell.getTerrainName();
@@ -90,7 +91,7 @@ class UserInterface {
       messageStr += message.message + "\n\n";
     }
 
-    PFont font = createFont("AmericanTypewriter-Bold-48.vlw", 14);
+    PFont font = loadFont("AmericanTypewriter-Bold-14.vlw");
     textFont(font);
     text(messageStr, 20, 40 - boardMap.yo, 200, 1000);
 
