@@ -104,6 +104,7 @@ class PlayerState {
 
     for (ResourceCode c : ResourceCode.values()) {
       if (resourceSupply.get(c) < cost.get(c)) {
+        userInterface.messageQueue.add(new Message("Not enough " + c.toString() + " to build a " + buildingCode.toString(), state.gameStateIndex+FRAME_RATE*5));
         return false;
       }
     }
@@ -231,7 +232,11 @@ class PlayerState {
 
   void addLumberjack() {
     Citizen freeCitizen = getFreeCitizen();
-    if (freeCitizen != null && buildings.get(BuildingCode.SAWMILL).size() > 0) {
+    if (freeCitizen == null) {
+      userInterface.messageQueue.add(new Message("Can't add a lumberjack: Not enough free citizens!", state.gameStateIndex+FRAME_RATE*5));
+    } else if (buildings.get(BuildingCode.SAWMILL).size() < 1) {
+      userInterface.messageQueue.add(new Message("Can't add a lumberjack: Need a sawmill!", state.gameStateIndex+FRAME_RATE*5));
+    } else {
       Sawmill targetSawmill = (Sawmill) buildings.get(BuildingCode.SAWMILL).get(rng.nextInt(buildings.get(BuildingCode.SAWMILL).size()));
       citizens.add(new Lumberjack(freeCitizen.loc, targetSawmill, this));
       citizens.remove(freeCitizen);
@@ -250,7 +255,11 @@ class PlayerState {
 
   void addFarmer() {
     Citizen freeCitizen = getFreeCitizen();
-    if (freeCitizen != null && buildings.get(BuildingCode.FARM).size() > 0) {
+    if (freeCitizen == null) {
+      userInterface.messageQueue.add(new Message("Can't add a farmer: Not enough free citizens!", state.gameStateIndex+FRAME_RATE*5));
+    } else if (buildings.get(BuildingCode.FARM).size() < 1) {
+      userInterface.messageQueue.add(new Message("Can't add a farmer: Need a farm!", state.gameStateIndex+FRAME_RATE*5));
+    } else {
       Farm targetFarm = (Farm) buildings.get(BuildingCode.FARM).get(rng.nextInt(buildings.get(BuildingCode.FARM).size()));
       citizens.add(new Farmer(freeCitizen.loc, targetFarm, this));
       citizens.remove(freeCitizen);
@@ -269,7 +278,11 @@ class PlayerState {
 
   void addSoldier() {
     Citizen freeCitizen = getFreeCitizen();
-    if (freeCitizen != null && buildings.get(BuildingCode.BARRACKS).size() > 0) {
+    if (freeCitizen == null) {
+      userInterface.messageQueue.add(new Message("Can't add a soldier: Not enough free citizens!", state.gameStateIndex+FRAME_RATE*5));
+    } else if (buildings.get(BuildingCode.BARRACKS).size() < 1) {
+      userInterface.messageQueue.add(new Message("Can't add a soldier: Need a barracks!", state.gameStateIndex+FRAME_RATE*5));
+    } else {
       Barracks targetBarracks = (Barracks) buildings.get(BuildingCode.BARRACKS).get(rng.nextInt(buildings.get(BuildingCode.BARRACKS).size()));
       soldiers.add(new Soldier(freeCitizen.loc, targetBarracks, this));
       citizens.remove(freeCitizen);
@@ -284,7 +297,11 @@ class PlayerState {
 
   void addMiner() {
     Citizen freeCitizen = getFreeCitizen();
-    if (freeCitizen != null && buildings.get(BuildingCode.FOUNDRY).size() > 0) {
+    if (freeCitizen == null) {
+      userInterface.messageQueue.add(new Message("Can't add a miner: Not enough free citizens!", state.gameStateIndex+FRAME_RATE*5));
+    } else if (buildings.get(BuildingCode.FOUNDRY).size() < 1) {
+      userInterface.messageQueue.add(new Message("Can't add a miner: Need a foundry!", state.gameStateIndex+FRAME_RATE*5));
+    } else {
       Foundry targetFoundry = (Foundry) buildings.get(BuildingCode.FOUNDRY).get(rng.nextInt(buildings.get(BuildingCode.FOUNDRY).size()));
       citizens.add(new Miner(freeCitizen.loc, targetFoundry, this));
       citizens.remove(freeCitizen);

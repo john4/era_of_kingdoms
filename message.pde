@@ -14,19 +14,15 @@ class MessageQueue {
     } else {
       length++;
     }
-    println("asdf");
     messages.add(message);
   }
 
   public void clean(double currentTime) {
     for(Message message: messages) {
       if(message.expiration < currentTime) {
-        println("cleaned" + message.message);
         messages.remove();
         length--;
       }
-      /* Assumes all messages have the same lifetime so all are naturally
-       ordered by expiration date. */
       return;
     }
   }

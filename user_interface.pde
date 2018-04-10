@@ -6,9 +6,6 @@ class UserInterface {
     messageQueue = new MessageQueue();
     panels = new ArrayList<Panel>();
 
-    messageQueue.add(new Message("Welcome to <insert name here>", 20));
-    messageQueue.add(new Message("Need additional Pylons", 20));
-
     ArrayList<ATarget> targets = new ArrayList<ATarget>();
     targets.add(new AddFarmerTarget());
     targets.add(new RemoveFarmerTarget());
@@ -77,7 +74,6 @@ class UserInterface {
     fill(255);
     rect(-boardMap.xo,-boardMap.yo, rows*cellSize,20);
     rect(mouseX + 10- boardMap.xo, mouseY-10- boardMap.yo, cursor.length() * 8,20);
-    rect(20,40-boardMap.yo,200,max(messageQueue.size()*60, 40));
 
     // control panel
     for(Panel panel : panels) {
@@ -87,12 +83,15 @@ class UserInterface {
     fill(0);
     text(cursor, mouseX + 10- boardMap.xo, mouseY + 2.5- boardMap.yo);
     text(resources, 20 - boardMap.xo,15 - boardMap.yo);
+
+    // Messages
     String messageStr = "";
     for(Message message: messageQueue.messages) {
       messageStr += message.message + "\n\n";
-      //print(message.message);
     }
 
+    PFont font = createFont("AmericanTypewriter-Bold-48.vlw", 14);
+    textFont(font);
     text(messageStr, 20, 40 - boardMap.yo, 200, 1000);
 
     if (state.placingBuilding != BuildingCode.NONE) {

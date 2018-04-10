@@ -47,11 +47,13 @@ void mouseClicked() {
   int y = mouseY/cellSize;
   int rows = boardMap.numRows;
   int cols = boardMap.numCols;
-
-  if (state.humanPlayer.placingBuilding != BuildingCode.NONE) {
+  BuildingCode pB = state.humanPlayer.placingBuilding;
+  if (pB != BuildingCode.NONE) {
     Cell hoveredCell = boardMap.cellAtPos(new PVector(mouseX, mouseY));
     if (boardMap.validBuildingSpot(hoveredCell)) {
       state.humanPlayer.placeBuilding(hoveredCell);
+    } else {
+      userInterface.messageQueue.add(new Message("Cannot place " + pB.toString() + " there!", state.gameStateIndex+FRAME_RATE*5));
     }
   }
 
