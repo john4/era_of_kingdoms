@@ -21,13 +21,20 @@ class GameState {
         isGameOver = true;
       }
 
+      if (gameStateIndex % (FRAME_RATE/2) == 0 && humanPlayer.foodSupply < 20) {
+        userInterface.messageQueue.add(new Message("Your people are starving...", 10*FRAME_RATE + gameStateIndex));
+      }
+
+      if (gameStateIndex % FRAME_RATE == 0) {
+        userInterface.messageQueue.clean(gameStateIndex);
+      }
       gameStateIndex += 1;
     }
   }
 
   void draw() {
     if (isGameOver) {
-      textSize(4);
+      textSize(34);
       text("YOUR PEOPLE STARVED", width / 2, height / 2);
       return;
     }

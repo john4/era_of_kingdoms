@@ -1,13 +1,13 @@
 class UserInterface {
-  ArrayList<Message> messages;
+  MessageQueue messageQueue;
   ArrayList<Panel> panels;
 
   UserInterface() {
-    messages = new ArrayList<Message>();
+    messageQueue = new MessageQueue();
     panels = new ArrayList<Panel>();
 
-    messages.add(new Message("Welcome to <insert name here>", 20));
-    messages.add(new Message("Need additional Pylons", 20));
+    messageQueue.add(new Message("Welcome to <insert name here>", 20));
+    messageQueue.add(new Message("Need additional Pylons", 20));
 
     ArrayList<ATarget> targets = new ArrayList<ATarget>();
     targets.add(new AddFarmerTarget());
@@ -77,7 +77,7 @@ class UserInterface {
     fill(255);
     rect(-boardMap.xo,-boardMap.yo, rows*cellSize,20);
     rect(mouseX + 10- boardMap.xo, mouseY-10- boardMap.yo, cursor.length() * 8,20);
-    rect(rows*cellSize-200-boardMap.xo,40-boardMap.yo,200,max(messages.size()*60, 40));
+    rect(20,40-boardMap.yo,200,max(messageQueue.size()*60, 40));
 
     // control panel
     for(Panel panel : panels) {
@@ -88,11 +88,12 @@ class UserInterface {
     text(cursor, mouseX + 10- boardMap.xo, mouseY + 2.5- boardMap.yo);
     text(resources, 20 - boardMap.xo,15 - boardMap.yo);
     String messageStr = "";
-    for(Message message: messages) {
+    for(Message message: messageQueue.messages) {
       messageStr += message.message + "\n\n";
+      //print(message.message);
     }
 
-    text(messageStr, rows*cellSize-190-boardMap.xo, 40 - boardMap.yo, 200, 1000);
+    text(messageStr, 20, 40 - boardMap.yo, 200, 1000);
 
     if (state.placingBuilding != BuildingCode.NONE) {
       fill(255, 255, 255);

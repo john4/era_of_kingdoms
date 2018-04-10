@@ -5,7 +5,6 @@
 //
 // John Martin, Arianna Tang, Nicholas Lailler
 
-
 import java.util.Random;
 
 BoardMap boardMap;
@@ -13,6 +12,7 @@ GameState state;
 UserInterface userInterface;
 boolean showControlPanel = true;
 final int CELL_SIZE = 10;
+final int FRAME_RATE = 60;
 
 Random rng = new Random();
 
@@ -22,6 +22,7 @@ PotentialPathNode path;
 void setup() {
   size(960, 540);
   noSmooth();
+  frameRate(FRAME_RATE);
   boardMap = new BoardMap(960, 540, CELL_SIZE);
   boardMap.generate();
   state = new GameState();
