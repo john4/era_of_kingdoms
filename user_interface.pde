@@ -38,7 +38,19 @@ class UserInterface {
     int y = mouseY/cellSize;
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
-
+    if (x < 0) {
+     x = 0; 
+    }
+    if (y < 0) {
+      y = 0;
+    }
+    if (x >= boardMap.numRows) {
+      x = boardMap.numRows - 1;
+    }
+    if (y >= boardMap.numCols) {
+      y = boardMap.numCols - 1;
+    }
+    
     Cell hoveredCell = boardMap.cells[x][y];
     if(x >= 0 && x < rows && y >= 0 && y < cols) {
       terrain = hoveredCell.getTerrainName();
