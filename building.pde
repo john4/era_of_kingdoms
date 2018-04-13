@@ -21,10 +21,20 @@ abstract class Building extends WorldlyObject {
 
 enum BuildingCode {
   NONE, FARM, CROP, HOVEL, SAWMILL, STOCKPILE, TOWNSQUARE, FOUNDRY, BARRACKS;
+
+  @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
 }
 
 enum ResourceCode {
   LUMBER, METAL;
+
+  @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
 }
 
 class BuildingCosts {
