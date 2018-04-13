@@ -1,13 +1,10 @@
 class UserInterface {
-  ArrayList<Message> messages;
+  MessageQueue messageQueue;
   ArrayList<Panel> panels;
 
   UserInterface() {
-    messages = new ArrayList<Message>();
+    messageQueue = new MessageQueue();
     panels = new ArrayList<Panel>();
-
-    messages.add(new Message("Welcome to <insert name here>", 20));
-    messages.add(new Message("Need additional Pylons", 20));
 
     ArrayList<ATarget> targets = new ArrayList<ATarget>();
     targets.add(new AddFarmerTarget());
@@ -41,6 +38,19 @@ class UserInterface {
     int y = mouseY/cellSize;
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
+    if (x < 0) {
+     x = 0; 
+    }
+    if (y < 0) {
+      y = 0;
+    }
+    if (x >= boardMap.numRows) {
+      x = boardMap.numRows - 1;
+    }
+    if (y >= boardMap.numCols) {
+      y = boardMap.numCols - 1;
+    }
+    
     Cell hoveredCell = boardMap.cells[x][y];
     if(x >= 0 && x < rows && y >= 0 && y < cols) {
       terrain = hoveredCell.getTerrainName();
@@ -77,7 +87,6 @@ class UserInterface {
     fill(255);
     rect(-boardMap.xo,-boardMap.yo, rows*cellSize,20);
     rect(mouseX + 10- boardMap.xo, mouseY-10- boardMap.yo, cursor.length() * 8,20);
-    rect(rows*cellSize-200-boardMap.xo,40-boardMap.yo,200,max(messages.size()*60, 40));
 
     // control panel
     for(Panel panel : panels) {
@@ -87,12 +96,16 @@ class UserInterface {
     fill(0);
     text(cursor, mouseX + 10- boardMap.xo, mouseY + 2.5- boardMap.yo);
     text(resources, 20 - boardMap.xo,15 - boardMap.yo);
+
+    // Messages
     String messageStr = "";
-    for(Message message: messages) {
+    for(Message message: messageQueue.messages) {
       messageStr += message.message + "\n\n";
     }
 
-    text(messageStr, rows*cellSize-190-boardMap.xo, 40 - boardMap.yo, 200, 1000);
+    PFont font = loadFont("AmericanTypewriter-Bold-14.vlw");
+    textFont(font);
+    text(messageStr, 20, 40 - boardMap.yo, 200, 1000);
 
     if (state.placingBuilding != BuildingCode.NONE) {
       fill(255, 255, 255);
