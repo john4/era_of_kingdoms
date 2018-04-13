@@ -24,12 +24,4 @@ void mouseDragged() {
     boardMap.xo = boardMap.xo + (mouseX - pmouseX);
     boardMap.yo = boardMap.yo + (mouseY - pmouseY);
   }
-
-  if (mouseButton == RIGHT) {
-    if (pmouseY-mouseY > 0) {
-      boardMap.angle -= .005;
-    } else {
-      boardMap.angle += .005;
-    }
-  }
 }
