@@ -337,6 +337,6 @@ class PlayerState {
   }
 
   void updatePopulationCapacity() {
-    populationCapacity = HOVEL_CAPACITY * buildings.get(BuildingCode.HOVEL).size();
+    populationCapacity = HOVEL_CAPACITY * buildings.get(BuildingCode.HOVEL).size() + 2;
   }
 }

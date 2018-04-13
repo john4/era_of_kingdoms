@@ -39,7 +39,7 @@ class UserInterface {
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
     if (x < 0) {
-     x = 0; 
+     x = 0;
     }
     if (y < 0) {
       y = 0;
@@ -50,7 +50,7 @@ class UserInterface {
     if (y >= boardMap.numCols) {
       y = boardMap.numCols - 1;
     }
-    
+
     Cell hoveredCell = boardMap.cells[x][y];
     if(x >= 0 && x < rows && y >= 0 && y < cols) {
       terrain = hoveredCell.getTerrainName();
@@ -66,6 +66,7 @@ class UserInterface {
     int farmerCount = 0;
     int minerCount = 0;
     int freeCitizenCount = 0;
+    int allHumanCount = state.citizens.size() + state.soldiers.size();
 
     for (Citizen c : state.citizens) {
       if (c instanceof Lumberjack) {
@@ -80,7 +81,7 @@ class UserInterface {
     }
 
     String resources = "Food: " + state.foodSupply + "  Lumber: " + state.resourceSupply.get(ResourceCode.LUMBER) +
-      "  Metal: " + state.resourceSupply.get(ResourceCode.METAL) + "  Population Capacity: " + state.populationCapacity +
+      "  Metal: " + state.resourceSupply.get(ResourceCode.METAL) + "  Population: " + allHumanCount + " / " + state.populationCapacity +
       "  Free Citizens: " + freeCitizenCount + "  Farmers: " + farmerCount + "  Lumberjacks: " + lumberjackCount +
       "  Miners: " + minerCount + "  Soldiers: " + state.soldiers.size();
 
