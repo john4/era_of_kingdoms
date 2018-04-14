@@ -38,8 +38,9 @@ class UserInterface {
     int y = mouseY/cellSize;
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
+
     if (x < 0) {
-     x = 0; 
+      x = 0;
     }
     if (y < 0) {
       y = 0;
@@ -50,7 +51,7 @@ class UserInterface {
     if (y >= boardMap.numCols) {
       y = boardMap.numCols - 1;
     }
-    
+
     Cell hoveredCell = boardMap.cells[x][y];
     if(x >= 0 && x < rows && y >= 0 && y < cols) {
       terrain = hoveredCell.getTerrainName();
@@ -105,7 +106,7 @@ class UserInterface {
 
     PFont font = loadFont("AmericanTypewriter-Bold-14.vlw");
     textFont(font);
-    text(messageStr, 20, 40 - boardMap.yo, 200, 1000);
+    text(messageStr, 20 - boardMap.xo, 40 - boardMap.yo, 200, 1000);
 
     if (state.placingBuilding != BuildingCode.NONE) {
       fill(255, 255, 255);
