@@ -34,11 +34,10 @@ class UserInterface {
     textSize(14);
     String terrain = "";
     int cellSize = boardMap.gridsize;
-    int x = mouseX/cellSize;
-    int y = mouseY/cellSize;
+    int x = (int) (mouseX-boardMap.xo)/cellSize;
+    int y = (int) (mouseY-boardMap.yo)/cellSize;
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
-
     if (x < 0) {
       x = 0;
     }

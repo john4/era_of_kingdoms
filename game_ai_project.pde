@@ -48,15 +48,10 @@ void mouseClicked() {
   if (mouseButton == LEFT) {
     System.out.println("Left Click");
 
-    int cellSize = boardMap.gridsize;
-    int x = mouseX/cellSize;
-    int y = mouseY/cellSize;
-    int rows = boardMap.numRows;
-    int cols = boardMap.numCols;
     BuildingCode pB = state.humanPlayer.placingBuilding;
 
     if (pB != BuildingCode.NONE) {
-      Cell hoveredCell = boardMap.cellAtPos(new PVector(mouseX, mouseY));
+      Cell hoveredCell = boardMap.cellAtPos(new PVector(mouseX-boardMap.xo, mouseY-boardMap.yo));
       if (boardMap.validBuildingSpot(hoveredCell)) {
         state.humanPlayer.placeBuilding(hoveredCell);
       } else {
