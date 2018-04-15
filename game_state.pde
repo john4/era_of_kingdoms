@@ -41,9 +41,9 @@ class GameState {
       textSize(34);
 
       if (humanPopulation < 1) {
-        text("YOUR PEOPLE STARVED", width / 2, height / 2);
+        text("YOUR PEOPLE STARVED", 30, height / 2);
       } else {
-        text("YOU DESTROYED THE ENEMY", width / 2, height / 2);
+        text("YOU DESTROYED THE ENEMY", 30, height / 2);
       }
 
       return;
