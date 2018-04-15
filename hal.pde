@@ -5,6 +5,12 @@ class Hal {
   Building townSquare;
   Cell[] cellsNearbyTownSquare;
 
+  // TODO when we have human types: hashmap human type -> golden ratio / 32
+  float goldenFarmers = 14 / 32;
+  float goldenLumberjacks = 4 / 32;
+  float goldenMiners = 4 / 32;
+  float goldenSoldiers = 10 / 32;
+
   HalTask behaviorTree;
 
   Hal(GameState gameState, PlayerState computerState, PlayerState humanState) {
@@ -31,6 +37,21 @@ abstract class HalTask {
   static final int HUMAN_ASSIGN_COOLDOWN = 5;
 }
 
+class AssignNextHuman extends HalTask {
+  PlayerState state;
+
+  AssignNextHuman(PlayerState state) {
+    this.state = state;
+  }
+
+  boolean execute() {
+    // if I have no free citizens, fail
+    // calculate my ratios
+    // find largest disparity
+    // assign next human, success
+  }
+}
+
 class RiskOfStarving extends HalTask {
   PlayerState state;
 
@@ -41,10 +62,10 @@ class RiskOfStarving extends HalTask {
   boolean execute() {
     int foodNeed = state.citizens.size() + (state.soldiers.size() * 2);
     if (foodNeed == 0) {
-      return FAIL;
+      return false;
     }
     int projection = state.foodSupply / foodNeed;
-    return projection < 2 ? SUCCESS : FAIL;
+    return projection < 2;
   }
 }
 
@@ -60,10 +81,10 @@ class EnemyTroopsNearby extends HalTask {
   boolean execute() {
     for (Soldier soldier : humanState.soldiers) {
       if (soldier.distanceTo(townSquare) < 250) {
-        return SUCCESS;
+        return true;
       }
     }
-    return FAIL;
+    return false;
   }
 }
 
@@ -83,9 +104,9 @@ class PlaceFarm extends HalTask {
       Cell potentialCell = potentialCells[rng.nextInt(potentialCells.length)];
       if (!potentialCell.hasBuilding()) {
         state.placeBuilding(potentialCell, BuildingCode.FARM);
-        return SUCCESS;
+        return true;
       }
     }
-    return FAIL;
+    return false;
   }
 }
