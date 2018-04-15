@@ -2,7 +2,6 @@ class PlayerState {
   final int STEP_FOOD_DEPLETION = 1000;
   final int STEP_BIRTH = 2000;
   final int HOVEL_CAPACITY = 2;
-  // int STEP_BIRTH = 100;  // for testing purposes
 
   HashMap<BuildingCode, HashMap<ResourceCode, Integer>> BUILDING_COSTS = new BuildingCosts().costs;
   HashMap<BuildingCode, ArrayList<Building>> buildings;
@@ -69,21 +68,23 @@ class PlayerState {
       int foodEaten = citizens.size() + (soldiers.size() * 2);
       foodSupply -= foodEaten;
       foodDepletionIndex += STEP_FOOD_DEPLETION;
+      this.handleStarvation();
     }
+
 
     // Births
     if (
       citizens.size() + soldiers.size() < populationCapacity &&  // population isn't at capacity
       gameStateIndex >= birthIndex &&  // enough time has elapsed for a birth
-      buildings.get(BuildingCode.HOVEL).size() > 0  // there is an existing hovel to spawn from
+      buildings.get(BuildingCode.HOVEL).size() > 0 &&  // there is an existing hovel to spawn from
+      foodSupply > 0
     ) {
       Hovel targetHovel = (Hovel) buildings.get(BuildingCode.HOVEL).get(rng.nextInt(buildings.get(BuildingCode.HOVEL).size()));
       citizens.add(new FreeCitizen(targetHovel.loc, this.getTownSquare(), this));
       birthIndex += STEP_BIRTH;
-      // c++;
     }
 
-    this.handleHealth();
+    this.handleBattleDamage();
 
     gameStateIndex += 1;
   }
@@ -129,7 +130,7 @@ class PlayerState {
    *  If any of our people are in the same cell as an enemy soldier, take damage.
    *  If any of our people reach health 0, they die.
    */
-  void handleHealth() {
+  void handleBattleDamage() {
     ArrayList<Cell> enemySoldierLocs = new ArrayList<Cell>();
 
     for (Soldier soldier : state.getSoldiers()) {
@@ -172,6 +173,57 @@ class PlayerState {
     for (Soldier s : deadSoldiers) {
       this.soldiers.remove(s);
     }
+  }
+
+  /**
+   *  Starves your population based on how negative your food supply is
+   */
+  void handleStarvation() {
+    if (foodSupply < 0) {
+      int mealsMissed = -foodSupply;
+
+      int citizenCount = citizens.size();
+      int soldierCount = soldiers.size();
+
+      while (mealsMissed > 0) {
+        if (citizenCount < 1) {
+          this.starveSoldier();
+          mealsMissed -= 2;
+          continue;
+        }
+
+        if (soldierCount < 1 || mealsMissed < 2) {
+          this.starveCitizen();
+          mealsMissed -= 1;
+          continue;
+        }
+
+        float citizenOrSoldier = rng.nextFloat();
+        if (citizenOrSoldier > 0.5) {
+          this.starveCitizen();
+          mealsMissed -= 1;
+        } else {
+          this.starveSoldier();
+          mealsMissed -= 2;
+        }
+      }
+    }
+  }
+
+  /**
+   *  Starves a random citizen
+   */
+  void starveCitizen() {
+    int whichCitizen = rng.nextInt(citizens.size());
+    citizens.get(whichCitizen).starve();
+  }
+
+  /**
+   *  Starves a random soldier
+   */
+  void starveSoldier() {
+    int whichSoldier = rng.nextInt(soldiers.size());
+    soldiers.get(whichSoldier).starve();
   }
 
   void placeBuilding(Cell loc) {

@@ -32,9 +32,9 @@ void setup() {
   state = new GameState();
   userInterface = new UserInterface();
   // bgmFile = new SoundFile(this, "bgm-drizzle.mp3");
-  // bgmFile = new SoundFile(this, "forgotten-plains.mp3");
-  bgmFile = new SoundFile(this, "wind-of-prairie.mp3");
-  bgmFile.amp(0.25);
+  bgmFile = new SoundFile(this, "forgotten-plains.mp3");
+  // bgmFile = new SoundFile(this, "wind-of-prairie.mp3");
+  bgmFile.amp(0.5);
   bgmFile.loop();
   buildingSound = new SoundFile(this, "hammering-nails.wav");
 

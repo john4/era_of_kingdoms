@@ -24,7 +24,7 @@ class GameState {
         isGameOver = true;
       }
 
-      if (gameStateIndex % (FRAME_RATE * 5) == 0 && humanPlayer.foodSupply < 20) {
+      if (gameStateIndex % (FRAME_RATE * 5) == 0 && humanPlayer.foodSupply < 1) {
         userInterface.messageQueue.add(new Message("Your people are starving...", 10*FRAME_RATE + gameStateIndex));
       }
 

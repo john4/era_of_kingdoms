@@ -4,6 +4,7 @@ abstract class Human extends WorldlyObject {
   float MAX_SPEED = 0.1;
   float MAX_ACCELERATION = 0.01;
   float MAX_HEALTH = 250;
+  float STARVE_DAMAGE = 25;
 
   int[] c = new int[3];
   float health;
@@ -100,5 +101,9 @@ abstract class Human extends WorldlyObject {
     // Update this character's cell location
     this.loc = boardMap.cellAtPos(this.pos);
 
+  }
+
+  void starve() {
+    this.health -= this.STARVE_DAMAGE;
   }
 }
