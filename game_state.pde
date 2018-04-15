@@ -17,7 +17,10 @@ class GameState {
       humanPlayer.step(gameStateIndex);
       computerPlayer.step(gameStateIndex);
 
-      if (humanPlayer.foodSupply < 1) {
+      int humanPopulation = humanPlayer.citizens.size() + humanPlayer.soldiers.size();
+      int computerPopulation = computerPlayer.citizens.size() + computerPlayer.soldiers.size();
+
+      if (humanPopulation < 1 || computerPopulation < 1) {
         isGameOver = true;
       }
 
@@ -34,8 +37,15 @@ class GameState {
 
   void draw() {
     if (isGameOver) {
+      int humanPopulation = humanPlayer.citizens.size() + humanPlayer.soldiers.size();
       textSize(34);
-      text("YOUR PEOPLE STARVED", width / 2, height / 2);
+
+      if (humanPopulation < 1) {
+        text("YOUR PEOPLE STARVED", width / 2, height / 2);
+      } else {
+        text("YOU DESTROYED THE ENEMY", width / 2, height / 2);
+      }
+
       return;
     }
 

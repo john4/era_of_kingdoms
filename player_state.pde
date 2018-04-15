@@ -60,7 +60,7 @@ class PlayerState {
     citizens.add(new FreeCitizen(townCenterCell, getTownSquare(), this));
     citizens.add(new FreeCitizen(townCenterCell, getTownSquare(), this));
   }
-// int c = 0;
+
   void step(double gameStateIndex) {
     // Iterate states of all Humans, update game stats (food levels, etc.)
 
