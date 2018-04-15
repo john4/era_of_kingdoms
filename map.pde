@@ -293,10 +293,11 @@ class BoardMap {
         cells[i][j].show();
       }
     }
-    //stroke(0,100,200);
-    //for (int i = 0; i < numRows; i++) {
+    // Draws lines connected each cell to neighbors
+    // stroke(0,100,200);
+    // for (int i = 0; i < numRows; i++) {
     //  for (int j = 0; j < numCols; j++) {
-
+    //
     //    if (j != 0) {
     //      line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].north.pos.x, cells[i][j].north.pos.y);
     //       //northeast
@@ -329,7 +330,7 @@ class BoardMap {
     //      line(cells[i][j].pos.x, cells[i][j].pos.y, cells[i][j].west.pos.x, cells[i][j].west.pos.y);
     //    }
     //  }
-    //}
+    // }
   }
 }
 

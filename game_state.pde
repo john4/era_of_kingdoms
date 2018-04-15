@@ -5,8 +5,9 @@ class GameState {
   boolean isGameOver;
 
   GameState() {
-    humanPlayer = new PlayerState(new int[] { 255, 215, 0 });
-    computerPlayer = new PlayerState(new int[] { 128, 0, 0 });
+    boolean humanLeft = int(random(2)) == 1;
+    humanPlayer = new PlayerState(new int[] { 255, 215, 0 }, humanLeft);
+    computerPlayer = new PlayerState(new int[] { 128, 0, 0 }, !humanLeft);
 
     gameStateIndex = 0;
     isGameOver = false;
