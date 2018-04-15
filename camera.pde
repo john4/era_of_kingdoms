@@ -8,7 +8,6 @@ void keyPressed() {
   }
 
   if (key == ' ') {
-    bgmFile.stop();
     setup();
   }
 
@@ -18,6 +17,11 @@ void keyPressed() {
     } else {
       resetCamera();
     }
+  }
+
+
+  if (key == 'm' && musicPlaying) {
+    bgmFile.stop();
   }
 }
 

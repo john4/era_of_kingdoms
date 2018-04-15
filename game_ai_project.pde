@@ -15,8 +15,10 @@ UserInterface userInterface;
 boolean showControlPanel = true;
 final int CELL_SIZE = 10;
 final int FRAME_RATE = 60;
+
 SoundFile bgmFile;
 SoundFile buildingSound;
+boolean musicPlaying;
 
 Random rng = new Random();
 
@@ -36,6 +38,7 @@ void setup() {
   // bgmFile = new SoundFile(this, "wind-of-prairie.mp3");
   bgmFile.amp(0.5);
   bgmFile.loop();
+  musicPlaying = true;
   buildingSound = new SoundFile(this, "hammering-nails.wav");
 
   // path = boardMap.findPath(state.getBuildings().get(0).loc, state.getBuildings().get(2).loc);
