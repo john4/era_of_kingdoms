@@ -15,6 +15,7 @@ boolean showControlPanel = true;
 final int CELL_SIZE = 10;
 final int FRAME_RATE = 60;
 SoundFile bgmFile;
+SoundFile buildingSound;
 
 Random rng = new Random();
 
@@ -29,9 +30,12 @@ void setup() {
   boardMap.generate();
   state = new GameState();
   userInterface = new UserInterface();
-  bgmFile = new SoundFile(this, "bgm-drizzle.mp3");
+  // bgmFile = new SoundFile(this, "bgm-drizzle.mp3");
+  // bgmFile = new SoundFile(this, "forgotten-plains.mp3");
+  bgmFile = new SoundFile(this, "wind-of-prairie.mp3");
+  bgmFile.amp(0.25);
   bgmFile.loop();
-
+  buildingSound = new SoundFile(this, "hammering-nails.wav");
 
   // path = boardMap.findPath(state.getBuildings().get(0).loc, state.getBuildings().get(2).loc);
 }
@@ -59,6 +63,7 @@ void mouseClicked() {
       Cell hoveredCell = boardMap.cellAtPos(new PVector(mouseX, mouseY));
       if (boardMap.validBuildingSpot(hoveredCell)) {
         state.humanPlayer.placeBuilding(hoveredCell);
+        buildingSound.play();
       } else {
         userInterface.messageQueue.add(new Message("Cannot place " + pB.toString() + " there!", state.gameStateIndex+FRAME_RATE*5));
       }

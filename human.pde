@@ -3,9 +3,10 @@ abstract class Human extends WorldlyObject {
   float SLOW_RADIUS = 5;
   float MAX_SPEED = 0.1;
   float MAX_ACCELERATION = 0.01;
+  float MAX_HEALTH = 250;
 
   int[] c = new int[3];
-  int health;
+  float health;
   PlayerState ownerState;
   Building assignedBuilding;
   Blackboard blackboard;
@@ -15,7 +16,7 @@ abstract class Human extends WorldlyObject {
     super(initialLocation);
     this.w = this.h = 4;
     this.c = new int[]{20, 20, 20};
-    this.health = 100;
+    this.health = MAX_HEALTH;
     this.assignedBuilding = buildingAssignment;
     this.ownerState = ownerState;
 
@@ -30,6 +31,13 @@ abstract class Human extends WorldlyObject {
     noStroke();
     fill(c[0], c[1], c[2]);
     ellipse(this.pos.x, this.pos.y, this.w, this.w);
+
+    if (this.health < MAX_HEALTH) {
+      fill(255, 0, 0);
+      rect(this.pos.x - 4, this.pos.y - 4, 8, 2);
+      fill(0, 255, 0);
+      rect(this.pos.x - 4, this.pos.y - 4, 8 * (this.health / MAX_HEALTH), 2);
+    }
   }
 
   void behave() {
@@ -62,16 +70,6 @@ abstract class Human extends WorldlyObject {
 
     // Acceleration tries to get to the target velocity
     PVector acceleration = targetVelocity.sub(this.vel);
-
-    // Steer away from obstacles
-    // float dist = 0;
-    // float s = 0;
-    // for (int i = 0; i < obstacles.size(); i++) {
-    //   Obstacle o = obstacles.get(i);
-    //   dist = PVector.dist(pos, o.pos);
-    //   s = o.separationConstant / (dist * dist);
-    //   acceleration.sub(s, s);
-    // }
 
     // Check if the acceleration is too fast
     if (acceleration.mag() > MAX_ACCELERATION) {

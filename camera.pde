@@ -15,6 +15,7 @@ void keyPressed() {
   }
 
   if (key == ' ') {
+    bgmFile.stop();
     setup();
   }
 }
