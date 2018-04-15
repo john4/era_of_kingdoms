@@ -1,4 +1,6 @@
 class Soldier extends Human {
+  final HumanCode type = HumanCode.SOLDIER;
+
   Soldier(Cell initialLocation, Building buildingAssignment, PlayerState ownerState) {
     super(initialLocation, buildingAssignment, ownerState);
 

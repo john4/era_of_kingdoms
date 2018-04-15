@@ -6,8 +6,7 @@ class PlayerState {
 
   HashMap<BuildingCode, HashMap<ResourceCode, Integer>> BUILDING_COSTS = new BuildingCosts().costs;
   HashMap<BuildingCode, ArrayList<Building>> buildings;
-  ArrayList<Citizen> citizens;
-  ArrayList<Soldier> soldiers;
+  HashMap<HumanCode, ArrayList<Human>> humans;
 
   double foodDepletionIndex;
   double birthIndex;
@@ -26,8 +25,11 @@ class PlayerState {
     for (BuildingCode code : BuildingCode.values()) {
       buildings.put(code, new ArrayList<Building>());
     }
-    citizens = new ArrayList<Citizen>();
-    soldiers = new ArrayList<Soldier>();
+
+    humans = new HashMap<HumanCode, ArrayList<Human>>();
+    for (HumanCode code : HumanCode.values()) {
+      humans.put(code, new ArrayList<Human>());
+    }
 
     foodDepletionIndex = STEP_FOOD_DEPLETION;
     birthIndex = 0;
@@ -61,19 +63,19 @@ class PlayerState {
 
     // Food depletion
     if (gameStateIndex >= foodDepletionIndex) {
-      int foodEaten = citizens.size() + (soldiers.size() * 2);
+      int foodEaten = getCitizens().size() + (humans.get(HumanCode.SOLDIER).size() * 2);
       foodSupply -= foodEaten;
       foodDepletionIndex += STEP_FOOD_DEPLETION;
     }
 
     // Births
     if (
-      citizens.size() + soldiers.size() < populationCapacity &&  // population isn't at capacity
+      getCitizens().size() + humans.get(HumanCode.SOLDIER).size() < populationCapacity &&  // population isn't at capacity
       gameStateIndex >= birthIndex &&  // enough time has elapsed for a birth
       buildings.get(BuildingCode.HOVEL).size() > 0  // there is an existing hovel to spawn from
     ) {
       Hovel targetHovel = (Hovel) buildings.get(BuildingCode.HOVEL).get(rng.nextInt(buildings.get(BuildingCode.HOVEL).size()));
-      citizens.add(new FreeCitizen(targetHovel.loc, this.getTownSquare(), this));
+      humans.get(HumanCode.FREE).add(new FreeCitizen(targetHovel.loc, this.getTownSquare(), this));
       birthIndex += STEP_BIRTH;
       // c++;
     }
@@ -87,10 +89,10 @@ class PlayerState {
     for (Building building : getBuildings()) {
       building.draw();
     }
-    for (Citizen citizen : citizens) {
+    for (Human citizen : getCitizens()) {
       citizen.draw();
     }
-    for (Soldier soldier : soldiers) {
+    for (Human soldier : getSoldiers()) {
       soldier.draw();
     }
   }
@@ -127,16 +129,16 @@ class PlayerState {
   void handleHealth() {
     ArrayList<Cell> enemySoldierLocs = new ArrayList<Cell>();
 
-    for (Soldier soldier : state.getSoldiers()) {
-      if (!this.soldiers.contains(soldier)) {
+    for (Human soldier : state.getSoldiers()) {
+      if (!this.getSoldiers().contains(soldier)) {
         enemySoldierLocs.add(soldier.loc);
       }
     }
 
-    ArrayList<Citizen> deadCitizens = new ArrayList<Citizen>();
-    ArrayList<Soldier> deadSoldiers = new ArrayList<Soldier>();
+    ArrayList<Human> deadCitizens = new ArrayList<Human>();
+    ArrayList<Human> deadSoldiers = new ArrayList<Human>();
 
-    for (Citizen citizen : this.citizens) {
+    for (Human citizen : this.getCitizens()) {
       if (enemySoldierLocs.contains(citizen.loc)) {
         citizen.health -= 0.5;
       }
@@ -146,7 +148,7 @@ class PlayerState {
       }
     }
 
-    for (Soldier soldier : this.soldiers) {
+    for (Human soldier : this.getSoldiers()) {
       if (enemySoldierLocs.contains(soldier.loc)) {
         soldier.health -= 0.5;
       }
@@ -156,12 +158,12 @@ class PlayerState {
       }
     }
 
-    for (Citizen c : deadCitizens) {
-      this.citizens.remove(c);
+    for (Human c : deadCitizens) {
+      this.humans.get(c.type).remove(c);
     }
 
-    for (Soldier s : deadSoldiers) {
-      this.soldiers.remove(s);
+    for (Human s : deadSoldiers) {
+      this.humans.get(HumanCode.SOLDIER).remove(s);
     }
   }
 
@@ -224,12 +226,24 @@ class PlayerState {
     return buildings.get(BuildingCode.TOWNSQUARE).get(0);
   }
 
+  ArrayList<Human> getCitizens() {
+    ArrayList<Human> result = new ArrayList<Human>();
+    for (HumanCode code : HumanCode.values()) {
+      if (code != HumanCode.SOLDIER) {
+        result.addAll(humans.get(code));
+      }
+    }
+    return result;
+  }
+
+  ArrayList<Human> getSoldiers() {
+    return humans.get(HumanCode.SOLDIER);
+  }
+
   // Get the first unoccupied citizen, else null
   Citizen getFreeCitizen() {
-    for (Citizen citizen : citizens) {
-      if (citizen.isFree()) {
-        return citizen;
-      }
+    if (humans.get(HumanCode.FREE).size() > 0) {
+      return (Citizen) humans.get(HumanCode.FREE).get(0);
     }
     return null;
   }
@@ -242,18 +256,15 @@ class PlayerState {
       userInterface.messageQueue.add(new Message("Can't add a lumberjack: Need a sawmill!", state.gameStateIndex+FRAME_RATE*5));
     } else {
       Sawmill targetSawmill = (Sawmill) buildings.get(BuildingCode.SAWMILL).get(rng.nextInt(buildings.get(BuildingCode.SAWMILL).size()));
-      citizens.add(new Lumberjack(freeCitizen.loc, targetSawmill, this));
-      citizens.remove(freeCitizen);
+      humans.get(HumanCode.LUMBERJACK).add(new Lumberjack(freeCitizen.loc, targetSawmill, this));
+      humans.get(HumanCode.FREE).remove(freeCitizen);
     }
   }
 
   void removeLumberjack() {
-    for (Citizen citizen : citizens) {
-      if (citizen instanceof Lumberjack) {
-        citizens.add(new FreeCitizen(citizen.loc, getTownSquare(), this));
-        citizens.remove(citizen);
-        break;
-      }
+    if (humans.get(HumanCode.LUMBERJACK).size() > 0) {
+      Human lumberJackToRemove = humans.get(HumanCode.LUMBERJACK).remove(0);
+      humans.get(HumanCode.FREE).add(new FreeCitizen(lumberJackToRemove.loc, getTownSquare(), this));
     }
   }
 
@@ -265,18 +276,15 @@ class PlayerState {
       userInterface.messageQueue.add(new Message("Can't add a farmer: Need a farm!", state.gameStateIndex+FRAME_RATE*5));
     } else {
       Farm targetFarm = (Farm) buildings.get(BuildingCode.FARM).get(rng.nextInt(buildings.get(BuildingCode.FARM).size()));
-      citizens.add(new Farmer(freeCitizen.loc, targetFarm, this));
-      citizens.remove(freeCitizen);
+      humans.get(HumanCode.FARMER).add(new Farmer(freeCitizen.loc, targetFarm, this));
+      humans.get(HumanCode.FREE).remove(freeCitizen);
     }
   }
 
   void removeFarmer() {
-    for (Citizen citizen : citizens) {
-      if (citizen instanceof Farmer) {
-        citizens.add(new FreeCitizen(citizen.loc, getTownSquare(), this));
-        citizens.remove(citizen);
-        break;
-      }
+    if (humans.get(HumanCode.FARMER).size() > 0) {
+      Human farmerToRemove = humans.get(HumanCode.FARMER).remove(0);
+      humans.get(HumanCode.FREE).add(new FreeCitizen(farmerToRemove.loc, getTownSquare(), this));
     }
   }
 
@@ -288,15 +296,14 @@ class PlayerState {
       userInterface.messageQueue.add(new Message("Can't add a soldier: Need a barracks!", state.gameStateIndex+FRAME_RATE*5));
     } else {
       Barracks targetBarracks = (Barracks) buildings.get(BuildingCode.BARRACKS).get(rng.nextInt(buildings.get(BuildingCode.BARRACKS).size()));
-      soldiers.add(new Soldier(freeCitizen.loc, targetBarracks, this));
-      citizens.remove(freeCitizen);
+      humans.get(HumanCode.SOLDIER).add(new Soldier(freeCitizen.loc, targetBarracks, this));
+      humans.get(HumanCode.FREE).remove(freeCitizen);
     }
   }
 
   void removeSoldier() {
-    Soldier s = soldiers.get(0);
-    citizens.add(new FreeCitizen(s.loc, getTownSquare(), this));
-    soldiers.remove(s);
+    Human soldierToRemove = humans.get(HumanCode.SOLDIER).remove(0);
+    humans.get(HumanCode.FREE).add(new FreeCitizen(soldierToRemove.loc, getTownSquare(), this));
   }
 
   void addMiner() {
@@ -307,18 +314,15 @@ class PlayerState {
       userInterface.messageQueue.add(new Message("Can't add a miner: Need a foundry!", state.gameStateIndex+FRAME_RATE*5));
     } else {
       Foundry targetFoundry = (Foundry) buildings.get(BuildingCode.FOUNDRY).get(rng.nextInt(buildings.get(BuildingCode.FOUNDRY).size()));
-      citizens.add(new Miner(freeCitizen.loc, targetFoundry, this));
-      citizens.remove(freeCitizen);
+      humans.get(HumanCode.MINER).add(new Miner(freeCitizen.loc, targetFoundry, this));
+      humans.get(HumanCode.FREE).remove(freeCitizen);
     }
   }
 
   void removeMiner() {
-    for (Citizen citizen : citizens) {
-      if (citizen instanceof Miner) {
-        citizens.add(new FreeCitizen(citizen.loc, getTownSquare(), this));
-        citizens.remove(citizen);
-        break;
-      }
+    if (humans.get(HumanCode.MINER).size() > 0) {
+      Human minerToRemove = humans.get(HumanCode.MINER).remove(0);
+      humans.get(HumanCode.FREE).add(new FreeCitizen(minerToRemove.loc, getTownSquare(), this));
     }
   }
 

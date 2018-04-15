@@ -1,4 +1,7 @@
 class Hal {
+  static final int ACTION_COOLDOWN = 30;
+  double cooldownIndex;
+
   GameState gameState;
   PlayerState computerState;
   PlayerState humanState;
@@ -12,23 +15,27 @@ class Hal {
     this.computerState = computerState;
     this.humanState = humanState;
 
+    cooldownIndex = gameState.gameStateIndex;
+
     townSquare = computerState.buildings.get(BuildingCode.TOWNSQUARE).get(0);
-    HashSet<Cell> cellsNearbyTownSquareSet = townSquare.loc.getNearbyCells(100);
+    HashSet<Cell> cellsNearbyTownSquareSet = townSquare.loc.getNearbyGrassCells(100);
     cellsNearbyTownSquare = cellsNearbyTownSquareSet.toArray(new Cell[cellsNearbyTownSquareSet.size()]);
 
-    behaviorTree = new PlaceFarm(computerState, cellsNearbyTownSquare);
+    behaviorTree = new PlaceX(BuildingCode.FARM, computerState, cellsNearbyTownSquare);
   }
 
-  boolean behave() {
-    return behaviorTree.execute();
+  void behave() {
+    if (gameState.gameStateIndex > cooldownIndex) {
+      if (behaviorTree.execute()) {
+        cooldownIndex = gameState.gameStateIndex + ACTION_COOLDOWN;
+      }
+    }
   }
 }
 
 
 abstract class HalTask {
-  abstract boolean execute();  // returns FAIL = 0, SUCCESS = 1
-  static final int BUILDING_PLACEMENT_COOLDOWN = 5;
-  static final int HUMAN_ASSIGN_COOLDOWN = 5;
+  abstract boolean execute();
 }
 
 class RiskOfStarving extends HalTask {
@@ -39,7 +46,7 @@ class RiskOfStarving extends HalTask {
   }
 
   boolean execute() {
-    int foodNeed = state.citizens.size() + (state.soldiers.size() * 2);
+    int foodNeed = state.getCitizens().size() + (state.getSoldiers().size() * 2);
     if (foodNeed == 0) {
       return false;
     }
@@ -58,7 +65,7 @@ class EnemyTroopsNearby extends HalTask {
   }
 
   boolean execute() {
-    for (Soldier soldier : humanState.soldiers) {
+    for (Human soldier : humanState.getSoldiers()) {
       if (soldier.distanceTo(townSquare) < 250) {
         return true;
       }
@@ -67,11 +74,13 @@ class EnemyTroopsNearby extends HalTask {
   }
 }
 
-class PlaceFarm extends HalTask {
+class PlaceX extends HalTask {
+  BuildingCode buildingType;
   PlayerState state;
   Cell[] potentialCells;
 
-  PlaceFarm(PlayerState state, Cell[] potentialCells) {
+  PlaceX(BuildingCode buildingType, PlayerState state, Cell[] potentialCells) {
+    this.buildingType = buildingType;
     this.state = state;
     this.potentialCells = potentialCells;
   }
@@ -82,10 +91,68 @@ class PlaceFarm extends HalTask {
       attempts++;
       Cell potentialCell = potentialCells[rng.nextInt(potentialCells.length)];
       if (!potentialCell.hasBuilding()) {
-        state.placeBuilding(potentialCell, BuildingCode.FARM);
+        state.placeBuilding(potentialCell, buildingType);
         return true;
       }
     }
     return false;
+  }
+}
+
+// class BuildMostNeededBuildingOrAssignMostNeededHuman extends HalTask {
+//   PlayerState state;
+//
+//   BuildMostNeededBuildingOrAssignMostNeededHuman(PlayerState state) {
+//
+//   }
+// }
+//
+// class AssignMostNeededHuman extends HalTask {
+//   PlayerState state;
+// }
+//
+// class AssignHuman extends HalTask {
+//   PlayerState state;
+//
+//   AssignHuman()
+// }
+
+
+/** Tries children in order until one returns success (return “fail” if all fail) */
+class HalSelector extends HalTask {
+  HalTask[] children;
+
+  HalSelector(HalTask[] children) {
+    this.children = children;
+  }
+
+  boolean execute() {
+    for (int i = 0; i < children.length; i++) {
+      boolean s = children[i].execute();
+      if (s) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+}
+
+/** Tries all its children in turn, returns failure if any fail (or success if all succeed) */
+class HalSequence extends HalTask {
+  HalTask[] children;
+
+  HalSequence(HalTask[] children) {
+    this.children = children;
+  }
+
+  boolean execute() {
+    for (int i = 0; i < children.length; i++) {
+      boolean s = children[i].execute();
+      if (!s) {
+        return false;
+      }
+    }
+    return true;
   }
 }

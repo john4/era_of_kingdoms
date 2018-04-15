@@ -121,17 +121,17 @@ class Cell {
     return neighbors;
   }
 
-  HashSet<Cell> getNearbyCells(int r) {
+  HashSet<Cell> getNearbyGrassCells(int r) {
     HashSet<Cell> set = new HashSet<Cell>();
     set.add(this);
-    return getNearbyCellsHelper(this, r, set);
+    return getNearbyGrassCellsHelper(this, r, set);
   }
 
-  private HashSet<Cell> getNearbyCellsHelper(Cell origin, int r, HashSet<Cell> acc) {
+  private HashSet<Cell> getNearbyGrassCellsHelper(Cell origin, int r, HashSet<Cell> acc) {
     for (Cell neighbor : this.getCardinalNeighbors()) {
-      if (neighbor != null && !acc.contains(neighbor) && origin.euclideanDistanceTo(neighbor) <= r) {
+      if (neighbor != null && neighbor.terraintype == 0 && !acc.contains(neighbor) && origin.euclideanDistanceTo(neighbor) <= r) {
         acc.add(neighbor);
-        neighbor.getNearbyCellsHelper(origin, r, acc);
+        neighbor.getNearbyGrassCellsHelper(origin, r, acc);
       }
     }
     return acc;

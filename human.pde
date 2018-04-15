@@ -1,4 +1,5 @@
 abstract class Human extends WorldlyObject {
+  HumanCode type;
   float TARGET_RADIUS = 2;
   float SLOW_RADIUS = 5;
   float MAX_SPEED = 0.1;
@@ -102,5 +103,14 @@ abstract class Human extends WorldlyObject {
     // Update this character's cell location
     this.loc = boardMap.cellAtPos(this.pos);
 
+  }
+}
+
+enum HumanCode {
+  FARMER, LUMBERJACK, MINER, SOLDIER, FREE;
+
+  @Override
+  public String toString() {
+      return name().toLowerCase();
   }
 }

@@ -1,4 +1,6 @@
 class Miner extends Citizen {
+  final HumanCode type = HumanCode.MINER;
+
   Miner(Cell initialLocation, Building buildingAssignment, PlayerState ownerState) {
     super(initialLocation, buildingAssignment, ownerState);
     this.c = new int[]{255, 105, 180};

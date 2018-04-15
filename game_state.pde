@@ -59,10 +59,10 @@ class GameState {
     return results;
   }
 
-  ArrayList<Soldier> getSoldiers() {
-    ArrayList<Soldier> results = new ArrayList<Soldier>();
-    results.addAll(humanPlayer.soldiers);
-    results.addAll(computerPlayer.soldiers);
+  ArrayList<Human> getSoldiers() {
+    ArrayList<Human> results = new ArrayList<Human>();
+    results.addAll(humanPlayer.getSoldiers());
+    results.addAll(computerPlayer.getSoldiers());
     return results;
   }
 }
