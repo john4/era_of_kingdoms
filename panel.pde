@@ -42,16 +42,15 @@ class Panel  {
   void click() {
     float posX = x - boardMap.xo;
     float posY = y + boardMap.yo;
-
     if (isVisible) {
       for (int i = 0; i < targets.size(); i += 2) {
-        if (posX + 10 + i * 60 < mouseX && mouseX < posX + 70 + i * 60 && posY + 30 < mouseY && mouseY < posY + 30 + TARGET_SIZE) {
+        if (posX + 10 + i * 60 < mouseX - boardMap.xo && mouseX- boardMap.xo < posX + 70 + i * 60 && posY + 30 < mouseY + boardMap.yo && mouseY + boardMap.yo < posY + 30 + TARGET_SIZE) {
           targets.get(i).clicked();
         }
       }
 
       for (int i = 1; i < targets.size(); i += 2) {
-        if (posX + 10 + (i - 1) * 60 < mouseX && mouseX < posX + 70 + (i - 1) * 60 && posY + 100 < mouseY && mouseY < posY + 100 + TARGET_SIZE) {
+        if (posX + 10 + (i - 1) * 60 < mouseX - boardMap.xo && mouseX- boardMap.xo < posX + 70 + (i - 1) * 60 && posY + 100 < mouseY + boardMap.yo && mouseY + boardMap.yo < posY + 100 + TARGET_SIZE) {
           targets.get(i).clicked();
         }
       }
