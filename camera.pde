@@ -18,6 +18,11 @@ void keyPressed() {
       resetCamera();
     }
   }
+
+
+  if (key == 'm' && musicPlaying) {
+    bgmFile.stop();
+  }
 }
 
 void resetCamera() {
