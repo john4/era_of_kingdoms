@@ -46,17 +46,13 @@ void draw() {
 
 void mouseClicked() {
   if (mouseButton == LEFT) {
-    System.out.println("Left Click");
-
-    int cellSize = boardMap.gridsize;
-    int x = mouseX/cellSize;
-    int y = mouseY/cellSize;
-    int rows = boardMap.numRows;
-    int cols = boardMap.numCols;
+    System.out.println("Left Click at (" + mouseX + ", " + mouseY + ")");
     BuildingCode pB = state.humanPlayer.placingBuilding;
 
+
+
     if (pB != BuildingCode.NONE) {
-      Cell hoveredCell = boardMap.cellAtPos(new PVector(mouseX, mouseY));
+      Cell hoveredCell = boardMap.getHoveredCell();
       if (boardMap.validBuildingSpot(hoveredCell)) {
         state.humanPlayer.placeBuilding(hoveredCell);
       } else {
@@ -72,7 +68,7 @@ void mouseClicked() {
       panel.click();
     }
   } else {
-    System.out.println("Right Click");
+    System.out.println("Right Click at (" + mouseX + ", " + mouseY + ")");
     state.humanPlayer.placingBuilding = BuildingCode.NONE;
   }
 
