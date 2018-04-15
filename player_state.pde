@@ -33,11 +33,13 @@ class PlayerState {
     birthIndex = 0;
 
     // Add town center to random grass cell
+    Cell townCenterCell = null;
     while (true) {
       int townRow = int(random(boardMap.numRows));
       int townCol = int(random(boardMap.numCols));
       if (boardMap.cells[townRow][townCol].terraintype == 0) {
         buildings.get(BuildingCode.TOWNSQUARE).add(new TownSquare(boardMap.cells[townRow][townCol], rgb));
+        townCenterCell = boardMap.cells[townRow][townCol];
         break;
       }
     }
@@ -54,6 +56,9 @@ class PlayerState {
     int cellSize = boardMap.gridsize;
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
+
+    citizens.add(new FreeCitizen(townCenterCell, getTownSquare(), this));
+    citizens.add(new FreeCitizen(townCenterCell, getTownSquare(), this));
   }
 // int c = 0;
   void step(double gameStateIndex) {
@@ -157,6 +162,11 @@ class PlayerState {
     }
 
     for (Citizen c : deadCitizens) {
+      if (c.assignedBuilding instanceof Crop) {
+        Crop crop = (Crop) c.assignedBuilding;
+        crop.farmer = null;
+      }
+
       this.citizens.remove(c);
     }
 
@@ -269,6 +279,14 @@ class PlayerState {
   void removeFarmer() {
     for (Citizen citizen : citizens) {
       if (citizen instanceof Farmer) {
+        for (Building b : buildings.get(BuildingCode.CROP)) {
+          Crop crop = (Crop) b;
+          if (crop.farmer == citizen) {
+            crop.farmer = null;
+            break;
+          }
+        }
+
         citizens.add(new FreeCitizen(citizen.loc, getTownSquare(), this));
         citizens.remove(citizen);
         break;
@@ -319,6 +337,6 @@ class PlayerState {
   }
 
   void updatePopulationCapacity() {
-    populationCapacity = HOVEL_CAPACITY * buildings.get(BuildingCode.HOVEL).size();
+    populationCapacity = HOVEL_CAPACITY * buildings.get(BuildingCode.HOVEL).size() + 2;
   }
 }

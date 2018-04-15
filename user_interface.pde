@@ -67,6 +67,7 @@ class UserInterface {
     int farmerCount = 0;
     int minerCount = 0;
     int freeCitizenCount = 0;
+    int allHumanCount = state.citizens.size() + state.soldiers.size();
 
     for (Citizen c : state.citizens) {
       if (c instanceof Lumberjack) {
@@ -81,7 +82,7 @@ class UserInterface {
     }
 
     String resources = "Food: " + state.foodSupply + "  Lumber: " + state.resourceSupply.get(ResourceCode.LUMBER) +
-      "  Metal: " + state.resourceSupply.get(ResourceCode.METAL) + "  Population Capacity: " + state.populationCapacity +
+      "  Metal: " + state.resourceSupply.get(ResourceCode.METAL) + "  Population: " + allHumanCount + " / " + state.populationCapacity +
       "  Free Citizens: " + freeCitizenCount + "  Farmers: " + farmerCount + "  Lumberjacks: " + lumberjackCount +
       "  Miners: " + minerCount + "  Soldiers: " + state.soldiers.size();
 
