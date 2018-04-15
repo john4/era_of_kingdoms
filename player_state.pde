@@ -18,7 +18,7 @@ class PlayerState {
   BuildingCode placingBuilding;
   CombatMode combatMode;
 
-  PlayerState(int[] rgb) {
+  PlayerState(int[] rgb, boolean humanLeft) {
     // Assumes map has been generated
     // Place town square, add initial Humans and supplies
     buildings = new HashMap<BuildingCode, ArrayList<Building>>();
@@ -33,9 +33,13 @@ class PlayerState {
 
     // Add town center to random grass cell
     Cell townCenterCell = null;
+
     while (true) {
-      int townRow = int(random(boardMap.numRows));
-      int townCol = int(random(boardMap.numCols));
+      int townRow = int(random(5, 20));
+      int townCol = int(random(5, boardMap.numCols - 5));
+      if (humanLeft) {
+        townRow = int(random(boardMap.numRows - 20, boardMap.numRows - 5));
+      }
       if (boardMap.cells[townRow][townCol].terraintype == 0) {
         buildings.get(BuildingCode.TOWNSQUARE).add(new TownSquare(boardMap.cells[townRow][townCol], rgb));
         townCenterCell = boardMap.cells[townRow][townCol];
