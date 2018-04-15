@@ -1,12 +1,14 @@
 class GameState {
   PlayerState humanPlayer;
   PlayerState computerPlayer;
+  Hal hal;
   double gameStateIndex;
   boolean isGameOver;
 
   GameState() {
     humanPlayer = new PlayerState(new int[] { 255, 215, 0 });
     computerPlayer = new PlayerState(new int[] { 128, 0, 0 });
+    hal = new Hal(this, computerPlayer, humanPlayer);
 
     gameStateIndex = 0;
     isGameOver = false;
@@ -16,6 +18,7 @@ class GameState {
     if (!isGameOver) {
       humanPlayer.step(gameStateIndex);
       computerPlayer.step(gameStateIndex);
+      hal.behave();
 
       if (humanPlayer.foodSupply < 1) {
         isGameOver = true;

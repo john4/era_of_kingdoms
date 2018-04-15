@@ -166,8 +166,12 @@ class PlayerState {
   }
 
   void placeBuilding(Cell loc) {
-    this.addBuilding(this.placingBuilding, loc);
+    this.placeBuilding(loc, this.placingBuilding);
     this.placingBuilding = BuildingCode.NONE;
+  }
+
+  void placeBuilding(Cell loc, BuildingCode buildingType) {
+    this.addBuilding(buildingType, loc);
   }
 
   Building addBuilding(BuildingCode b, Cell loc) {
