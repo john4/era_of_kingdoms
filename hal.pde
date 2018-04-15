@@ -41,10 +41,10 @@ class RiskOfStarving extends HalTask {
   boolean execute() {
     int foodNeed = state.citizens.size() + (state.soldiers.size() * 2);
     if (foodNeed == 0) {
-      return false;
+      return FAIL;
     }
     int projection = state.foodSupply / foodNeed;
-    return projection < 2;
+    return projection < 2 ? SUCCESS : FAIL;
   }
 }
 
@@ -60,10 +60,10 @@ class EnemyTroopsNearby extends HalTask {
   boolean execute() {
     for (Soldier soldier : humanState.soldiers) {
       if (soldier.distanceTo(townSquare) < 250) {
-        return true;
+        return SUCCESS;
       }
     }
-    return false;
+    return FAIL;
   }
 }
 
@@ -83,9 +83,9 @@ class PlaceFarm extends HalTask {
       Cell potentialCell = potentialCells[rng.nextInt(potentialCells.length)];
       if (!potentialCell.hasBuilding()) {
         state.placeBuilding(potentialCell, BuildingCode.FARM);
-        return true;
+        return SUCCESS;
       }
     }
-    return false;
+    return FAIL;
   }
 }
