@@ -49,31 +49,10 @@ void mouseClicked() {
     System.out.println("Left Click at (" + mouseX + ", " + mouseY + ")");
     BuildingCode pB = state.humanPlayer.placingBuilding;
 
-    float zoom = boardMap.zoom;
-    float actualMouseX = (mouseX - boardMap.xo) / zoom;
-    float actualMouseY = (mouseY - boardMap.yo) / zoom;
-    int cellX = (int) (actualMouseX / boardMap.gridsize);
-    int cellY = (int) (actualMouseY / boardMap.gridsize);
-
-    if (cellX < 0) {
-      cellX = 0;
-    }
-
-    if (cellY < 0) {
-      cellY = 0;
-    }
-
-    if (cellX >= boardMap.numRows) {
-      cellX = boardMap.numRows - 1;
-    }
-
-    if (cellY >= boardMap.numCols) {
-      cellY = boardMap.numCols - 1;
-    }
 
 
     if (pB != BuildingCode.NONE) {
-      Cell hoveredCell = boardMap.cells[cellX][cellY];
+      Cell hoveredCell = boardMap.getHoveredCell();
       if (boardMap.validBuildingSpot(hoveredCell)) {
         state.humanPlayer.placeBuilding(hoveredCell);
       } else {

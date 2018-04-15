@@ -258,6 +258,31 @@ class BoardMap {
     }
   }
 
+  Cell getHoveredCell() {
+    float actualMouseX = (mouseX - this.xo) / this.zoom;
+    float actualMouseY = (mouseY - this.yo) / this.zoom;
+    int cellX = (int) (actualMouseX / this.gridsize);
+    int cellY = (int) (actualMouseY / this.gridsize);
+
+    if (cellX < 0) {
+      cellX = 0;
+    }
+
+    if (cellY < 0) {
+      cellY = 0;
+    }
+
+    if (cellX >= this.numRows) {
+      cellX = this.numRows - 1;
+    }
+
+    if (cellY >= this.numCols) {
+      cellY = this.numCols - 1;
+    }
+
+    return this.cells[cellX][cellY];
+  }
+
   void draw() {
     background(52);
     translate(xo, yo);

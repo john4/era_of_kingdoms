@@ -46,28 +46,9 @@ class UserInterface {
 
     String terrain = "";
 
-    int cellX = (int) (actualMouseX / cellSize);
-    int cellY = (int) (actualMouseY / cellSize);
+    Cell hoveredCell = boardMap.getHoveredCell();
 
-    if (cellX < 0) {
-      cellX = 0;
-    }
-
-    if (cellY < 0) {
-      cellY = 0;
-    }
-
-    if (cellX >= boardMap.numRows) {
-      cellX = boardMap.numRows - 1;
-    }
-
-    if (cellY >= boardMap.numCols) {
-      cellY = boardMap.numCols - 1;
-    }
-
-    Cell hoveredCell = boardMap.cells[cellX][cellY];
-
-    if (cellX >= 0 && cellX < rows && cellY >= 0 && cellY < cols) {
+    if (hoveredCell.i >= 0 && hoveredCell.i < rows && hoveredCell.j >= 0 && hoveredCell.j < cols) {
       terrain = hoveredCell.getTerrainName();
     }
 
@@ -77,7 +58,7 @@ class UserInterface {
       }
     }
 
-    String cursor = "(" + cellX + ", " + cellY + "), " + terrain;
+    String cursor = "(" + hoveredCell.i + ", " + hoveredCell.j + "), " + terrain;
 
     int lumberjackCount = 0;
     int farmerCount = 0;
