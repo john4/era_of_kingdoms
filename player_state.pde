@@ -2,7 +2,6 @@ class PlayerState {
   final int STEP_FOOD_DEPLETION = 1000;
   final int STEP_BIRTH = 2000;
   final int HOVEL_CAPACITY = 2;
-  // int STEP_BIRTH = 100;  // for testing purposes
 
   HashMap<BuildingCode, HashMap<ResourceCode, Integer>> BUILDING_COSTS = new BuildingCosts().costs;
   HashMap<BuildingCode, ArrayList<Building>> buildings;
@@ -18,7 +17,7 @@ class PlayerState {
   BuildingCode placingBuilding;
   CombatMode combatMode;
 
-  PlayerState(int[] rgb) {
+  PlayerState(int[] rgb, boolean humanLeft) {
     // Assumes map has been generated
     // Place town square, add initial Humans and supplies
     buildings = new HashMap<BuildingCode, ArrayList<Building>>();
@@ -35,11 +34,17 @@ class PlayerState {
     birthIndex = 0;
 
     // Add town center to random grass cell
+    Cell townCenterCell = null;
+
     while (true) {
-      int townRow = int(random(boardMap.numRows));
-      int townCol = int(random(boardMap.numCols));
+      int townRow = int(random(5, 20));
+      int townCol = int(random(5, boardMap.numCols - 5));
+      if (humanLeft) {
+        townRow = int(random(boardMap.numRows - 20, boardMap.numRows - 5));
+      }
       if (boardMap.cells[townRow][townCol].terraintype == 0) {
         buildings.get(BuildingCode.TOWNSQUARE).add(new TownSquare(boardMap.cells[townRow][townCol], rgb));
+        townCenterCell = boardMap.cells[townRow][townCol];
         break;
       }
     }
@@ -56,8 +61,11 @@ class PlayerState {
     int cellSize = boardMap.gridsize;
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
+
+    humans.get(HumanCode.FREE).add(new FreeCitizen(townCenterCell, getTownSquare(), this));
+    humans.get(HumanCode.FREE).add(new FreeCitizen(townCenterCell, getTownSquare(), this));
   }
-// int c = 0;
+
   void step(double gameStateIndex) {
     // Iterate states of all Humans, update game stats (food levels, etc.)
 
@@ -66,21 +74,23 @@ class PlayerState {
       int foodEaten = getCitizens().size() + (humans.get(HumanCode.SOLDIER).size() * 2);
       foodSupply -= foodEaten;
       foodDepletionIndex += STEP_FOOD_DEPLETION;
+      this.handleStarvation();
     }
+
 
     // Births
     if (
       getCitizens().size() + humans.get(HumanCode.SOLDIER).size() < populationCapacity &&  // population isn't at capacity
       gameStateIndex >= birthIndex &&  // enough time has elapsed for a birth
-      buildings.get(BuildingCode.HOVEL).size() > 0  // there is an existing hovel to spawn from
+      buildings.get(BuildingCode.HOVEL).size() > 0 &&  // there is an existing hovel to spawn from
+      foodSupply > 0
     ) {
       Hovel targetHovel = (Hovel) buildings.get(BuildingCode.HOVEL).get(rng.nextInt(buildings.get(BuildingCode.HOVEL).size()));
       humans.get(HumanCode.FREE).add(new FreeCitizen(targetHovel.loc, this.getTownSquare(), this));
       birthIndex += STEP_BIRTH;
-      // c++;
     }
 
-    this.handleHealth();
+    this.handleBattleDamage();
 
     gameStateIndex += 1;
   }
@@ -126,7 +136,7 @@ class PlayerState {
    *  If any of our people are in the same cell as an enemy soldier, take damage.
    *  If any of our people reach health 0, they die.
    */
-  void handleHealth() {
+  void handleBattleDamage() {
     ArrayList<Cell> enemySoldierLocs = new ArrayList<Cell>();
 
     for (Human soldier : state.getSoldiers()) {
@@ -137,11 +147,11 @@ class PlayerState {
 
     ArrayList<Human> deadCitizens = new ArrayList<Human>();
     ArrayList<Human> deadSoldiers = new ArrayList<Human>();
+    int occurrences = 0;
 
     for (Human citizen : this.getCitizens()) {
-      if (enemySoldierLocs.contains(citizen.loc)) {
-        citizen.health -= 0.5;
-      }
+      occurrences = Collections.frequency(enemySoldierLocs, citizen.loc);
+      citizen.health -= 0.5 * occurrences;
 
       if (citizen.health <= 0) {
         deadCitizens.add(citizen);
@@ -149,9 +159,8 @@ class PlayerState {
     }
 
     for (Human soldier : this.getSoldiers()) {
-      if (enemySoldierLocs.contains(soldier.loc)) {
-        soldier.health -= 0.5;
-      }
+      occurrences = Collections.frequency(enemySoldierLocs, soldier.loc);
+      soldier.health -= 0.5 * occurrences;
 
       if (soldier.health <= 0) {
         deadSoldiers.add(soldier);
@@ -159,12 +168,68 @@ class PlayerState {
     }
 
     for (Human c : deadCitizens) {
+      if (c.assignedBuilding instanceof Crop) {
+        Crop crop = (Crop) c.assignedBuilding;
+        crop.farmer = null;
+      }
+
       this.humans.get(c.type).remove(c);
     }
 
     for (Human s : deadSoldiers) {
       this.humans.get(HumanCode.SOLDIER).remove(s);
     }
+  }
+
+  /**
+   *  Starves your population based on how negative your food supply is
+   */
+  void handleStarvation() {
+    if (foodSupply < 0) {
+      int mealsMissed = -foodSupply;
+
+      int citizenCount = getCitizens().size();
+      int soldierCount = getSoldiers().size();
+
+      while (mealsMissed > 0) {
+        if (citizenCount < 1) {
+          this.starveSoldier();
+          mealsMissed -= 2;
+          continue;
+        }
+
+        if (soldierCount < 1 || mealsMissed < 2) {
+          this.starveCitizen();
+          mealsMissed -= 1;
+          continue;
+        }
+
+        float citizenOrSoldier = rng.nextFloat();
+        if (citizenOrSoldier > 0.5) {
+          this.starveCitizen();
+          mealsMissed -= 1;
+        } else {
+          this.starveSoldier();
+          mealsMissed -= 2;
+        }
+      }
+    }
+  }
+
+  /**
+   *  Starves a random citizen
+   */
+  void starveCitizen() {
+    int whichCitizen = rng.nextInt(getCitizens().size());
+    getCitizens().get(whichCitizen).starve();
+  }
+
+  /**
+   *  Starves a random soldier
+   */
+  void starveSoldier() {
+    int whichSoldier = rng.nextInt(getSoldiers().size());
+    getSoldiers().get(whichSoldier).starve();
   }
 
   void placeBuilding(Cell loc) {
@@ -285,6 +350,14 @@ class PlayerState {
     if (humans.get(HumanCode.FARMER).size() > 0) {
       Human farmerToRemove = humans.get(HumanCode.FARMER).remove(0);
       humans.get(HumanCode.FREE).add(new FreeCitizen(farmerToRemove.loc, getTownSquare(), this));
+
+      for (Building b : buildings.get(BuildingCode.CROP)) {
+        Crop crop = (Crop) b;
+        if (crop.farmer == farmerToRemove) {
+          crop.farmer = null;
+          break;
+        }
+      }
     }
   }
 
@@ -327,6 +400,6 @@ class PlayerState {
   }
 
   void updatePopulationCapacity() {
-    populationCapacity = HOVEL_CAPACITY * buildings.get(BuildingCode.HOVEL).size();
+    populationCapacity = HOVEL_CAPACITY * buildings.get(BuildingCode.HOVEL).size() + 2;
   }
 }

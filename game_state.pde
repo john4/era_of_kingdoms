@@ -6,8 +6,9 @@ class GameState {
   boolean isGameOver;
 
   GameState() {
-    humanPlayer = new PlayerState(new int[] { 255, 215, 0 });
-    computerPlayer = new PlayerState(new int[] { 128, 0, 0 });
+    boolean humanLeft = int(random(2)) == 1;
+    humanPlayer = new PlayerState(new int[] { 255, 215, 0 }, humanLeft);
+    computerPlayer = new PlayerState(new int[] { 128, 0, 0 }, !humanLeft);
     hal = new Hal(this, computerPlayer, humanPlayer);
 
     gameStateIndex = 0;
@@ -20,11 +21,14 @@ class GameState {
       computerPlayer.step(gameStateIndex);
       hal.behave();
 
-      if (humanPlayer.foodSupply < 1) {
+      int humanPopulation = humanPlayer.getCitizens().size() + humanPlayer.getSoldiers().size();
+      int computerPopulation = computerPlayer.getCitizens().size() + computerPlayer.getSoldiers().size();
+
+      if (humanPopulation < 1 || computerPopulation < 1) {
         isGameOver = true;
       }
 
-      if (gameStateIndex % (FRAME_RATE * 5) == 0 && humanPlayer.foodSupply < 20) {
+      if (gameStateIndex % (FRAME_RATE * 5) == 0 && humanPlayer.foodSupply < 1) {
         userInterface.messageQueue.add(new Message("Your people are starving...", 10*FRAME_RATE + gameStateIndex));
       }
 
@@ -37,8 +41,15 @@ class GameState {
 
   void draw() {
     if (isGameOver) {
+      int humanPopulation = humanPlayer.getCitizens().size() + humanPlayer.getSoldiers().size();
       textSize(34);
-      text("YOUR PEOPLE STARVED", width / 2, height / 2);
+
+      if (humanPopulation < 1) {
+        text("YOUR PEOPLE STARVED", 30, height / 2);
+      } else {
+        text("YOU DESTROYED THE ENEMY", 30, height / 2);
+      }
+
       return;
     }
 

@@ -6,6 +6,7 @@
 // John Martin, Arianna Tang, Nicholas Lailler
 
 import java.util.Random;
+import java.util.Collections;
 import processing.sound.*;
 
 BoardMap boardMap;
@@ -14,7 +15,10 @@ UserInterface userInterface;
 boolean showControlPanel = true;
 final int CELL_SIZE = 10;
 final int FRAME_RATE = 60;
+
 SoundFile bgmFile;
+SoundFile buildingSound;
+boolean musicPlaying;
 
 Random rng = new Random();
 
@@ -29,9 +33,13 @@ void setup() {
   boardMap.generate();
   state = new GameState();
   userInterface = new UserInterface();
-  bgmFile = new SoundFile(this, "bgm-drizzle.mp3");
+  // bgmFile = new SoundFile(this, "bgm-drizzle.mp3");
+  bgmFile = new SoundFile(this, "forgotten-plains.mp3");
+  // bgmFile = new SoundFile(this, "wind-of-prairie.mp3");
+  bgmFile.amp(0.5);
   bgmFile.loop();
-
+  musicPlaying = true;
+  buildingSound = new SoundFile(this, "hammering-nails.wav");
 
   // path = boardMap.findPath(state.getBuildings().get(0).loc, state.getBuildings().get(2).loc);
 }
@@ -46,19 +54,16 @@ void draw() {
 
 void mouseClicked() {
   if (mouseButton == LEFT) {
-    System.out.println("Left Click");
-
-    int cellSize = boardMap.gridsize;
-    int x = mouseX/cellSize;
-    int y = mouseY/cellSize;
-    int rows = boardMap.numRows;
-    int cols = boardMap.numCols;
+    System.out.println("Left Click at (" + mouseX + ", " + mouseY + ")");
     BuildingCode pB = state.humanPlayer.placingBuilding;
 
+
+
     if (pB != BuildingCode.NONE) {
-      Cell hoveredCell = boardMap.cellAtPos(new PVector(mouseX, mouseY));
+      Cell hoveredCell = boardMap.getHoveredCell();
       if (boardMap.validBuildingSpot(hoveredCell)) {
         state.humanPlayer.placeBuilding(hoveredCell);
+        buildingSound.play();
       } else {
         userInterface.messageQueue.add(new Message("Cannot place " + pB.toString() + " there!", state.gameStateIndex+FRAME_RATE*5));
       }
@@ -72,7 +77,7 @@ void mouseClicked() {
       panel.click();
     }
   } else {
-    System.out.println("Right Click");
+    System.out.println("Right Click at (" + mouseX + ", " + mouseY + ")");
     state.humanPlayer.placingBuilding = BuildingCode.NONE;
   }
 

@@ -115,6 +115,36 @@ class Plant extends Task {
       return SUCCESS;
     }
 
+    // Check if there are any unmanned crops, choose those and reassign farm if necessary
+    boolean pickedExistingCrop = false;
+    ArrayList<Building> crops = f.ownerState.buildings.get(BuildingCode.CROP);
+    for (Building b : crops) {
+      if (((Crop) b).farmer == null) {
+        f.crop = (Crop) b;
+        ((Crop) b).farmer = f;
+        pickedExistingCrop = true;
+        this.blackboard.put("Crop", f.crop);
+        break;
+      }
+    }
+
+    if (pickedExistingCrop) {
+      ArrayList<Building> farms = f.ownerState.buildings.get(BuildingCode.FARM);
+      float dist = 999999;
+      float newDist = 999999;
+
+      for (Building b : farms) {
+        newDist = b.loc.euclideanDistanceTo(f.crop.loc);
+
+        if (newDist < dist) {
+          dist = newDist;
+          f.assignedBuilding = b;
+        }
+      }
+
+      return SUCCESS;
+    }
+
     // Move to the nearest grass cell to our farm
     Cell target = (Cell) this.blackboard.get("Target");
     if (target == null) {
@@ -122,11 +152,14 @@ class Plant extends Task {
       this.blackboard.put("Target", target);
     }
 
-    // TODO: look for crops that have lost their farmer and take those
-
     if (!target.isIn(f.pos.x, f.pos.y)) {
       f.moveTo(target.pos.x, target.pos.y);
     } else {    // Plant some freaking crops
+      if (!boardMap.validBuildingSpot(target)) {
+        this.blackboard.put("Target", null);
+        return FAIL;
+      }
+
       Crop newCrop = (Crop) f.ownerState.addBuilding(BuildingCode.CROP, target);
       newCrop.farmer = f;
       f.crop = newCrop;

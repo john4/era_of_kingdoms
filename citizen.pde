@@ -1,5 +1,5 @@
 class Citizen extends Human {
-  final int CARRY_CAPACITY = 10;
+  final int CARRY_CAPACITY = 3;
 
   boolean isCarryingSupply;
   int carryWeight;

@@ -56,6 +56,7 @@ class AssignNextHuman extends HalTask {
     // calculate my ratios
     // find largest disparity
     // assign next human, success
+    return false;
   }
 }
 
