@@ -8,6 +8,12 @@ class Hal {
   Building townSquare;
   Cell[] cellsNearbyTownSquare;
 
+  // TODO when we have human types: hashmap human type -> golden ratio / 32
+  float goldenFarmers = 14 / 32;
+  float goldenLumberjacks = 4 / 32;
+  float goldenMiners = 4 / 32;
+  float goldenSoldiers = 10 / 32;
+
   HalTask behaviorTree;
 
   Hal(GameState gameState, PlayerState computerState, PlayerState humanState) {
@@ -36,6 +42,21 @@ class Hal {
 
 abstract class HalTask {
   abstract boolean execute();
+}
+
+class AssignNextHuman extends HalTask {
+  PlayerState state;
+
+  AssignNextHuman(PlayerState state) {
+    this.state = state;
+  }
+
+  boolean execute() {
+    // if I have no free citizens, fail
+    // calculate my ratios
+    // find largest disparity
+    // assign next human, success
+  }
 }
 
 class RiskOfStarving extends HalTask {
