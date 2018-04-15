@@ -140,11 +140,11 @@ class PlayerState {
 
     ArrayList<Citizen> deadCitizens = new ArrayList<Citizen>();
     ArrayList<Soldier> deadSoldiers = new ArrayList<Soldier>();
+    int occurrences = 0;
 
     for (Citizen citizen : this.citizens) {
-      if (enemySoldierLocs.contains(citizen.loc)) {
-        citizen.health -= 0.5;
-      }
+      occurrences = Collections.frequency(enemySoldierLocs, citizen.loc);
+      citizen.health -= 0.5 * occurrences;
 
       if (citizen.health <= 0) {
         deadCitizens.add(citizen);
@@ -152,9 +152,8 @@ class PlayerState {
     }
 
     for (Soldier soldier : this.soldiers) {
-      if (enemySoldierLocs.contains(soldier.loc)) {
-        soldier.health -= 0.5;
-      }
+      occurrences = Collections.frequency(enemySoldierLocs, soldier.loc);
+      soldier.health -= 0.5 * occurrences;
 
       if (soldier.health <= 0) {
         deadSoldiers.add(soldier);

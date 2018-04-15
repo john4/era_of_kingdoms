@@ -6,6 +6,7 @@
 // John Martin, Arianna Tang, Nicholas Lailler
 
 import java.util.Random;
+import java.util.Collections;
 import processing.sound.*;
 
 BoardMap boardMap;
