@@ -1,6 +1,7 @@
 class GameState {
   PlayerState humanPlayer;
   PlayerState computerPlayer;
+  Hal hal;
   double gameStateIndex;
   boolean isGameOver;
 
@@ -8,6 +9,7 @@ class GameState {
     boolean humanLeft = int(random(2)) == 1;
     humanPlayer = new PlayerState(new int[] { 255, 215, 0 }, humanLeft);
     computerPlayer = new PlayerState(new int[] { 128, 0, 0 }, !humanLeft);
+    hal = new Hal(this, computerPlayer, humanPlayer);
 
     gameStateIndex = 0;
     isGameOver = false;
@@ -17,9 +19,10 @@ class GameState {
     if (!isGameOver) {
       humanPlayer.step(gameStateIndex);
       computerPlayer.step(gameStateIndex);
+      hal.behave();
 
-      int humanPopulation = humanPlayer.citizens.size() + humanPlayer.soldiers.size();
-      int computerPopulation = computerPlayer.citizens.size() + computerPlayer.soldiers.size();
+      int humanPopulation = humanPlayer.getCitizens().size() + humanPlayer.getSoldiers().size();
+      int computerPopulation = computerPlayer.getCitizens().size() + computerPlayer.getSoldiers().size();
 
       if (humanPopulation < 1 || computerPopulation < 1) {
         isGameOver = true;
@@ -38,7 +41,7 @@ class GameState {
 
   void draw() {
     if (isGameOver) {
-      int humanPopulation = humanPlayer.citizens.size() + humanPlayer.soldiers.size();
+      int humanPopulation = humanPlayer.getCitizens().size() + humanPlayer.getSoldiers().size();
       textSize(34);
 
       if (humanPopulation < 1) {
@@ -67,10 +70,10 @@ class GameState {
     return results;
   }
 
-  ArrayList<Soldier> getSoldiers() {
-    ArrayList<Soldier> results = new ArrayList<Soldier>();
-    results.addAll(humanPlayer.soldiers);
-    results.addAll(computerPlayer.soldiers);
+  ArrayList<Human> getSoldiers() {
+    ArrayList<Human> results = new ArrayList<Human>();
+    results.addAll(humanPlayer.getSoldiers());
+    results.addAll(computerPlayer.getSoldiers());
     return results;
   }
 }

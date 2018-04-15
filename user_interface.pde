@@ -64,16 +64,16 @@ class UserInterface {
     int farmerCount = 0;
     int minerCount = 0;
     int freeCitizenCount = 0;
-    int allHumanCount = state.citizens.size() + state.soldiers.size();
+    int allHumanCount = state.getCitizens().size() + state.getSoldiers().size();
 
-    for (Citizen c : state.citizens) {
+    for (Human c : state.getCitizens()) {
       if (c instanceof Lumberjack) {
         lumberjackCount++;
       } else if (c instanceof Farmer) {
         farmerCount++;
       } else if (c instanceof Miner) {
         minerCount++;
-      } else if (c.isFree()) {
+      } else if (c instanceof FreeCitizen) {
         freeCitizenCount++;
       }
     }
@@ -81,7 +81,7 @@ class UserInterface {
     String resources = "Food: " + state.foodSupply + "  Lumber: " + state.resourceSupply.get(ResourceCode.LUMBER) +
       "  Metal: " + state.resourceSupply.get(ResourceCode.METAL) + "  Population: " + allHumanCount + " / " + state.populationCapacity +
       "  Free Citizens: " + freeCitizenCount + "  Farmers: " + farmerCount + "  Lumberjacks: " + lumberjackCount +
-      "  Miners: " + minerCount + "  Soldiers: " + state.soldiers.size();
+      "  Miners: " + minerCount + "  Soldiers: " + state.getSoldiers().size();
 
     fill(255);
     rect(-boardMap.xo, -boardMap.yo, rows * cellSize, 20);

@@ -1,3 +1,5 @@
+import java.util.HashSet;
+
 class Cell {
   ArrayList<Building> buildings = new ArrayList<Building>();
   Cell north, south, east, west;
@@ -76,6 +78,10 @@ class Cell {
     buildings.add(building);
   }
 
+  boolean hasBuilding() {
+    return buildings.size() > 0;
+  }
+
   boolean hasImpass(Building b) {
     for (Building building : buildings) {
       if (building.impassable) {
@@ -104,6 +110,31 @@ class Cell {
     neighbors.add(this.southeast);
     neighbors.add(this.southwest);
     return neighbors;
+  }
+
+  ArrayList<Cell> getCardinalNeighbors() {
+    ArrayList<Cell> neighbors = new ArrayList<Cell>();
+    neighbors.add(this.north);
+    neighbors.add(this.south);
+    neighbors.add(this.east);
+    neighbors.add(this.west);
+    return neighbors;
+  }
+
+  HashSet<Cell> getNearbyGrassCells(int r) {
+    HashSet<Cell> set = new HashSet<Cell>();
+    set.add(this);
+    return getNearbyGrassCellsHelper(this, r, set);
+  }
+
+  private HashSet<Cell> getNearbyGrassCellsHelper(Cell origin, int r, HashSet<Cell> acc) {
+    for (Cell neighbor : this.getCardinalNeighbors()) {
+      if (neighbor != null && neighbor.terraintype == 0 && !acc.contains(neighbor) && origin.euclideanDistanceTo(neighbor) <= r) {
+        acc.add(neighbor);
+        neighbor.getNearbyGrassCellsHelper(origin, r, acc);
+      }
+    }
+    return acc;
   }
 
   /** Breadth-first find closest cell of type terrain */

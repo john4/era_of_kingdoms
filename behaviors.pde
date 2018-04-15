@@ -363,8 +363,8 @@ class TargetEnemy extends Task {
     mark = null;
 
     // Picking an enemy prioritizes soldiers over citizens, closest first
-    ArrayList<Soldier> enemySoldiers = state.computerPlayer.soldiers;
-    ArrayList<Citizen> enemyCitizens = state.computerPlayer.citizens;
+    ArrayList<Human> enemySoldiers = state.computerPlayer.getSoldiers();
+    ArrayList<Human> enemyCitizens = state.computerPlayer.getCitizens();
 
     float shortestDistance = 99999;
 
@@ -372,7 +372,7 @@ class TargetEnemy extends Task {
       mark = enemySoldiers.get(0);
       shortestDistance = s.loc.euclideanDistanceTo(mark.loc);
 
-      for (Soldier enemySoldier : enemySoldiers) {
+      for (Human enemySoldier : enemySoldiers) {
         if (s.assignedBuilding.loc.euclideanDistanceTo(enemySoldier.loc) < shortestDistance) {
           mark = enemySoldier;
         }
@@ -387,7 +387,7 @@ class TargetEnemy extends Task {
       mark = enemyCitizens.get(0);
       shortestDistance = s.loc.euclideanDistanceTo(mark.loc);
 
-      for (Citizen enemyCitizen : enemyCitizens) {
+      for (Human enemyCitizen : enemyCitizens) {
         if (s.assignedBuilding.loc.euclideanDistanceTo(enemyCitizen.loc) < shortestDistance) {
           mark = enemyCitizen;
         }

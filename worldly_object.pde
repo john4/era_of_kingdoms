@@ -21,6 +21,10 @@ abstract class WorldlyObject {
     return (float) (Math.sqrt(Math.pow(c.x - loc.x, 2) + Math.pow(c.y - loc.y, 2)));
   }
 
+  float distanceTo(WorldlyObject o) {
+    return distanceTo(o.loc);
+  }
+
   void maybeUpdateCell() {
 
   }

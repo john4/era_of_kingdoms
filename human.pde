@@ -1,4 +1,5 @@
 abstract class Human extends WorldlyObject {
+  HumanCode type;
   float TARGET_RADIUS = 2;
   float SLOW_RADIUS = 5;
   float MAX_SPEED = 0.1;
@@ -105,5 +106,14 @@ abstract class Human extends WorldlyObject {
 
   void starve() {
     this.health -= this.STARVE_DAMAGE;
+  }
+}
+
+enum HumanCode {
+  FARMER, LUMBERJACK, MINER, SOLDIER, FREE;
+
+  @Override
+  public String toString() {
+      return name().toLowerCase();
   }
 }
