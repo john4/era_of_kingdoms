@@ -32,36 +32,33 @@ class UserInterface {
 
   void draw(PlayerState state) {
     textSize(14);
-    String terrain = "";
     int cellSize = boardMap.gridsize;
-    int x = mouseX/cellSize;
-    int y = mouseY/cellSize;
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
+    float zoom = boardMap.zoom;
 
-    if (x < 0) {
-      x = 0;
-    }
-    if (y < 0) {
-      y = 0;
-    }
-    if (x >= boardMap.numRows) {
-      x = boardMap.numRows - 1;
-    }
-    if (y >= boardMap.numCols) {
-      y = boardMap.numCols - 1;
+    if (boardMap.zoom != 1) {
+      scale(0.5);
     }
 
-    Cell hoveredCell = boardMap.cells[x][y];
-    if(x >= 0 && x < rows && y >= 0 && y < cols) {
+    float actualMouseX = (mouseX - boardMap.xo) / zoom;
+    float actualMouseY = (mouseY - boardMap.yo) / zoom;
+
+    String terrain = "";
+
+    Cell hoveredCell = boardMap.getHoveredCell();
+
+    if (hoveredCell.i >= 0 && hoveredCell.i < rows && hoveredCell.j >= 0 && hoveredCell.j < cols) {
       terrain = hoveredCell.getTerrainName();
     }
-    for(Building building : state.getBuildings()) {
-      if (building.loc.isIn(mouseX-boardMap.xo,mouseY-boardMap.yo)) {
+
+    for (Building building : state.getBuildings()) {
+      if (building.loc.isIn(actualMouseX, actualMouseY)) {
         terrain += ", " + building.getName();
       }
     }
-    String cursor = "(" + (mouseX- boardMap.xo) + ", " + (mouseY- boardMap.yo) + "), " + terrain;
+
+    String cursor = "(" + hoveredCell.i + ", " + hoveredCell.j + "), " + terrain;
 
     int lumberjackCount = 0;
     int farmerCount = 0;
@@ -87,21 +84,21 @@ class UserInterface {
       "  Miners: " + minerCount + "  Soldiers: " + state.soldiers.size();
 
     fill(255);
-    rect(-boardMap.xo,-boardMap.yo, rows*cellSize,20);
-    rect(mouseX + 10- boardMap.xo, mouseY-10- boardMap.yo, cursor.length() * 8,20);
+    rect(-boardMap.xo, -boardMap.yo, rows * cellSize, 20);
+    rect(mouseX + 10 - boardMap.xo, mouseY - 10 - boardMap.yo, cursor.length() * 8,20);
 
     // control panel
-    for(Panel panel : panels) {
+    for (Panel panel : panels) {
       panel.draw();
     }
 
     fill(0);
-    text(cursor, mouseX + 10- boardMap.xo, mouseY + 2.5- boardMap.yo);
-    text(resources, 20 - boardMap.xo,15 - boardMap.yo);
+    text(cursor, mouseX + 10 - boardMap.xo, mouseY + 2.5 - boardMap.yo);
+    text(resources, 20 - boardMap.xo, 15 - boardMap.yo);
 
     // Messages
     String messageStr = "";
-    for(Message message: messageQueue.messages) {
+    for (Message message : messageQueue.messages) {
       messageStr += message.message + "\n\n";
     }
 
@@ -115,7 +112,8 @@ class UserInterface {
         fill(255, 0, 0);
       }
 
-      rect(hoveredCell.x + 1, hoveredCell.y + 1, 8, 8);
+      rect(hoveredCell.x * zoom , hoveredCell.y * zoom, 8 * zoom, 8 * zoom);
+
     }
   }
 }
