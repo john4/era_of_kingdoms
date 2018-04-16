@@ -149,15 +149,19 @@ class CheckBelowGoldenRatio extends HalTask {
 
 class CheckHaveBuilding extends HalTask {
   PlayerState state;
-  BuildingCode building;
+  BuildingCode type;
 
-  CheckHaveBuilding(PlayerState state, BuildingCode building) {
+  CheckHaveBuilding(PlayerState state, BuildingCode type) {
     this.state = state;
-    this.building = building;
+    this.type = type;
   }
 
   boolean execute() {
-    return state.buildings.get(this.building).size() > 0;
+    Building targetBuilding = this.state.getLeastAssigned(this.type);
+    if (targetBuilding == null || targetBuilding.numFreeAssignments() == 0) {
+      return false;
+    }
+    return true;
   }
 }
 
@@ -180,15 +184,15 @@ class AssignCitizen extends HalTask {
 
     switch (this.type) {
       case FARMER:
-        targetBuilding = this.state.buildings.get(BuildingCode.FARM).get(rng.nextInt(this.state.buildings.get(BuildingCode.FARM).size()));
+        targetBuilding = this.state.getLeastAssigned(BuildingCode.FARM);
         newCitizen = new Farmer(oldFreeCitizen.loc, targetBuilding, state);
         break;
       case LUMBERJACK:
-        targetBuilding = this.state.buildings.get(BuildingCode.SAWMILL).get(rng.nextInt(this.state.buildings.get(BuildingCode.SAWMILL).size()));
+        targetBuilding = this.state.getLeastAssigned(BuildingCode.SAWMILL);
         newCitizen = new Lumberjack(oldFreeCitizen.loc, targetBuilding, state);
         break;
       case MINER:
-        targetBuilding = this.state.buildings.get(BuildingCode.FOUNDRY).get(rng.nextInt(this.state.buildings.get(BuildingCode.FOUNDRY).size()));
+        targetBuilding = this.state.getLeastAssigned(BuildingCode.FOUNDRY);
         newCitizen = new Miner(oldFreeCitizen.loc, targetBuilding, state);
         break;
     }
