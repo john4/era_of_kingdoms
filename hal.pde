@@ -38,6 +38,16 @@ class Hal {
     placeFarmSelectorItems[1] = new PlaceX(BuildingCode.FARM, computerState, cellsNearbyTownSquare);
     HalTask placeFarmSelector = new HalSelector(placeFarmSelectorItems);
 
+    HalTask[] placeSawmillSelectorItems = new HalTask[2];
+    placeSawmillSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.SAWMILL);
+    placeSawmillSelectorItems[1] = new PlaceX(BuildingCode.SAWMILL, computerState, cellsNearbyTownSquare);
+    HalTask placeSawmillSelector = new HalSelector(placeSawmillSelectorItems);
+
+    HalTask[] placeFoundrySelectorItems = new HalTask[2];
+    placeFoundrySelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.FOUNDRY);
+    placeFoundrySelectorItems[1] = new PlaceX(BuildingCode.FOUNDRY, computerState, cellsNearbyTownSquare);
+    HalTask placeFoundarySelector = new HalSelector(placeFoundrySelectorItems);
+
     HalTask[] placeStockpileSelectorItems = new HalTask[2];
     placeStockpileSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.STOCKPILE);
     placeStockpileSelectorItems[1] = new PlaceX(BuildingCode.STOCKPILE, computerState, cellsNearbyTownSquare);
@@ -49,8 +59,22 @@ class Hal {
     assignFarmerSequenceItems[2] = new AssignCitizen(computerState, HumanCode.FARMER);
     HalTask assignFarmerSequence = new HalSequence(assignFarmerSequenceItems);
 
-    HalTask[] oracleAssignSelectorItems = new HalTask[1];
+    HalTask[] assignLumberjackSequenceItems = new HalTask[3];
+    assignLumberjackSequenceItems[0] = new CheckBelowGoldenRatio(computerState, HumanCode.LUMBERJACK, this.goldenRatio);
+    assignLumberjackSequenceItems[1] = placeSawmillSelector;
+    assignLumberjackSequenceItems[2] = new AssignCitizen(computerState, HumanCode.LUMBERJACK);
+    HalTask assignLumberjackSequence = new HalSequence(assignLumberjackSequenceItems);
+
+    HalTask[] assignMinerSelectorItems = new HalTask[3];
+    assignMinerSelectorItems[0] = new CheckBelowGoldenRatio(computerState, HumanCode.MINER, this.goldenRatio);
+    assignMinerSelectorItems[1] = placeFoundarySelector;
+    assignMinerSelectorItems[2] = new AssignCitizen(computerState, HumanCode.MINER);
+    HalTask assignMinerSequence = new HalSequence(assignMinerSelectorItems);
+
+    HalTask[] oracleAssignSelectorItems = new HalTask[3];
     oracleAssignSelectorItems[0] = assignFarmerSequence;
+    oracleAssignSelectorItems[1] = assignLumberjackSequence;
+    oracleAssignSelectorItems[2] = assignMinerSequence;
     HalTask oracleAssignSelector = new HalSelector(oracleAssignSelectorItems);
 
     HalTask[] oracleAssignSequenceItems = new HalTask[3];
@@ -78,6 +102,7 @@ class Hal {
 
 abstract class HalTask {
   abstract boolean execute();
+  boolean verbose = true;
 }
 
 class NeedMoreCitizens extends HalTask {
@@ -146,8 +171,10 @@ class AssignCitizen extends HalTask {
   }
 
   boolean execute() {
-    ArrayList<Human> freeCitizens = this.state.humans.get(HumanCode.FREE);
-    Human oldFreeCitizen = freeCitizens.get(0);
+    Human oldFreeCitizen = this.state.getFreeCitizen();
+    if (oldFreeCitizen == null) {
+      return false;
+    }
     Building targetBuilding = null;
     Human newCitizen = null;
 
@@ -156,6 +183,18 @@ class AssignCitizen extends HalTask {
         targetBuilding = this.state.buildings.get(BuildingCode.FARM).get(rng.nextInt(this.state.buildings.get(BuildingCode.FARM).size()));
         newCitizen = new Farmer(oldFreeCitizen.loc, targetBuilding, state);
         break;
+      case LUMBERJACK:
+        targetBuilding = this.state.buildings.get(BuildingCode.SAWMILL).get(rng.nextInt(this.state.buildings.get(BuildingCode.SAWMILL).size()));
+        newCitizen = new Lumberjack(oldFreeCitizen.loc, targetBuilding, state);
+        break;
+      case MINER:
+        targetBuilding = this.state.buildings.get(BuildingCode.FOUNDRY).get(rng.nextInt(this.state.buildings.get(BuildingCode.FOUNDRY).size()));
+        newCitizen = new Miner(oldFreeCitizen.loc, targetBuilding, state);
+        break;
+    }
+
+    if (newCitizen == null) {
+      return false;
     }
 
     this.state.humans.get(HumanCode.FREE).remove(oldFreeCitizen);
