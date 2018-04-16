@@ -3,6 +3,7 @@ class Foundry extends Building {
 
   Foundry(Cell initialLocation) {
     super(initialLocation, "Sawmill");
+    this.assignmentLimit = 1;
     this.img = loadImage("pick.png");
   }
 

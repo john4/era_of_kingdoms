@@ -54,7 +54,7 @@ void draw() {
 
 void mouseClicked() {
   if (mouseButton == LEFT) {
-    System.out.println("Left Click at (" + mouseX + ", " + mouseY + ")");
+    // System.out.println("Left Click at (" + mouseX + ", " + mouseY + ")");
     BuildingCode pB = state.humanPlayer.placingBuilding;
 
 
@@ -77,7 +77,7 @@ void mouseClicked() {
       panel.click();
     }
   } else {
-    System.out.println("Right Click at (" + mouseX + ", " + mouseY + ")");
+    // System.out.println("Right Click at (" + mouseX + ", " + mouseY + ")");
     state.humanPlayer.placingBuilding = BuildingCode.NONE;
   }
 

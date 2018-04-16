@@ -34,9 +34,9 @@ abstract class Building extends WorldlyObject implements Comparable<Building> {
     int ourFreeAssign = this.numFreeAssignments();
     int theirFreeAssign = b.numFreeAssignments();
     if (ourFreeAssign > theirFreeAssign) {
-      return 1;
-    } else if (ourFreeAssign < theirFreeAssign) {
       return -1;
+    } else if (ourFreeAssign < theirFreeAssign) {
+      return 1;
     }
     return 0;
   }

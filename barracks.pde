@@ -3,6 +3,7 @@ class Barracks extends Building {
 
   Barracks(Cell initialLocation) {
     super(initialLocation, "Sawmill");
+    this.assignmentLimit = 6;
     this.img = loadImage("sword.png");
   }
 
