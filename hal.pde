@@ -48,6 +48,11 @@ class Hal {
     placeFoundrySelectorItems[1] = new PlaceX(BuildingCode.FOUNDRY, computerState, cellsNearbyTownSquare);
     HalTask placeFoundarySelector = new HalSelector(placeFoundrySelectorItems);
 
+    HalTask[] placeBarracksSelectorItems = new HalTask[2];
+    placeBarracksSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.BARRACKS);
+    placeBarracksSelectorItems[1] = new PlaceX(BuildingCode.BARRACKS, computerState, cellsNearbyTownSquare);
+    HalTask placeBarracksSelector = new HalSelector(placeBarracksSelectorItems);
+
     HalTask[] placeStockpileSelectorItems = new HalTask[2];
     placeStockpileSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.STOCKPILE);
     placeStockpileSelectorItems[1] = new PlaceX(BuildingCode.STOCKPILE, computerState, cellsNearbyTownSquare);
@@ -71,10 +76,17 @@ class Hal {
     assignMinerSelectorItems[2] = new AssignCitizen(computerState, HumanCode.MINER);
     HalTask assignMinerSequence = new HalSequence(assignMinerSelectorItems);
 
-    HalTask[] oracleAssignSelectorItems = new HalTask[3];
+    HalTask[] assignSoldierSelectorItems = new HalTask[3];
+    assignSoldierSelectorItems[0] = new CheckBelowGoldenRatio(computerState, HumanCode.SOLDIER, this.goldenRatio);
+    assignSoldierSelectorItems[1] = placeBarracksSelector;
+    assignSoldierSelectorItems[2] = new AssignCitizen(computerState, HumanCode.SOLDIER);
+    HalTask assignSoldierSequence = new HalSequence(assignSoldierSelectorItems);
+
+    HalTask[] oracleAssignSelectorItems = new HalTask[4];
     oracleAssignSelectorItems[0] = assignFarmerSequence;
     oracleAssignSelectorItems[1] = assignLumberjackSequence;
     oracleAssignSelectorItems[2] = assignMinerSequence;
+    oracleAssignSelectorItems[3] = assignSoldierSequence;
     HalTask oracleAssignSelector = new HalSelector(oracleAssignSelectorItems);
 
     HalTask[] oracleAssignSequenceItems = new HalTask[3];
