@@ -6,6 +6,7 @@ abstract class Human extends WorldlyObject {
   float MAX_ACCELERATION = 0.01;
   float MAX_HEALTH = 250;
   float STARVE_DAMAGE = 25;
+  int collisions = 0;
 
   int[] c = new int[3];
   float health;
@@ -25,7 +26,13 @@ abstract class Human extends WorldlyObject {
 
     this.blackboard = new Blackboard();
     this.blackboard.put("Human", this);
-    this.btree = new Wander(this.blackboard, 25);
+
+    Task[] wanderSequence = new Task[2];
+    wanderSequence[0] = new Wander(this.blackboard, 25);
+    wanderSequence[1] = new Move(this.blackboard);
+    Task wander = new Sequence(this.blackboard, wanderSequence);
+
+    this.btree = wander;
   }
 
   void unassignFromBuilding() {
@@ -99,7 +106,9 @@ abstract class Human extends WorldlyObject {
     pos.add(ray);
     Cell c = boardMap.cellAtPos(pos);
     if(c.hasImpass(assignedBuilding)){
-      ray.rotate(PI/2 + random(-PI/16,PI/16));
+      this.collisions++;
+      println("collisions: " + this.collisions);
+      ray.rotate(PI/2);
       ray.setMag(.2);
       this.vel.add(ray);
     }

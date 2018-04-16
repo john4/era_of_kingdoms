@@ -203,6 +203,7 @@ class BoardMap {
   }
 
   PotentialPathNode findPath(Cell from, Cell to) {
+    println("Oh god A*\n\n\n");
     // initialize
     queue = new PriorityQueue<PotentialPathNode>();
     distanceTable = new HashMap<Cell, Float>();

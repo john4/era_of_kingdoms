@@ -213,15 +213,15 @@ class PlaceX extends HalTask {
 
   boolean execute() {
     int attempts = 0;
-    while(attempts < potentialCells.length) {
-      attempts++;
-      Cell potentialCell = potentialCells[rng.nextInt(potentialCells.length)];
-      if (!potentialCell.hasBuilding()) {
-        state.placeBuilding(potentialCell, buildingType);
+    // while(attempts < potentialCells.length) {
+    //   attempts++;
+    //   Cell potentialCell = potentialCells[rng.nextInt(potentialCells.length)];
+    //   if (!potentialCell.hasBuilding()) {
+    //     state.placeBuilding(potentialCell, buildingType);
         return true;
-      }
-    }
-    return false;
+    //   }
+    // }
+    // return false;
   }
 }
 

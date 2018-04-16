@@ -1,5 +1,49 @@
 final int GATHER_SPEED = 1;  // how many seconds to gather 1 unit
 
+class Move extends Task {
+
+  Move(Blackboard bb) {
+    this.blackboard = bb;
+  }
+
+  int execute() {
+    Human h = (Human) this.blackboard.get("Human");
+    Cell target = (Cell) this.blackboard.get("Target");
+    PotentialPathNode node = (PotentialPathNode) this.blackboard.get("Path");
+
+    if (h.collisions >= MAX_COLLISIONS) { // run A* on max collision count
+      h.collisions = 0; // reset collision counter
+      node = boardMap.findPath(h.loc, target);
+      if(node != null) {
+        node.draw();
+        // delay(1);
+      }
+    }
+
+    // close enough to let moveTo take over
+    double dist = CELL_SIZE * Math.sqrt(2) + .1;
+    if (node == null || target.euclideanDistanceTo(h.loc) < dist) {
+      this.blackboard.put("Path", null); // pathfinding is done
+      h.moveTo(target.pos.x, target.pos.y);
+    } else {
+      followPath(node, h); // node traverse to find path
+    }
+
+    return SUCCESS;
+  }
+
+  void followPath(PotentialPathNode node, Human h) {
+    // should never be null, store current node for next frame.
+    this.blackboard.put("Path", node);
+    // if reached node but node still has parent, recall to update node and move to new cell.
+    if (node.cell.isIn(h.loc.x, h.loc.y) && node.parent != null) {
+      followPath(node.parent, h);
+    } else {
+      h.moveTo(node.cell.x, node.cell.y);
+    }
+  }
+}
+
 class Wander extends Task {
   Wander(Blackboard bb, int radius) {
     this.blackboard = bb;
@@ -85,15 +129,7 @@ class Wander extends Task {
         this.blackboard.put("Target", target);
         this.blackboard.put("Waiting", 50);
       }
-
-
-      h.moveTo(target.pos.x, target.pos.y);
     }
-
-    // TODO: A*
-    // PotentialPathNode path = boardMap.findPath(h.loc, target);
-    // path.draw();
-    // Cell target = boardMap.findPath(h.
 
     return SUCCESS;
   }
