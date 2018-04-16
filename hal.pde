@@ -201,7 +201,7 @@ class AssignCitizen extends HalTask {
       return false;
     }
 
-    this.state.humans.get(HumanCode.FREE).remove(oldFreeCitizen);
+    this.state.removeHuman(oldFreeCitizen);
     this.state.humans.get(this.type).add(newCitizen);
     return true;
   }
