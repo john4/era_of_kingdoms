@@ -16,7 +16,6 @@ class Move extends Task {
       node = boardMap.findPath(h.loc, target);
       if(node != null) {
         node.draw();
-        // delay(1);
       }
     }
 

@@ -232,10 +232,18 @@ class BoardMap {
         distanceTable.put(n.cell, n.costSoFar);
 
         // check all adjecent cells
-        findPathHelper(n, n.cell.northeast, to);
-        findPathHelper(n, n.cell.northwest, to);
-        findPathHelper(n, n.cell.southeast, to);
-        findPathHelper(n, n.cell.southwest, to);
+        if (!n.cell.north.hasBuilding() || !n.cell.east.hasBuilding()) {
+          findPathHelper(n, n.cell.northeast, to);
+        }
+        if (!n.cell.north.hasBuilding() || !n.cell.west.hasBuilding()) {
+          findPathHelper(n, n.cell.northwest, to);
+        }
+        if (!n.cell.south.hasBuilding() || !n.cell.east.hasBuilding()) {
+          findPathHelper(n, n.cell.southeast, to);
+        }
+        if (!n.cell.south.hasBuilding() || !n.cell.west.hasBuilding()) {
+          findPathHelper(n, n.cell.southwest, to);
+        }
         findPathHelper(n, n.cell.north, to);
         findPathHelper(n, n.cell.south, to);
         findPathHelper(n, n.cell.east, to);

@@ -101,16 +101,15 @@ abstract class Human extends WorldlyObject {
     // Calculate new position
     PVector pos = this.pos.copy();
     PVector ray = this.vel.copy();
-    ray.setMag(CELL_SIZE/2);
 
     pos.add(ray);
     Cell c = boardMap.cellAtPos(pos);
     if(c.hasImpass(assignedBuilding)){
       this.collisions++;
       println("collisions: " + this.collisions);
-      ray.rotate(PI/2);
-      ray.setMag(.2);
-      this.vel.add(ray);
+      this.vel.rotate(PI/8);
+      // ray.setMag(.2);
+      // this.vel.add(ray);
     }
 
 
