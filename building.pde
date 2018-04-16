@@ -1,12 +1,44 @@
-abstract class Building extends WorldlyObject {
+abstract class Building extends WorldlyObject implements Comparable<Building> {
   int[] c = new int[3];
   String name;
+  ArrayList<Human> assignedHumans;
+  int assignmentLimit;
 
   Building(Cell location, String name) {
     super(location);
     this.c = new int[]{20, 20, 20};
     this.name = name;
+    this.assignedHumans = new ArrayList<Human>();
+    this.assignmentLimit = Integer.MAX_VALUE;
     location.addBuilding(this);
+  }
+
+  boolean removeAssignee(Human h) {
+    return this.assignedHumans.remove(h);
+  }
+
+  boolean addAssignee(Human h) {
+    if (this.numFreeAssignments() > 0) {
+      this.assignedHumans.add(h);
+      return true;
+    }
+    return false;
+  }
+
+  int numFreeAssignments() {
+    return this.assignmentLimit - this.assignedHumans.size();
+  }
+
+  // buildings sortable by how many available assignee spaces they have left
+  @Override public int compareTo(Building b) {
+    int ourFreeAssign = this.numFreeAssignments();
+    int theirFreeAssign = b.numFreeAssignments();
+    if (ourFreeAssign > theirFreeAssign) {
+      return 1;
+    } else if (ourFreeAssign < theirFreeAssign) {
+      return -1;
+    }
+    return 0;
   }
 
   void draw() {
