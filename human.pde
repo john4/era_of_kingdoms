@@ -20,11 +20,23 @@ abstract class Human extends WorldlyObject {
     this.c = new int[]{20, 20, 20};
     this.health = MAX_HEALTH;
     this.assignedBuilding = buildingAssignment;
+    buildingAssignment.addAssignee(this);
     this.ownerState = ownerState;
 
     this.blackboard = new Blackboard();
     this.blackboard.put("Human", this);
     this.btree = new Wander(this.blackboard, 25);
+  }
+
+  void unassignFromBuilding() {
+    this.assignedBuilding.removeAssignee(this);
+    this.assignedBuilding = null;
+  }
+
+  void assignToNewBuilding(Building newAssignment) {
+    this.assignedBuilding.removeAssignee(this);
+    this.assignedBuilding = newAssignment;
+    newAssignment.addAssignee(this);
   }
 
   void draw() {

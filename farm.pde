@@ -3,6 +3,7 @@ class Farm extends Building {
 
   Farm(Cell initialLocation) {
     super(initialLocation, "Farm");
+    this.assignmentLimit = 2;
     this.impassable = true;
     this.img = loadImage("farm.png");
   }
