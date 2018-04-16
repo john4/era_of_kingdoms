@@ -51,13 +51,8 @@ class PlayerState {
 
     foodSupply = 1200;
     resourceSupply = new HashMap<ResourceCode, Integer>();
-<<<<<<< Updated upstream
     resourceSupply.put(ResourceCode.LUMBER, 48);
     resourceSupply.put(ResourceCode.METAL, 12);
-=======
-    resourceSupply.put(ResourceCode.LUMBER, 3600);
-    resourceSupply.put(ResourceCode.METAL, 6);
->>>>>>> Stashed changes
 
     updatePopulationCapacity();
     placingBuilding = BuildingCode.NONE;
