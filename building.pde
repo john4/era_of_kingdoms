@@ -57,13 +57,28 @@ class BuildingCosts {
     hovel.put(ResourceCode.LUMBER, 4);
     hovel.put(ResourceCode.METAL, 0);
 
+    HashMap<ResourceCode, Integer> stockpile = new HashMap<ResourceCode, Integer>();
+    stockpile.put(ResourceCode.LUMBER, 4);
+    stockpile.put(ResourceCode.METAL, 0);
+
+    HashMap<ResourceCode, Integer> barracks = new HashMap<ResourceCode, Integer>();
+    stockpile.put(ResourceCode.LUMBER, 32);
+    stockpile.put(ResourceCode.METAL, 16);
+
+    HashMap<ResourceCode, Integer> foundry = new HashMap<ResourceCode, Integer>();
+    stockpile.put(ResourceCode.LUMBER, 24);
+    stockpile.put(ResourceCode.METAL, 0);
 
     costs = new HashMap<BuildingCode, HashMap<ResourceCode, Integer>>();
     for (BuildingCode buildingCode : BuildingCode.values()) {
       costs.put(buildingCode, free);
     }
+
     costs.put(BuildingCode.FARM, farm);
     costs.put(BuildingCode.SAWMILL, sawmill);
     costs.put(BuildingCode.HOVEL, hovel);
+    costs.put(BuildingCode.STOCKPILE, stockpile);
+    costs.put(BuildingCode.BARRACKS, barracks);
+    costs.put(BuildingCode.FOUNDRY, foundry);
   }
 }

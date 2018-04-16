@@ -291,6 +291,14 @@ class PlayerState {
     return buildings.get(BuildingCode.TOWNSQUARE).get(0);
   }
 
+  ArrayList<Human> getAllHumans() {
+    ArrayList<Human> result = new ArrayList<Human>();
+    for (HumanCode code : HumanCode.values()) {
+      result.addAll(humans.get(code));
+    }
+    return result;
+  }
+
   ArrayList<Human> getCitizens() {
     ArrayList<Human> result = new ArrayList<Human>();
     for (HumanCode code : HumanCode.values()) {

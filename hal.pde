@@ -7,12 +7,7 @@ class Hal {
   PlayerState humanState;
   Building townSquare;
   Cell[] cellsNearbyTownSquare;
-
-  // TODO when we have human types: hashmap human type -> golden ratio / 32
-  float goldenFarmers = 14 / 32;
-  float goldenLumberjacks = 4 / 32;
-  float goldenMiners = 4 / 32;
-  float goldenSoldiers = 10 / 32;
+  HashMap<HumanCode, Float> goldenRatio;
 
   HalTask behaviorTree;
 
@@ -21,13 +16,54 @@ class Hal {
     this.computerState = computerState;
     this.humanState = humanState;
 
+    this.goldenRatio = new HashMap<HumanCode, Float>();
+    this.goldenRatio.put(HumanCode.FARMER, 14.0 / 32.0);
+    this.goldenRatio.put(HumanCode.LUMBERJACK, 4.0 / 32.0);
+    this.goldenRatio.put(HumanCode.MINER, 4.0 / 32.0);
+    this.goldenRatio.put(HumanCode.SOLDIER, 10.0 / 32.0);
+
     cooldownIndex = gameState.gameStateIndex;
 
     townSquare = computerState.buildings.get(BuildingCode.TOWNSQUARE).get(0);
     HashSet<Cell> cellsNearbyTownSquareSet = townSquare.loc.getNearbyGrassCells(100);
     cellsNearbyTownSquare = cellsNearbyTownSquareSet.toArray(new Cell[cellsNearbyTownSquareSet.size()]);
 
-    behaviorTree = new PlaceX(BuildingCode.FARM, computerState, cellsNearbyTownSquare);
+    HalTask[] increasePopulationItems = new HalTask[2];
+    increasePopulationItems[0] = new NeedMoreCitizens(computerState);
+    increasePopulationItems[1] = new PlaceX(BuildingCode.HOVEL, computerState, cellsNearbyTownSquare);
+    HalTask increasePopulationSequence = new HalSequence(increasePopulationItems);
+
+    HalTask[] placeFarmSelectorItems = new HalTask[2];
+    placeFarmSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.FARM);
+    placeFarmSelectorItems[1] = new PlaceX(BuildingCode.FARM, computerState, cellsNearbyTownSquare);
+    HalTask placeFarmSelector = new HalSelector(placeFarmSelectorItems);
+
+    HalTask[] placeStockpileSelectorItems = new HalTask[2];
+    placeStockpileSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.STOCKPILE);
+    placeStockpileSelectorItems[1] = new PlaceX(BuildingCode.STOCKPILE, computerState, cellsNearbyTownSquare);
+    HalTask placeStockpileSelector = new HalSelector(placeStockpileSelectorItems);
+
+    HalTask[] assignFarmerSequenceItems = new HalTask[3];
+    assignFarmerSequenceItems[0] = new CheckBelowGoldenRatio(computerState, HumanCode.FARMER, this.goldenRatio);
+    assignFarmerSequenceItems[1] = placeFarmSelector;
+    assignFarmerSequenceItems[2] = new AssignCitizen(computerState, HumanCode.FARMER);
+    HalTask assignFarmerSequence = new HalSequence(assignFarmerSequenceItems);
+
+    HalTask[] oracleAssignSelectorItems = new HalTask[1];
+    oracleAssignSelectorItems[0] = assignFarmerSequence;
+    HalTask oracleAssignSelector = new HalSelector(oracleAssignSelectorItems);
+
+    HalTask[] oracleAssignSequenceItems = new HalTask[3];
+    oracleAssignSequenceItems[0] = new HaveFreeCitizen(computerState);
+    oracleAssignSequenceItems[1] = placeStockpileSelector;
+    oracleAssignSequenceItems[2] = oracleAssignSelector;
+    HalTask oracleAssignSequence = new HalSequence(oracleAssignSequenceItems);
+
+    HalTask[] oracleItems = new HalTask[2];
+    oracleItems[0] = increasePopulationSequence;
+    oracleItems[1] = oracleAssignSequence;
+
+    behaviorTree = new HalSelector(oracleItems);
   }
 
   void behave() {
@@ -44,19 +80,87 @@ abstract class HalTask {
   abstract boolean execute();
 }
 
-class AssignNextHuman extends HalTask {
+class NeedMoreCitizens extends HalTask {
   PlayerState state;
 
-  AssignNextHuman(PlayerState state) {
+  NeedMoreCitizens(PlayerState state) {
     this.state = state;
   }
 
   boolean execute() {
-    // if I have no free citizens, fail
-    // calculate my ratios
-    // find largest disparity
-    // assign next human, success
-    return false;
+    return this.state.getAllHumans().size() >= this.state.populationCapacity;
+  }
+}
+
+class HaveFreeCitizen extends HalTask {
+  PlayerState state;
+
+  HaveFreeCitizen(PlayerState state) {
+    this.state = state;
+  }
+
+  boolean execute() {
+    return this.state.humans.get(HumanCode.FREE).size() > 0;
+  }
+}
+
+class CheckBelowGoldenRatio extends HalTask {
+  PlayerState state;
+  HumanCode type;
+  HashMap<HumanCode, Float> goldenRatio;
+
+  CheckBelowGoldenRatio(PlayerState state, HumanCode type, HashMap<HumanCode, Float> goldenRatio) {
+    this.state = state;
+    this.type = type;
+    this.goldenRatio = goldenRatio;
+  }
+
+  boolean execute() {
+    float goal = this.goldenRatio.get(this.type);
+    float current = (float) this.state.humans.get(this.type).size() / (float) this.state.getAllHumans().size();
+    return current < goal;
+  }
+}
+
+class CheckHaveBuilding extends HalTask {
+  PlayerState state;
+  BuildingCode building;
+
+  CheckHaveBuilding(PlayerState state, BuildingCode building) {
+    this.state = state;
+    this.building = building;
+  }
+
+  boolean execute() {
+    return state.buildings.get(this.building).size() > 0;
+  }
+}
+
+class AssignCitizen extends HalTask {
+  PlayerState state;
+  HumanCode type;
+
+  AssignCitizen(PlayerState state, HumanCode type) {
+    this.state = state;
+    this.type = type;
+  }
+
+  boolean execute() {
+    ArrayList<Human> freeCitizens = this.state.humans.get(HumanCode.FREE);
+    Human oldFreeCitizen = freeCitizens.get(0);
+    Building targetBuilding = null;
+    Human newCitizen = null;
+
+    switch (this.type) {
+      case FARMER:
+        targetBuilding = this.state.buildings.get(BuildingCode.FARM).get(rng.nextInt(this.state.buildings.get(BuildingCode.FARM).size()));
+        newCitizen = new Farmer(oldFreeCitizen.loc, targetBuilding, state);
+        break;
+    }
+
+    this.state.humans.get(HumanCode.FREE).remove(oldFreeCitizen);
+    this.state.humans.get(this.type).add(newCitizen);
+    return true;
   }
 }
 
