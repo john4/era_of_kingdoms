@@ -1,4 +1,4 @@
-class Citizen extends Human {
+abstract class Citizen extends Human {
   final int CARRY_CAPACITY = 3;
 
   boolean isCarryingSupply;
