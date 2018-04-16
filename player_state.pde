@@ -49,10 +49,10 @@ class PlayerState {
       }
     }
 
-    foodSupply = 120;
+    foodSupply = 12;
     resourceSupply = new HashMap<ResourceCode, Integer>();
-    resourceSupply.put(ResourceCode.LUMBER, 360);
-    resourceSupply.put(ResourceCode.METAL, 60);
+    resourceSupply.put(ResourceCode.LUMBER, 48);
+    resourceSupply.put(ResourceCode.METAL, 12);
 
     updatePopulationCapacity();
     placingBuilding = BuildingCode.NONE;
@@ -62,9 +62,6 @@ class PlayerState {
     int rows = boardMap.numRows;
     int cols = boardMap.numCols;
 
-    humans.get(HumanCode.FREE).add(new FreeCitizen(townCenterCell, getTownSquare(), this));
-    humans.get(HumanCode.FREE).add(new FreeCitizen(townCenterCell, getTownSquare(), this));
-    humans.get(HumanCode.FREE).add(new FreeCitizen(townCenterCell, getTownSquare(), this));
     humans.get(HumanCode.FREE).add(new FreeCitizen(townCenterCell, getTownSquare(), this));
     humans.get(HumanCode.FREE).add(new FreeCitizen(townCenterCell, getTownSquare(), this));
   }
