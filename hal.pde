@@ -117,7 +117,7 @@ class CheckBelowGoldenRatio extends HalTask {
 
   boolean execute() {
     float goal = this.goldenRatio.get(this.type);
-    float current = this.state.humans.get(this.type).size() / this.state.getAllHumans().size();
+    float current = (float) this.state.humans.get(this.type).size() / (float) this.state.getAllHumans().size();
     return current < goal;
   }
 }
