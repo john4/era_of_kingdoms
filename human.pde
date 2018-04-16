@@ -98,6 +98,9 @@ abstract class Human extends WorldlyObject {
 
     pos.add(ray);
     Cell c = boardMap.cellAtPos(pos);
+    if (c == null){
+      return;
+    }
     if(c.hasImpass(assignedBuilding)){
       ray.rotate(PI/2 + random(-PI/16,PI/16));
       ray.setMag(.2);
