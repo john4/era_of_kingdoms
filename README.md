@@ -9,4 +9,5 @@ BGM: https://www.newgrounds.com/audio/listen/783837
 - Space: restart the game
 - r: reset camera
 - z: switch between 1x and 2x zoom
+- m: mute sound
 - left mouse: drag to drag the map around
