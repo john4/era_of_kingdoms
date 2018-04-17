@@ -3,7 +3,9 @@ import java.util.Arrays;
 class Hal {
   static final int ACTION_COOLDOWN = 30;
   double cooldownIndex;
-  static final int DESIRED_RESOURCE_BUILDING_PROXIMITY_TO_STOCKPILE = 25;
+  static final int DESIRED_RESOURCE_BUILDING_PROXIMITY_TO_STOCKPILE = 30;
+  static final int DESIRED_FARM_PROXIMITY_TO_STOCKPILE = 25;
+  static final int CELLS_AROUND_TOWN_SQUARE_RADIUS = 100;
 
   GameState gameState;
   PlayerState computerState;
@@ -34,7 +36,7 @@ class Hal {
     cooldownIndex = gameState.gameStateIndex;
 
     townSquare = computerState.buildings.get(BuildingCode.TOWNSQUARE).get(0);
-    HashSet<Cell> grassCellsNearbyTownSquareSet = townSquare.loc.getNearbyGrassCells(100);
+    HashSet<Cell> grassCellsNearbyTownSquareSet = townSquare.loc.getNearbyGrassCells(CELLS_AROUND_TOWN_SQUARE_RADIUS);
     grassCellsNearbyTownSquare = new ArrayList<Cell>(Arrays.asList(grassCellsNearbyTownSquareSet.toArray(new Cell[grassCellsNearbyTownSquareSet.size()])));
     grassCellsNearStockpiles = new ArrayList<Cell>();
     grassCellsNearForest = new ArrayList<Cell>();
@@ -140,7 +142,7 @@ class Hal {
     HashSet<Cell> newCellsNearStockpiles = new HashSet<Cell>();
 
     for (Building stockpile : stockpiles) {
-      newCellsNearStockpiles = stockpile.loc.getNearbyGrassCells(40, newCellsNearStockpiles);
+      newCellsNearStockpiles = stockpile.loc.getNearbyGrassCells(DESIRED_FARM_PROXIMITY_TO_STOCKPILE, newCellsNearStockpiles);
     }
 
     this.grassCellsNearStockpiles.clear();
