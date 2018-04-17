@@ -114,7 +114,7 @@ class Hal {
     assignSoldierSelectorItems[2] = new AssignCitizen(computerState, HumanCode.SOLDIER);
     HalTask assignSoldierSequence = new HalSequence(assignSoldierSelectorItems);
 
-    HalTask[] oracleAssignSelectorItems = new HalTask[4];
+    HalTask[] oracleAssignSelectorItems = new HalTask[5];
     oracleAssignSelectorItems[0] = assignFarmerSequence;
     oracleAssignSelectorItems[1] = assignLumberjackSequence;
     oracleAssignSelectorItems[2] = assignMinerSequence;
