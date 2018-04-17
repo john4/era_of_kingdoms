@@ -51,7 +51,7 @@ class PlayerState {
 
     foodSupply = 12;
     resourceSupply = new HashMap<ResourceCode, Integer>();
-    resourceSupply.put(ResourceCode.LUMBER, 48);
+    resourceSupply.put(ResourceCode.LUMBER, 64);
     resourceSupply.put(ResourceCode.METAL, 12);
 
     updatePopulationCapacity();
