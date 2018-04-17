@@ -232,66 +232,6 @@ abstract class HalTask {
   boolean verbose = true;
 }
 
-class NeedMoreCitizens extends HalTask {
-  PlayerState state;
-
-  NeedMoreCitizens(PlayerState state) {
-    this.state = state;
-  }
-
-  boolean execute() {
-    return this.state.getAllHumans().size() >= this.state.populationCapacity && this.state.humans.get(HumanCode.FREE).size() == 0;
-  }
-}
-
-class HaveFreeCitizen extends HalTask {
-  PlayerState state;
-
-  HaveFreeCitizen(PlayerState state) {
-    this.state = state;
-  }
-
-  boolean execute() {
-    return this.state.humans.get(HumanCode.FREE).size() > 0;
-  }
-}
-
-class CheckBelowGoldenRatio extends HalTask {
-  PlayerState state;
-  HumanCode type;
-  HashMap<HumanCode, Float> goldenRatio;
-
-  CheckBelowGoldenRatio(PlayerState state, HumanCode type, HashMap<HumanCode, Float> goldenRatio) {
-    this.state = state;
-    this.type = type;
-    this.goldenRatio = goldenRatio;
-  }
-
-  boolean execute() {
-    float goal = this.goldenRatio.get(this.type);
-    float current = (float) this.state.humans.get(this.type).size() / (float) this.state.getAllHumans().size();
-    return current < goal;
-  }
-}
-
-class CheckHaveBuilding extends HalTask {
-  PlayerState state;
-  BuildingCode type;
-
-  CheckHaveBuilding(PlayerState state, BuildingCode type) {
-    this.state = state;
-    this.type = type;
-  }
-
-  boolean execute() {
-    Building targetBuilding = this.state.getLeastAssigned(this.type);
-    if (targetBuilding == null || targetBuilding.numFreeAssignments() == 0) {
-      return false;
-    }
-    return true;
-  }
-}
-
 class AssignCitizen extends HalTask {
   PlayerState state;
   HumanCode type;
@@ -334,20 +274,57 @@ class AssignCitizen extends HalTask {
   }
 }
 
-class RiskOfStarving extends HalTask {
+class CanPlaceX extends HalTask {
+  BuildingCode buildingType;
   PlayerState state;
 
-  RiskOfStarving(PlayerState state) {
+  CanPlaceX(BuildingCode buildingType, PlayerState state) {
+    this.buildingType = buildingType;
     this.state = state;
   }
 
   boolean execute() {
-    int foodNeed = state.getCitizens().size() + (state.getSoldiers().size() * 2);
-    if (foodNeed == 0) {
+    HashMap<BuildingCode, HashMap<ResourceCode, Integer>> allCosts = this.state.BUILDING_COSTS;
+    HashMap<ResourceCode, Integer> buildingCost = allCosts.get(this.buildingType);
+
+    return state.resourceSupply.get(ResourceCode.LUMBER) >= buildingCost.get(ResourceCode.LUMBER) &&
+      state.resourceSupply.get(ResourceCode.METAL) >= buildingCost.get(ResourceCode.METAL);
+  }
+}
+
+class CheckBelowGoldenRatio extends HalTask {
+  PlayerState state;
+  HumanCode type;
+  HashMap<HumanCode, Float> goldenRatio;
+
+  CheckBelowGoldenRatio(PlayerState state, HumanCode type, HashMap<HumanCode, Float> goldenRatio) {
+    this.state = state;
+    this.type = type;
+    this.goldenRatio = goldenRatio;
+  }
+
+  boolean execute() {
+    float goal = this.goldenRatio.get(this.type);
+    float current = (float) this.state.humans.get(this.type).size() / (float) this.state.getAllHumans().size();
+    return current < goal;
+  }
+}
+
+class CheckHaveBuilding extends HalTask {
+  PlayerState state;
+  BuildingCode type;
+
+  CheckHaveBuilding(PlayerState state, BuildingCode type) {
+    this.state = state;
+    this.type = type;
+  }
+
+  boolean execute() {
+    Building targetBuilding = this.state.getLeastAssigned(this.type);
+    if (targetBuilding == null || targetBuilding.numFreeAssignments() == 0) {
       return false;
     }
-    int projection = state.foodSupply / foodNeed;
-    return projection < 2;
+    return true;
   }
 }
 
@@ -370,21 +347,45 @@ class EnemyTroopsNearby extends HalTask {
   }
 }
 
-class CanPlaceX extends HalTask {
-  BuildingCode buildingType;
+class HaveFreeCitizen extends HalTask {
   PlayerState state;
 
-  CanPlaceX(BuildingCode buildingType, PlayerState state) {
-    this.buildingType = buildingType;
+  HaveFreeCitizen(PlayerState state) {
     this.state = state;
   }
 
   boolean execute() {
-    HashMap<BuildingCode, HashMap<ResourceCode, Integer>> allCosts = this.state.BUILDING_COSTS;
-    HashMap<ResourceCode, Integer> buildingCost = allCosts.get(this.buildingType);
+    return this.state.humans.get(HumanCode.FREE).size() > 0;
+  }
+}
 
-    return state.resourceSupply.get(ResourceCode.LUMBER) >= buildingCost.get(ResourceCode.LUMBER) &&
-      state.resourceSupply.get(ResourceCode.METAL) >= buildingCost.get(ResourceCode.METAL);
+class NeedMoreCitizens extends HalTask {
+  PlayerState state;
+
+  NeedMoreCitizens(PlayerState state) {
+    this.state = state;
+  }
+
+  boolean execute() {
+    return this.state.getAllHumans().size() >= this.state.populationCapacity && this.state.humans.get(HumanCode.FREE).size() == 0;
+  }
+}
+
+class PlaceProximityStockpile extends PlaceX {
+  PlaceProximityStockpile(BuildingCode buildingType, PlayerState state, PotentialCells potentialCells, CallbackMarker callbackMarker) {
+    super(buildingType, state, potentialCells, callbackMarker);
+  }
+
+  // if we succeed in placing a proximity stockpile,
+  // we want to clear the potential cells because that's
+  // our behavior tree's signal that it needs to try to
+  // build a proximity stockpile
+  boolean execute() {
+    boolean result = super.execute();
+    if (result) {
+      this.potentialCells.primary.clear();
+    }
+    return result;
   }
 }
 
@@ -419,21 +420,20 @@ class PlaceX extends HalTask {
   }
 }
 
-class PlaceProximityStockpile extends PlaceX {
-  PlaceProximityStockpile(BuildingCode buildingType, PlayerState state, PotentialCells potentialCells, CallbackMarker callbackMarker) {
-    super(buildingType, state, potentialCells, callbackMarker);
+class RiskOfStarving extends HalTask {
+  PlayerState state;
+
+  RiskOfStarving(PlayerState state) {
+    this.state = state;
   }
 
-  // if we succeed in placing a proximity stockpile,
-  // we want to clear the potential cells because that's
-  // our behavior tree's signal that it needs to try to
-  // build a proximity stockpile
   boolean execute() {
-    boolean result = super.execute();
-    if (result) {
-      this.potentialCells.primary.clear();
+    int foodNeed = state.getCitizens().size() + (state.getSoldiers().size() * 2);
+    if (foodNeed == 0) {
+      return false;
     }
-    return result;
+    int projection = state.foodSupply / foodNeed;
+    return projection < 2;
   }
 }
 
