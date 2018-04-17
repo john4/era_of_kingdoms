@@ -3,6 +3,7 @@ import java.util.Arrays;
 class Hal {
   static final int ACTION_COOLDOWN = 30;
   double cooldownIndex;
+  static final int DESIRED_RESOURCE_BUILDING_PROXIMITY_TO_STOCKPILE = 25;
 
   GameState gameState;
   PlayerState computerState;
@@ -12,7 +13,9 @@ class Hal {
   ArrayList<Cell> grassCellsNearForest;
   ArrayList<Cell> grassCellsNearStone;
   ArrayList<Cell> grassCellsNearStockpiles;
+  ArrayList<Cell> grassCellsNearDesiredBuildingForStockpileProximity;
   CallbackMarker newStockpileBuilt = new CallbackMarker();
+  CallbackMarker newSawmillOrFoundryBuilt = new CallbackMarker();
   HashMap<HumanCode, Float> goldenRatio;
 
   HalTask behaviorTree;
@@ -36,11 +39,13 @@ class Hal {
     grassCellsNearStockpiles = new ArrayList<Cell>();
     grassCellsNearForest = new ArrayList<Cell>();
     grassCellsNearStone = new ArrayList<Cell>();
+    grassCellsNearDesiredBuildingForStockpileProximity = new ArrayList<Cell>();
 
     PotentialCells potentialGeneralCells = new PotentialCells(grassCellsNearbyTownSquare);
     PotentialCells potentialFarmCells = new PotentialCells(grassCellsNearStockpiles, grassCellsNearbyTownSquare);
     PotentialCells potentialSawmillCells = new PotentialCells(grassCellsNearForest, grassCellsNearbyTownSquare);
     PotentialCells potentialFoundryCells = new PotentialCells(grassCellsNearStone, grassCellsNearbyTownSquare);
+    PotentialCells potentialStockpileProximityCells = new PotentialCells(grassCellsNearDesiredBuildingForStockpileProximity);
 
     for (Cell cell : grassCellsNearbyTownSquare) {
       if (cell.isNearCellOfType(1, 3)) {
@@ -63,12 +68,12 @@ class Hal {
 
     HalTask[] placeSawmillSelectorItems = new HalTask[2];
     placeSawmillSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.SAWMILL);
-    placeSawmillSelectorItems[1] = new PlaceX(BuildingCode.SAWMILL, computerState, potentialSawmillCells);
+    placeSawmillSelectorItems[1] = new PlaceX(BuildingCode.SAWMILL, computerState, potentialSawmillCells, newSawmillOrFoundryBuilt);
     HalTask placeSawmillSelector = new HalSelector(placeSawmillSelectorItems);
 
     HalTask[] placeFoundrySelectorItems = new HalTask[2];
     placeFoundrySelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.FOUNDRY);
-    placeFoundrySelectorItems[1] = new PlaceX(BuildingCode.FOUNDRY, computerState, potentialFoundryCells);
+    placeFoundrySelectorItems[1] = new PlaceX(BuildingCode.FOUNDRY, computerState, potentialFoundryCells, newSawmillOrFoundryBuilt);
     HalTask placeFoundarySelector = new HalSelector(placeFoundrySelectorItems);
 
     HalTask[] placeBarracksSelectorItems = new HalTask[2];
@@ -80,6 +85,10 @@ class Hal {
     placeStockpileSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.STOCKPILE);
     placeStockpileSelectorItems[1] = new PlaceX(BuildingCode.STOCKPILE, computerState, potentialGeneralCells, newStockpileBuilt);
     HalTask placeStockpileSelector = new HalSelector(placeStockpileSelectorItems);
+
+    HalTask[] placeProximityStockpileSelectorItems = new HalTask[1];
+    placeProximityStockpileSelectorItems[0] = new PlaceProximityStockpile(BuildingCode.STOCKPILE, computerState, potentialStockpileProximityCells, newStockpileBuilt);
+    HalTask placeProximityStockpileSelector = new HalSelector(placeProximityStockpileSelectorItems);
 
     HalTask[] assignFarmerSequenceItems = new HalTask[3];
     assignFarmerSequenceItems[0] = new CheckBelowGoldenRatio(computerState, HumanCode.FARMER, this.goldenRatio);
@@ -110,6 +119,7 @@ class Hal {
     oracleAssignSelectorItems[1] = assignLumberjackSequence;
     oracleAssignSelectorItems[2] = assignMinerSequence;
     oracleAssignSelectorItems[3] = assignSoldierSequence;
+    oracleAssignSelectorItems[4] = placeProximityStockpileSelector;
     HalTask oracleAssignSelector = new HalSelector(oracleAssignSelectorItems);
 
     HalTask[] oracleAssignSequenceItems = new HalTask[3];
@@ -137,10 +147,35 @@ class Hal {
     this.grassCellsNearStockpiles.addAll(new ArrayList<Cell>(Arrays.asList(newCellsNearStockpiles.toArray(new Cell[newCellsNearStockpiles.size()]))));
   }
 
+  void calculatePotentialBuildingForNewStockpile() {
+    ArrayList<Building> sawmillsAndFoundries = new ArrayList<Building>();
+    sawmillsAndFoundries.addAll(this.computerState.buildings.get(BuildingCode.SAWMILL));
+    sawmillsAndFoundries.addAll(this.computerState.buildings.get(BuildingCode.FOUNDRY));
+
+    for (Building b : sawmillsAndFoundries) {
+      for (Building stockpile : this.computerState.buildings.get(BuildingCode.STOCKPILE)) {
+        if (stockpile.loc.euclideanDistanceTo(b.loc) <= DESIRED_RESOURCE_BUILDING_PROXIMITY_TO_STOCKPILE) {
+          break;
+        }
+        // this building could use a stockpile nearby
+        this.grassCellsNearDesiredBuildingForStockpileProximity.clear();
+        HashSet<Cell> cellsNearTargetBuilding = b.loc.getNearbyGrassCells(DESIRED_RESOURCE_BUILDING_PROXIMITY_TO_STOCKPILE - 2);
+        this.grassCellsNearDesiredBuildingForStockpileProximity.addAll(new ArrayList<Cell>(Arrays.asList(cellsNearTargetBuilding.toArray(new Cell[cellsNearTargetBuilding.size()]))));
+      }
+    }
+
+    this.newSawmillOrFoundryBuilt.state = false;
+  }
+
   void behave() {
     if (this.newStockpileBuilt.state) {
       this.recalculateNearbyStockpileCells();
       this.newStockpileBuilt.state = false;
+    }
+
+    if (this.newSawmillOrFoundryBuilt.state) {
+      this.calculatePotentialBuildingForNewStockpile();
+      this.newSawmillOrFoundryBuilt.state = false;
     }
 
     if (gameState.gameStateIndex > cooldownIndex) {
@@ -323,6 +358,24 @@ class PlaceX extends HalTask {
       return true;
     }
     return false;
+  }
+}
+
+class PlaceProximityStockpile extends PlaceX {
+  PlaceProximityStockpile(BuildingCode buildingType, PlayerState state, PotentialCells potentialCells, CallbackMarker callbackMarker) {
+    super(buildingType, state, potentialCells, callbackMarker);
+  }
+
+  // if we succeed in placing a proximity stockpile,
+  // we want to clear the potential cells because that's
+  // our behavior tree's signal that it needs to try to
+  // build a proximity stockpile
+  boolean execute() {
+    boolean result = super.execute();
+    if (result) {
+      this.potentialCells.primary.clear();
+    }
+    return result;
   }
 }
 
