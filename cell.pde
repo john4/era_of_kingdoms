@@ -123,8 +123,12 @@ class Cell {
 
   HashSet<Cell> getNearbyGrassCells(int r) {
     HashSet<Cell> set = new HashSet<Cell>();
-    set.add(this);
-    return getNearbyGrassCellsHelper(this, r, set);
+    return getNearbyGrassCells(r, set);
+  }
+
+  HashSet<Cell> getNearbyGrassCells(int r, HashSet<Cell> initialSet) {
+    initialSet.add(this);
+    return getNearbyGrassCellsHelper(this, r, initialSet);
   }
 
   private HashSet<Cell> getNearbyGrassCellsHelper(Cell origin, int r, HashSet<Cell> acc) {
@@ -135,6 +139,26 @@ class Cell {
       }
     }
     return acc;
+  }
+
+  boolean isNearCellOfType(int type, int hops) {
+    return isNearCellOfTypeHelper(type, 1, hops);
+  }
+
+  private boolean isNearCellOfTypeHelper(int type, int nthHop, int hops) {
+    if (nthHop > hops) {
+      return false;
+    }
+    if (this.terraintype == type) {
+      return true;
+    }
+
+    for (Cell neighbor : this.getCardinalNeighbors()) {
+      if (neighbor != null && neighbor.isNearCellOfTypeHelper(type, nthHop + 1, hops)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /** Breadth-first find closest cell of type terrain */
