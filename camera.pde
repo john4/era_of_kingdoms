@@ -22,6 +22,7 @@ void keyPressed() {
 
   if (key == 'm' && musicPlaying) {
     bgmFile.stop();
+    musicPlaying = false;
   }
 }
 

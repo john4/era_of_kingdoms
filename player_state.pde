@@ -77,7 +77,6 @@ class PlayerState {
       this.handleStarvation();
     }
 
-
     // Births
     if (
       getCitizens().size() + humans.get(HumanCode.SOLDIER).size() < populationCapacity &&  // population isn't at capacity
@@ -121,9 +120,6 @@ class PlayerState {
       }
     }
 
-    for (ResourceCode c : ResourceCode.values()) {
-      adjustResource(c, -cost.get(c));
-    }
     this.placingBuilding = buildingCode;
     return true;
   }
@@ -238,6 +234,12 @@ class PlayerState {
   }
 
   void placeBuilding(Cell loc, BuildingCode buildingType) {
+    HashMap<ResourceCode, Integer> cost = BUILDING_COSTS.get(buildingType);
+
+    for (ResourceCode c : ResourceCode.values()) {
+      adjustResource(c, -cost.get(c));
+    }
+
     this.addBuilding(buildingType, loc);
   }
 
