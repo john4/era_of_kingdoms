@@ -145,39 +145,20 @@ class PlayerState {
       }
     }
 
-    ArrayList<Human> deadCitizens = new ArrayList<Human>();
-    ArrayList<Human> deadSoldiers = new ArrayList<Human>();
+    ArrayList<Human> deadHumans = new ArrayList<Human>();
     int occurrences = 0;
 
-    for (Human citizen : this.getCitizens()) {
-      occurrences = Collections.frequency(enemySoldierLocs, citizen.loc);
-      citizen.health -= 0.5 * occurrences;
+    for (Human h : this.getAllHumans()) {
+      occurrences = Collections.frequency(enemySoldierLocs, h.loc);
+      h.health -= 0.5 * occurrences;
 
-      if (citizen.health <= 0) {
-        deadCitizens.add(citizen);
+      if (h.health <= 0) {
+        deadHumans.add(h);
       }
     }
 
-    for (Human soldier : this.getSoldiers()) {
-      occurrences = Collections.frequency(enemySoldierLocs, soldier.loc);
-      soldier.health -= 0.5 * occurrences;
-
-      if (soldier.health <= 0) {
-        deadSoldiers.add(soldier);
-      }
-    }
-
-    for (Human c : deadCitizens) {
-      if (c.assignedBuilding instanceof Crop) {
-        Crop crop = (Crop) c.assignedBuilding;
-        crop.farmer = null;
-      }
-
-      this.humans.get(c.type).remove(c);
-    }
-
-    for (Human s : deadSoldiers) {
-      this.humans.get(HumanCode.SOLDIER).remove(s);
+    for (Human h : deadHumans) {
+      this.removeHuman(h);
     }
   }
 
@@ -214,6 +195,25 @@ class PlayerState {
         }
       }
     }
+  }
+
+  void removeHuman(Human h) {
+    if (h.assignedBuilding instanceof Farm) {
+      Crop cropToRemove = null;
+      for (Building b : buildings.get(BuildingCode.CROP)) {
+        Crop crop = (Crop) b;
+        if (crop.farmer == h) {
+          cropToRemove = crop;
+          break;
+        }
+      }
+      if (cropToRemove != null) {
+        buildings.get(BuildingCode.CROP).remove(cropToRemove);
+      }
+    }
+
+    h.unassignFromBuilding();
+    this.humans.get(h.type).remove(h);
   }
 
   /**
@@ -341,15 +341,15 @@ class PlayerState {
       userInterface.messageQueue.add(new Message("Can't add a lumberjack: No free sawmills!", state.gameStateIndex+FRAME_RATE*5));
     } else {
       humans.get(HumanCode.LUMBERJACK).add(new Lumberjack(freeCitizen.loc, targetSawmill, this));
-      humans.get(HumanCode.FREE).remove(freeCitizen);
+      this.removeHuman(freeCitizen);
     }
   }
 
   void removeLumberjack() {
     if (humans.get(HumanCode.LUMBERJACK).size() > 0) {
-      Human lumberJackToRemove = humans.get(HumanCode.LUMBERJACK).remove(0);
-      lumberJackToRemove.unassignFromBuilding();
+      Human lumberJackToRemove = humans.get(HumanCode.LUMBERJACK).get(0);
       humans.get(HumanCode.FREE).add(new FreeCitizen(lumberJackToRemove.loc, getTownSquare(), this));
+      this.removeHuman(lumberJackToRemove);
     }
   }
 
@@ -365,27 +365,15 @@ class PlayerState {
       userInterface.messageQueue.add(new Message("Can't add a farmer: No free farms!", state.gameStateIndex+FRAME_RATE*5));
     } else {
       humans.get(HumanCode.FARMER).add(new Farmer(freeCitizen.loc, targetFarm, this));
-      humans.get(HumanCode.FREE).remove(freeCitizen);
+      this.removeHuman(freeCitizen);
     }
   }
 
   void removeFarmer() {
     if (humans.get(HumanCode.FARMER).size() > 0) {
-      Human farmerToRemove = humans.get(HumanCode.FARMER).remove(0);
-      farmerToRemove.unassignFromBuilding();
+      Human farmerToRemove = humans.get(HumanCode.FARMER).get(0);
       humans.get(HumanCode.FREE).add(new FreeCitizen(farmerToRemove.loc, getTownSquare(), this));
-
-      Crop cropToRemove = null;
-      for (Building b : buildings.get(BuildingCode.CROP)) {
-        Crop crop = (Crop) b;
-        if (crop.farmer == farmerToRemove) {
-          cropToRemove = crop;
-          break;
-        }
-      }
-      if (cropToRemove != null) {
-        buildings.get(BuildingCode.CROP).remove(cropToRemove);
-      }
+      this.removeHuman(farmerToRemove);
     }
   }
 
@@ -401,14 +389,14 @@ class PlayerState {
       userInterface.messageQueue.add(new Message("Can't add a soldier: No free barracks!", state.gameStateIndex+FRAME_RATE*5));
     } else {
       humans.get(HumanCode.SOLDIER).add(new Soldier(freeCitizen.loc, targetBarracks, this));
-      humans.get(HumanCode.FREE).remove(freeCitizen);
+      this.removeHuman(freeCitizen);
     }
   }
 
   void removeSoldier() {
-    Human soldierToRemove = humans.get(HumanCode.SOLDIER).remove(0);
-    soldierToRemove.unassignFromBuilding();
+    Human soldierToRemove = humans.get(HumanCode.SOLDIER).get(0);
     humans.get(HumanCode.FREE).add(new FreeCitizen(soldierToRemove.loc, getTownSquare(), this));
+    this.removeHuman(soldierToRemove);
   }
 
   void addMiner() {
@@ -423,15 +411,15 @@ class PlayerState {
       userInterface.messageQueue.add(new Message("Can't add a miner: No free foundries!", state.gameStateIndex+FRAME_RATE*5));
     } else {
       humans.get(HumanCode.MINER).add(new Miner(freeCitizen.loc, targetFoundry, this));
-      humans.get(HumanCode.FREE).remove(freeCitizen);
+      this.removeHuman(freeCitizen);
     }
   }
 
   void removeMiner() {
     if (humans.get(HumanCode.MINER).size() > 0) {
-      Human minerToRemove = humans.get(HumanCode.MINER).remove(0);
-      minerToRemove.unassignFromBuilding();
+      Human minerToRemove = humans.get(HumanCode.MINER).get(0);
       humans.get(HumanCode.FREE).add(new FreeCitizen(minerToRemove.loc, getTownSquare(), this));
+      this.removeHuman(minerToRemove);
     }
   }
 

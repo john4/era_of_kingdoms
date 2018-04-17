@@ -38,6 +38,21 @@ class Hal {
     placeFarmSelectorItems[1] = new PlaceX(BuildingCode.FARM, computerState, cellsNearbyTownSquare);
     HalTask placeFarmSelector = new HalSelector(placeFarmSelectorItems);
 
+    HalTask[] placeSawmillSelectorItems = new HalTask[2];
+    placeSawmillSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.SAWMILL);
+    placeSawmillSelectorItems[1] = new PlaceX(BuildingCode.SAWMILL, computerState, cellsNearbyTownSquare);
+    HalTask placeSawmillSelector = new HalSelector(placeSawmillSelectorItems);
+
+    HalTask[] placeFoundrySelectorItems = new HalTask[2];
+    placeFoundrySelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.FOUNDRY);
+    placeFoundrySelectorItems[1] = new PlaceX(BuildingCode.FOUNDRY, computerState, cellsNearbyTownSquare);
+    HalTask placeFoundarySelector = new HalSelector(placeFoundrySelectorItems);
+
+    HalTask[] placeBarracksSelectorItems = new HalTask[2];
+    placeBarracksSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.BARRACKS);
+    placeBarracksSelectorItems[1] = new PlaceX(BuildingCode.BARRACKS, computerState, cellsNearbyTownSquare);
+    HalTask placeBarracksSelector = new HalSelector(placeBarracksSelectorItems);
+
     HalTask[] placeStockpileSelectorItems = new HalTask[2];
     placeStockpileSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.STOCKPILE);
     placeStockpileSelectorItems[1] = new PlaceX(BuildingCode.STOCKPILE, computerState, cellsNearbyTownSquare);
@@ -49,8 +64,29 @@ class Hal {
     assignFarmerSequenceItems[2] = new AssignCitizen(computerState, HumanCode.FARMER);
     HalTask assignFarmerSequence = new HalSequence(assignFarmerSequenceItems);
 
-    HalTask[] oracleAssignSelectorItems = new HalTask[1];
+    HalTask[] assignLumberjackSequenceItems = new HalTask[3];
+    assignLumberjackSequenceItems[0] = new CheckBelowGoldenRatio(computerState, HumanCode.LUMBERJACK, this.goldenRatio);
+    assignLumberjackSequenceItems[1] = placeSawmillSelector;
+    assignLumberjackSequenceItems[2] = new AssignCitizen(computerState, HumanCode.LUMBERJACK);
+    HalTask assignLumberjackSequence = new HalSequence(assignLumberjackSequenceItems);
+
+    HalTask[] assignMinerSelectorItems = new HalTask[3];
+    assignMinerSelectorItems[0] = new CheckBelowGoldenRatio(computerState, HumanCode.MINER, this.goldenRatio);
+    assignMinerSelectorItems[1] = placeFoundarySelector;
+    assignMinerSelectorItems[2] = new AssignCitizen(computerState, HumanCode.MINER);
+    HalTask assignMinerSequence = new HalSequence(assignMinerSelectorItems);
+
+    HalTask[] assignSoldierSelectorItems = new HalTask[3];
+    assignSoldierSelectorItems[0] = new CheckBelowGoldenRatio(computerState, HumanCode.SOLDIER, this.goldenRatio);
+    assignSoldierSelectorItems[1] = placeBarracksSelector;
+    assignSoldierSelectorItems[2] = new AssignCitizen(computerState, HumanCode.SOLDIER);
+    HalTask assignSoldierSequence = new HalSequence(assignSoldierSelectorItems);
+
+    HalTask[] oracleAssignSelectorItems = new HalTask[4];
     oracleAssignSelectorItems[0] = assignFarmerSequence;
+    oracleAssignSelectorItems[1] = assignLumberjackSequence;
+    oracleAssignSelectorItems[2] = assignMinerSequence;
+    oracleAssignSelectorItems[3] = assignSoldierSequence;
     HalTask oracleAssignSelector = new HalSelector(oracleAssignSelectorItems);
 
     HalTask[] oracleAssignSequenceItems = new HalTask[3];
@@ -78,6 +114,7 @@ class Hal {
 
 abstract class HalTask {
   abstract boolean execute();
+  boolean verbose = true;
 }
 
 class NeedMoreCitizens extends HalTask {
@@ -124,15 +161,19 @@ class CheckBelowGoldenRatio extends HalTask {
 
 class CheckHaveBuilding extends HalTask {
   PlayerState state;
-  BuildingCode building;
+  BuildingCode type;
 
-  CheckHaveBuilding(PlayerState state, BuildingCode building) {
+  CheckHaveBuilding(PlayerState state, BuildingCode type) {
     this.state = state;
-    this.building = building;
+    this.type = type;
   }
 
   boolean execute() {
-    return state.buildings.get(this.building).size() > 0;
+    Building targetBuilding = this.state.getLeastAssigned(this.type);
+    if (targetBuilding == null || targetBuilding.numFreeAssignments() == 0) {
+      return false;
+    }
+    return true;
   }
 }
 
@@ -146,19 +187,33 @@ class AssignCitizen extends HalTask {
   }
 
   boolean execute() {
-    ArrayList<Human> freeCitizens = this.state.humans.get(HumanCode.FREE);
-    Human oldFreeCitizen = freeCitizens.get(0);
+    Human oldFreeCitizen = this.state.getFreeCitizen();
+    if (oldFreeCitizen == null) {
+      return false;
+    }
     Building targetBuilding = null;
     Human newCitizen = null;
 
     switch (this.type) {
       case FARMER:
-        targetBuilding = this.state.buildings.get(BuildingCode.FARM).get(rng.nextInt(this.state.buildings.get(BuildingCode.FARM).size()));
+        targetBuilding = this.state.getLeastAssigned(BuildingCode.FARM);
         newCitizen = new Farmer(oldFreeCitizen.loc, targetBuilding, state);
+        break;
+      case LUMBERJACK:
+        targetBuilding = this.state.getLeastAssigned(BuildingCode.SAWMILL);
+        newCitizen = new Lumberjack(oldFreeCitizen.loc, targetBuilding, state);
+        break;
+      case MINER:
+        targetBuilding = this.state.getLeastAssigned(BuildingCode.FOUNDRY);
+        newCitizen = new Miner(oldFreeCitizen.loc, targetBuilding, state);
         break;
     }
 
-    this.state.humans.get(HumanCode.FREE).remove(oldFreeCitizen);
+    if (newCitizen == null) {
+      return false;
+    }
+
+    this.state.removeHuman(oldFreeCitizen);
     this.state.humans.get(this.type).add(newCitizen);
     return true;
   }

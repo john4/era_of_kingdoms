@@ -1,9 +1,9 @@
 class Farmer extends Citizen {
   Crop crop;
-  final HumanCode type = HumanCode.FARMER;
 
   Farmer(Cell initialLocation, Building buildingAssignment, PlayerState ownerState) {
     super(initialLocation, buildingAssignment, ownerState);
+    this.type = HumanCode.FARMER;
     this.c = new int[]{176,56,30};
     this.crop = null;
 
