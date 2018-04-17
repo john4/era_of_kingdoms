@@ -77,7 +77,6 @@ class PlayerState {
       this.handleStarvation();
     }
 
-
     // Births
     if (
       getCitizens().size() + humans.get(HumanCode.SOLDIER).size() < populationCapacity &&  // population isn't at capacity

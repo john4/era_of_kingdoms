@@ -103,6 +103,15 @@ class Hal {
   }
 
   void behave() {
+    System.out.println("---------- Hal Stats ----------");
+    System.out.println("Food: " + this.computerState.foodSupply);
+    System.out.println("Lumber: " + this.computerState.resourceSupply.get(ResourceCode.LUMBER));
+    System.out.println("Metal: " + this.computerState.resourceSupply.get(ResourceCode.METAL));
+    System.out.println("-------------------------------");
+
+    // CHEAT: HAL CAN NEVER RUN OUT OF FOOD
+    this.computerState.foodSupply = 999;
+
     if (gameState.gameStateIndex > cooldownIndex) {
       if (behaviorTree.execute()) {
         cooldownIndex = gameState.gameStateIndex + ACTION_COOLDOWN;
@@ -279,25 +288,6 @@ class PlaceX extends HalTask {
     return false;
   }
 }
-
-// class BuildMostNeededBuildingOrAssignMostNeededHuman extends HalTask {
-//   PlayerState state;
-//
-//   BuildMostNeededBuildingOrAssignMostNeededHuman(PlayerState state) {
-//
-//   }
-// }
-//
-// class AssignMostNeededHuman extends HalTask {
-//   PlayerState state;
-// }
-//
-// class AssignHuman extends HalTask {
-//   PlayerState state;
-//
-//   AssignHuman()
-// }
-
 
 /** Tries children in order until one returns success (return “fail” if all fail) */
 class HalSelector extends HalTask {
