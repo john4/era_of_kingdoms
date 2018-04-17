@@ -4,6 +4,7 @@ class Soldier extends Human {
   Soldier(Cell initialLocation, Building buildingAssignment, PlayerState ownerState) {
     super(initialLocation, buildingAssignment, ownerState);
 
+    this.moveSpeed = 0.15;
 
     Task[] seekItems = new Task[2];
     seekItems[0] = new TargetEnemy(this.blackboard, 50);

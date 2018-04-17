@@ -2,7 +2,6 @@ abstract class Human extends WorldlyObject {
   HumanCode type;
   float TARGET_RADIUS = 2;
   float SLOW_RADIUS = 5;
-  float MAX_SPEED = 0.1;
   float MAX_ACCELERATION = 0.01;
   float MAX_HEALTH = 250;
   float STARVE_DAMAGE = 25;
@@ -13,12 +12,14 @@ abstract class Human extends WorldlyObject {
   Building assignedBuilding;
   Blackboard blackboard;
   Task btree;
+  float moveSpeed;
 
   Human(Cell initialLocation, Building buildingAssignment, PlayerState ownerState) {
     super(initialLocation);
     this.w = this.h = 4;
     this.c = new int[]{20, 20, 20};
     this.health = MAX_HEALTH;
+    this.moveSpeed = 0.1;
     this.assignedBuilding = buildingAssignment;
     buildingAssignment.addAssignee(this);
     this.ownerState = ownerState;
@@ -72,9 +73,9 @@ abstract class Human extends WorldlyObject {
     // If we are outside SLOW_RADIUS, go max speed
     float targetSpeed = 0;
     if (distance > SLOW_RADIUS) {
-      targetSpeed = MAX_SPEED;
+      targetSpeed = this.moveSpeed;
     } else {  // calculate a scaled speed
-      targetSpeed = MAX_SPEED * distance / SLOW_RADIUS;
+      targetSpeed = this.moveSpeed * distance / SLOW_RADIUS;
     }
 
     // Velocity combines speed and direction

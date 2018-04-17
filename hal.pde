@@ -58,6 +58,37 @@ class Hal {
       }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // COMBAT MODE ////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    HalTask becomeOffensive = new ChangeCombatMode(computerState, CombatMode.OFFENSIVE);
+    HalTask becomeDefensive = new ChangeCombatMode(computerState, CombatMode.DEFENSIVE);
+
+    HalTask[] shouldBecomeOffensiveSelectorItems = new HalTask[2];
+    shouldBecomeOffensiveSelectorItems[0] = new EnemyArmyWeak(computerState, humanState);
+    shouldBecomeOffensiveSelectorItems[1] = new HaveLargeArmy(computerState);
+    HalTask shouldBecomeOffensiveSelector = new HalSelector(shouldBecomeOffensiveSelectorItems);
+
+    HalTask[] becomeOffensiveSequenceItems = new HalTask[2];
+    becomeOffensiveSequenceItems[0] = shouldBecomeOffensiveSelector;
+    becomeOffensiveSequenceItems[1] = becomeOffensive;
+    HalTask becomeOffensiveSequence = new HalSequence(becomeOffensiveSequenceItems);
+
+    HalTask[] shouldBecomeDefensiveSelectorItems = new HalTask[2];
+    shouldBecomeDefensiveSelectorItems[0] = new EnemyTroopsNearby(townSquare.loc, humanState);
+    shouldBecomeDefensiveSelectorItems[1] = new HaveSmallArmy(computerState);
+    HalTask shouldBecomeDefensiveSelector = new HalSelector(shouldBecomeDefensiveSelectorItems);
+
+    HalTask[] becomeDefensiveSequenceItems = new HalTask[2];
+    becomeDefensiveSequenceItems[0] = shouldBecomeDefensiveSelector;
+    becomeDefensiveSequenceItems[1] = becomeDefensive;
+    HalTask becomeDefensiveSequence = new HalSequence(becomeDefensiveSequenceItems);
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // PLACE BUILDING ////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+
     HalTask[] placeHovelSequenceItems = new HalTask[2];
     placeHovelSequenceItems[0] = new CanPlaceX(BuildingCode.HOVEL, computerState);
     placeHovelSequenceItems[1] = new PlaceX(BuildingCode.HOVEL, computerState, potentialGeneralCells);
@@ -122,6 +153,10 @@ class Hal {
     placeProximityStockpileSelectorItems[0] = new PlaceProximityStockpile(BuildingCode.STOCKPILE, computerState, potentialStockpileProximityCells, newStockpileBuilt);
     HalTask placeProximityStockpileSelector = new HalSelector(placeProximityStockpileSelectorItems);
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // ASSIGN CITIZENS ////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+
     HalTask[] assignFarmerSequenceItems = new HalTask[3];
     assignFarmerSequenceItems[0] = new CheckBelowGoldenRatio(computerState, HumanCode.FARMER, this.goldenRatio);
     assignFarmerSequenceItems[1] = placeFarmSelector;
@@ -146,6 +181,10 @@ class Hal {
     assignSoldierSelectorItems[2] = new AssignCitizen(computerState, HumanCode.SOLDIER);
     HalTask assignSoldierSequence = new HalSequence(assignSoldierSelectorItems);
 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // ORACLE ////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     HalTask[] oracleAssignSelectorItems = new HalTask[5];
     oracleAssignSelectorItems[0] = assignFarmerSequence;
     oracleAssignSelectorItems[1] = assignLumberjackSequence;
@@ -163,8 +202,26 @@ class Hal {
     HalTask[] oracleItems = new HalTask[2];
     oracleItems[0] = increasePopulationSequence;
     oracleItems[1] = oracleAssignSequence;
+    HalTask oracle = new HalSelector(oracleItems);
 
-    behaviorTree = new HalSelector(oracleItems);
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // WAR TABLE /////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    HalTask[] combatModeDecisionSelectorItems = new HalTask[2];
+    combatModeDecisionSelectorItems[0] = becomeDefensiveSequence;
+    combatModeDecisionSelectorItems[1] = becomeOffensiveSequence;
+    HalTask combatModeDecisionSelector = new HalSelector(combatModeDecisionSelectorItems);
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // TOP LEVEL /////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    HalTask[] btreeItems = new HalTask[2];
+    btreeItems[0] = combatModeDecisionSelector;
+    btreeItems[1] = oracle;
+
+    behaviorTree = new HalSequence(btreeItems);
   }
 
   void recalculateNearbyStockpileCells() {
@@ -292,6 +349,21 @@ class CanPlaceX extends HalTask {
   }
 }
 
+class ChangeCombatMode extends HalTask {
+  PlayerState state;
+  CombatMode mode;
+
+  ChangeCombatMode(PlayerState state, CombatMode mode) {
+    this.state = state;
+    this.mode = mode;
+  }
+
+  boolean execute() {
+    this.state.setCombatMode(this.mode);
+    return true;
+  }
+}
+
 class CheckBelowGoldenRatio extends HalTask {
   PlayerState state;
   HumanCode type;
@@ -328,6 +400,27 @@ class CheckHaveBuilding extends HalTask {
   }
 }
 
+class EnemyArmyWeak extends HalTask {
+  PlayerState state;
+  PlayerState humanState;
+
+  EnemyArmyWeak(PlayerState state, PlayerState humanState) {
+    this.state = state;
+    this.humanState = humanState;
+  }
+
+  boolean execute() {
+    float humanArmySize = (float) this.humanState.humans.get(HumanCode.SOLDIER).size();
+    float myArmySize = (float) this.state.humans.get(HumanCode.SOLDIER).size();
+
+    if (myArmySize == 0) {
+      return false;
+    }
+
+    return humanArmySize / myArmySize < 0.6;
+  }
+}
+
 class EnemyTroopsNearby extends HalTask {
   Cell townSquare;
   PlayerState humanState;
@@ -356,6 +449,30 @@ class HaveFreeCitizen extends HalTask {
 
   boolean execute() {
     return this.state.humans.get(HumanCode.FREE).size() > 0;
+  }
+}
+
+class HaveSmallArmy extends HalTask {
+  PlayerState state;
+
+  HaveSmallArmy(PlayerState state) {
+    this.state = state;
+  }
+
+  boolean execute() {
+    return this.state.humans.get(HumanCode.SOLDIER).size() < 10;
+  }
+}
+
+class HaveLargeArmy extends HalTask {
+  PlayerState state;
+
+  HaveLargeArmy(PlayerState state) {
+    this.state = state;
+  }
+
+  boolean execute() {
+    return this.state.humans.get(HumanCode.SOLDIER).size() >= 10;
   }
 }
 
