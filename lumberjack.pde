@@ -1,8 +1,8 @@
 class Lumberjack extends Citizen {
-  final HumanCode type = HumanCode.LUMBERJACK;
 
   Lumberjack(Cell initialLocation, Building buildingAssignment, PlayerState ownerState) {
     super(initialLocation, buildingAssignment, ownerState);
+    this.type = HumanCode.LUMBERJACK;
     this.c = new int[]{69,44,0};
 
     Task[] gatherSelector = new Task[2];

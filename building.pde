@@ -94,12 +94,12 @@ class BuildingCosts {
     stockpile.put(ResourceCode.METAL, 0);
 
     HashMap<ResourceCode, Integer> barracks = new HashMap<ResourceCode, Integer>();
-    stockpile.put(ResourceCode.LUMBER, 32);
-    stockpile.put(ResourceCode.METAL, 16);
+    barracks.put(ResourceCode.LUMBER, 32);
+    barracks.put(ResourceCode.METAL, 16);
 
     HashMap<ResourceCode, Integer> foundry = new HashMap<ResourceCode, Integer>();
-    stockpile.put(ResourceCode.LUMBER, 24);
-    stockpile.put(ResourceCode.METAL, 0);
+    foundry.put(ResourceCode.LUMBER, 24);
+    foundry.put(ResourceCode.METAL, 0);
 
     costs = new HashMap<BuildingCode, HashMap<ResourceCode, Integer>>();
     for (BuildingCode buildingCode : BuildingCode.values()) {
