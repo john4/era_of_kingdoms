@@ -5,6 +5,7 @@ abstract class Human extends WorldlyObject {
   float MAX_ACCELERATION = 0.01;
   float MAX_HEALTH = 250;
   float STARVE_DAMAGE = 25;
+  int collisions = 0;
 
   int[] c = new int[3];
   float health;
@@ -26,7 +27,12 @@ abstract class Human extends WorldlyObject {
 
     this.blackboard = new Blackboard();
     this.blackboard.put("Human", this);
-    this.btree = new Wander(this.blackboard, 25);
+
+    Task[] wanderSequence = new Task[2];
+    wanderSequence[0] = new Wander(this.blackboard, 25);
+    wanderSequence[1] = new Move(this.blackboard);
+
+    this.btree = new Sequence(this.blackboard, wanderSequence);
   }
 
   void unassignFromBuilding() {
@@ -59,11 +65,16 @@ abstract class Human extends WorldlyObject {
     this.btree.execute();
   }
 
-  void moveTo(float x, float y) {
+  void moveTo(float x, float y, boolean withAvoidance) {
     // Get the direction and distance to the target
     PVector target = new PVector(x, y);
     PVector direction = target.sub(pos);
     float distance = direction.mag();
+
+    if (!withAvoidance) { // force human to go to passable node
+      this.vel.rotate(PVector.angleBetween(target, this.vel));
+      this.vel.setMag(.25);
+    }
 
     // Check if we are there, no steering
     if (distance < TARGET_RADIUS) {
@@ -92,32 +103,45 @@ abstract class Human extends WorldlyObject {
       acceleration.mult(MAX_ACCELERATION);
     }
 
+    // Calculate new character velocity
+    this.vel.add(acceleration);
     // Calculate new position
     PVector pos = this.pos.copy();
     PVector ray = this.vel.copy();
-    ray.setMag(CELL_SIZE/2);
-
     pos.add(ray);
     Cell c = boardMap.cellAtPos(pos);
-    if (c == null){
-      return;
+
+    if(withAvoidance && c.hasImpass(assignedBuilding)){
+      this.collisions++;
+      // avoid will temporarily treat the closest passable cell as the target
+      avoid(x, y);
+    } else {
+      // Move the character
+      this.pos.add(this.vel);
+      // Update this character's cell location
+      this.loc = boardMap.cellAtPos(this.pos);
     }
-    if(c.hasImpass(assignedBuilding)){
-      ray.rotate(PI/2 + random(-PI/16,PI/16));
-      ray.setMag(.2);
-      this.vel.add(ray);
+  }
+
+  void avoid(float x, float y) {
+    ArrayList<Cell> passableCells = this.loc.getCardinalNeighbors();
+
+    Cell closestCell = null;
+    float closestDistance = 9999f;
+    for (Cell c : passableCells) {
+      if (!c.hasImpass(assignedBuilding)) {
+        float dist = c.euclideanDistanceTo(x, y);
+        if (dist < closestDistance) {
+          closestDistance = dist;
+          closestCell = c;
+        }
+      }
     }
 
-
-    // Calculate new character velocity
-    this.vel.add(acceleration);
-
-    // Move the character
-    this.pos.add(this.vel);
-
-    // Update this character's cell location
-    this.loc = boardMap.cellAtPos(this.pos);
-
+    if (closestCell != null) { // move to closest passable cell
+      moveTo(closestCell.pos.x, closestCell.pos.y, false);
+    }
+    // otherwise don't move since you are trapped!
   }
 
   void starve() {

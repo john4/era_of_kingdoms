@@ -1,5 +1,49 @@
 final int GATHER_SPEED = 1;  // how many seconds to gather 1 unit
 
+class Move extends Task {
+
+  Move(Blackboard bb) {
+    this.blackboard = bb;
+  }
+
+  int execute() {
+    Human h = (Human) this.blackboard.get("Human");
+    Cell target = (Cell) this.blackboard.get("Target");
+    PotentialPathNode node = (PotentialPathNode) this.blackboard.get("Path");
+
+    if (target == null) { // can't do anything without a target.
+      return FAIL;
+    }
+
+    if (h.collisions >= MAX_COLLISIONS) { // run A* on max collision count
+      h.collisions = 0; // reset collision counter
+      node = boardMap.findPath(target, h.loc);
+    }
+
+    // close enough to let moveTo take over
+    double dist = CELL_SIZE * Math.sqrt(2) + .1;
+    if (node == null || target.euclideanDistanceTo(h.loc) < dist) {
+      this.blackboard.put("Path", null); // pathfinding is done
+      h.moveTo(target.pos.x, target.pos.y, true);
+    } else {
+      followPath(node, h); // node traverse to find path
+    }
+
+    return FAIL;
+  }
+
+  void followPath(PotentialPathNode node, Human h) {
+    // should never be null, store current node for next frame.
+    this.blackboard.put("Path", node);
+    // if reached node but node still has parent, recall to update node and move to new cell.
+    if (node.cell.i == h.loc.i && node.cell.j == h.loc.j && node.parent != null) {
+      followPath(node.parent, h);
+    } else {
+      h.moveTo(node.cell.pos.x, node.cell.pos.y, true); // use moveToto follow nodes
+    }
+  }
+}
+
 class Wander extends Task {
   Wander(Blackboard bb, int radius) {
     this.blackboard = bb;
@@ -74,6 +118,7 @@ class Wander extends Task {
 
     if (wait > 0) {
       this.blackboard.put("Waiting", wait - 1);
+      return FAIL;
     } else {
       // Check to see if we've arrived at our target cell
       PVector direction = PVector.sub(target.pos, h.pos);
@@ -85,15 +130,7 @@ class Wander extends Task {
         this.blackboard.put("Target", target);
         this.blackboard.put("Waiting", 50);
       }
-
-
-      h.moveTo(target.pos.x, target.pos.y);
     }
-
-    // TODO: A*
-    // PotentialPathNode path = boardMap.findPath(h.loc, target);
-    // path.draw();
-    // Cell target = boardMap.findPath(h.
 
     return SUCCESS;
   }
@@ -112,6 +149,8 @@ class Plant extends Task {
 
     // If we have somewhere to farm from, don't plant any more crops
     if (crop != null) {
+      f.crop = crop;
+      this.blackboard.put("Human", f);
       return SUCCESS;
     }
 
@@ -141,7 +180,6 @@ class Plant extends Task {
           f.assignedBuilding = b;
         }
       }
-
       return SUCCESS;
     }
 
@@ -150,10 +188,11 @@ class Plant extends Task {
     if (target == null) {
       target = f.assignedBuilding.loc.findClosestOfType(0);
       this.blackboard.put("Target", target);
+      return FAIL;
     }
 
     if (!target.isIn(f.pos.x, f.pos.y)) {
-      f.moveTo(target.pos.x, target.pos.y);
+      this.blackboard.put("Target", target);
     } else {    // Plant some freaking crops
       if (!boardMap.validBuildingSpot(target)) {
         this.blackboard.put("Target", null);
@@ -164,6 +203,7 @@ class Plant extends Task {
       newCrop.farmer = f;
       f.crop = newCrop;
       this.blackboard.put("Crop", newCrop);
+      this.blackboard.put("Human", f);
     }
 
     return FAIL;
@@ -192,7 +232,7 @@ class Harvest extends Task {
         this.blackboard.put("LastGather", millis());
       }
     } else {
-      f.moveTo(f.crop.pos.x, f.crop.pos.y);
+      this.blackboard.put("Target", boardMap.cellAtPos(f.crop.pos));
     }
 
     return FAIL;
@@ -231,7 +271,7 @@ class Process extends Task {
       }
     }
 
-    c.moveTo(target.pos.x, target.pos.y);
+    this.blackboard.put("Target", target);
     return FAIL;
   }
 }
@@ -263,10 +303,9 @@ class Gather extends Task {
 
       if (target == null) {
         target = c.loc.findClosestOfType(terrain);
-        this.blackboard.put("Target", target);
       }
 
-      c.moveTo(target.pos.x, target.pos.y);
+      this.blackboard.put("Target", target);
     } else {   // Gather slowly
       if (millis() - lastGather >= GATHER_SPEED * 1000) {
         c.setCarryWeight(carrying + 1);
@@ -335,7 +374,7 @@ class DropOff extends Task {
     }
 
     // If not, keep movin
-    c.moveTo(target.pos.x, target.pos.y);
+    this.blackboard.put("Target", target);
     return FAIL;
   }
 }
@@ -426,7 +465,7 @@ class AttackEnemy extends Task {
       return FAIL;
     }
 
-    s.moveTo(mark.pos.x, mark.pos.y);
+    this.blackboard.put("Target", boardMap.cellAtPos(mark.pos));
     return SUCCESS;
   }
 }
