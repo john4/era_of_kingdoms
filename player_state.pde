@@ -49,10 +49,10 @@ class PlayerState {
       }
     }
 
-    foodSupply = 1200;
+    foodSupply = 12;
     resourceSupply = new HashMap<ResourceCode, Integer>();
-    resourceSupply.put(ResourceCode.LUMBER, 4800);
-    resourceSupply.put(ResourceCode.METAL, 1200);
+    resourceSupply.put(ResourceCode.LUMBER, 48);
+    resourceSupply.put(ResourceCode.METAL, 12);
 
     updatePopulationCapacity();
     placingBuilding = BuildingCode.NONE;

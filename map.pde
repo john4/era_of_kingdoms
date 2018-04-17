@@ -203,7 +203,6 @@ class BoardMap {
   }
 
   PotentialPathNode findPath(Cell from, Cell to) {
-    println("Oh god A*\n\n\n");
     // initialize
     queue = new PriorityQueue<PotentialPathNode>();
     distanceTable = new HashMap<Cell, Float>();
@@ -302,7 +301,7 @@ class BoardMap {
         cells[i][j].show();
       }
     }
-    // Draws lines connected each cell to neighbors
+    // // Draws lines connected each cell to neighbors
     // stroke(0,100,200);
     // for (int i = 0; i < numRows; i++) {
     //  for (int j = 0; j < numCols; j++) {

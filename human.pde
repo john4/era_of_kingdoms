@@ -65,7 +65,7 @@ abstract class Human extends WorldlyObject {
     this.btree.execute();
   }
 
-  void moveTo(float x, float y) {
+  void moveTo(float x, float y, boolean withAvoidance) {
     // Get the direction and distance to the target
     PVector target = new PVector(x, y);
     PVector direction = target.sub(pos);
@@ -97,31 +97,50 @@ abstract class Human extends WorldlyObject {
       acceleration.normalize();
       acceleration.mult(MAX_ACCELERATION);
     }
-
+    if (!withAvoidance) { // if without avoidance, reset velocity
+      this.vel = new PVector(0, 0);
+      this.vel.setMag(.1);
+    }
+    // Calculate new character velocity
+    this.vel.add(acceleration);
     // Calculate new position
     PVector pos = this.pos.copy();
     PVector ray = this.vel.copy();
-
     pos.add(ray);
     Cell c = boardMap.cellAtPos(pos);
-    if(c.hasImpass(assignedBuilding)){
+
+    if(withAvoidance && c.hasImpass(assignedBuilding)){
       this.collisions++;
-      println("collisions: " + this.collisions);
-      this.vel.rotate(PI/8);
-      // ray.setMag(.2);
-      // this.vel.add(ray);
+      // avoid will temporarily treat the closest passable cell as the target
+      avoid(x, y);
+    } else {
+      // Move the character
+      println("mag: " + this.vel.mag());
+       println("head: " + this.vel.heading());
+      this.pos.add(this.vel);
+      // Update this character's cell location
+      this.loc = boardMap.cellAtPos(this.pos);
     }
+  }
 
+  void avoid(float x, float y) {
+    ArrayList<Cell> passableCells = this.loc.getCardinalNeighbors();
 
-    // Calculate new character velocity
-    this.vel.add(acceleration);
-
-    // Move the character
-    this.pos.add(this.vel);
-
-    // Update this character's cell location
-    this.loc = boardMap.cellAtPos(this.pos);
-
+    Cell closestCell = null;
+    float closestDistance = 9999f;
+    for (Cell c : passableCells) {
+      if (!c.hasImpass(assignedBuilding)) {
+        float dist = c.euclideanDistanceTo(x, y);
+        if (dist < closestDistance) {
+          closestDistance = dist;
+          closestCell = c;
+        }
+      }
+    }
+    if (closestCell != null) { // move to closest passable cell
+      moveTo(closestCell.pos.x, closestCell.pos.y, false);
+    }
+    // otherwise don't move since you are trapped!
   }
 
   void starve() {
