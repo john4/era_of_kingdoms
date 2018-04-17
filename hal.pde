@@ -17,9 +17,9 @@ class Hal {
     this.humanState = humanState;
 
     this.goldenRatio = new HashMap<HumanCode, Float>();
-    this.goldenRatio.put(HumanCode.FARMER, 14.0 / 32.0);
-    this.goldenRatio.put(HumanCode.LUMBERJACK, 4.0 / 32.0);
-    this.goldenRatio.put(HumanCode.MINER, 4.0 / 32.0);
+    this.goldenRatio.put(HumanCode.FARMER, 13.0 / 32.0);
+    this.goldenRatio.put(HumanCode.LUMBERJACK, 6.0 / 32.0);
+    this.goldenRatio.put(HumanCode.MINER, 3.0 / 32.0);
     this.goldenRatio.put(HumanCode.SOLDIER, 10.0 / 32.0);
 
     cooldownIndex = gameState.gameStateIndex;
@@ -28,39 +28,64 @@ class Hal {
     HashSet<Cell> cellsNearbyTownSquareSet = townSquare.loc.getNearbyGrassCells(100);
     cellsNearbyTownSquare = cellsNearbyTownSquareSet.toArray(new Cell[cellsNearbyTownSquareSet.size()]);
 
+    HalTask[] placeHovelSequenceItems = new HalTask[2];
+    placeHovelSequenceItems[0] = new CanPlaceX(BuildingCode.HOVEL, computerState);
+    placeHovelSequenceItems[1] = new PlaceX(BuildingCode.HOVEL, computerState, cellsNearbyTownSquare);
+    HalTask placeHovelSequence = new HalSequence(placeHovelSequenceItems);
+
     HalTask[] increasePopulationItems = new HalTask[2];
     increasePopulationItems[0] = new NeedMoreCitizens(computerState);
-    increasePopulationItems[1] = new PlaceX(BuildingCode.HOVEL, computerState, cellsNearbyTownSquare);
+    increasePopulationItems[1] = placeHovelSequence;
     HalTask increasePopulationSequence = new HalSequence(increasePopulationItems);
 
-    HalTask[] placeFarmSelectorItems = new HalTask[3];
+    HalTask[] placeFarmSequenceItems = new HalTask[2];
+    placeFarmSequenceItems[0] = new CanPlaceX(BuildingCode.FARM, computerState);
+    placeFarmSequenceItems[1] = new PlaceX(BuildingCode.FARM, computerState, cellsNearbyTownSquare);
+    HalTask placeFarmSequence = new HalSequence(placeFarmSequenceItems);
+
+    HalTask[] placeFarmSelectorItems = new HalTask[2];
     placeFarmSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.FARM);
-    placeFarmSelectorItems[1] = new CanPlaceX(BuildingCode.FARM, computerState);
-    placeFarmSelectorItems[2] = new PlaceX(BuildingCode.FARM, computerState, cellsNearbyTownSquare);
+    placeFarmSelectorItems[1] = placeFarmSequence;
     HalTask placeFarmSelector = new HalSelector(placeFarmSelectorItems);
 
-    HalTask[] placeSawmillSelectorItems = new HalTask[3];
+    HalTask[] placeSawmillSequenceItems = new HalTask[2];
+    placeSawmillSequenceItems[0] = new CanPlaceX(BuildingCode.SAWMILL, computerState);
+    placeSawmillSequenceItems[1] = new PlaceX(BuildingCode.SAWMILL, computerState, cellsNearbyTownSquare);
+    HalTask placeSawmillSequence = new HalSequence(placeSawmillSequenceItems);
+
+    HalTask[] placeSawmillSelectorItems = new HalTask[2];
     placeSawmillSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.SAWMILL);
-    placeSawmillSelectorItems[1] = new CanPlaceX(BuildingCode.SAWMILL, computerState);
-    placeSawmillSelectorItems[2] = new PlaceX(BuildingCode.SAWMILL, computerState, cellsNearbyTownSquare);
+    placeSawmillSelectorItems[1] = placeSawmillSequence;
     HalTask placeSawmillSelector = new HalSelector(placeSawmillSelectorItems);
 
-    HalTask[] placeFoundrySelectorItems = new HalTask[3];
-    placeFoundrySelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.FOUNDRY);
-    placeFoundrySelectorItems[1] = new CanPlaceX(BuildingCode.FOUNDRY, computerState);
-    placeFoundrySelectorItems[2] = new PlaceX(BuildingCode.FOUNDRY, computerState, cellsNearbyTownSquare);
-    HalTask placeFoundarySelector = new HalSelector(placeFoundrySelectorItems);
+    HalTask[] placeFoundrySequenceItems = new HalTask[2];
+    placeFoundrySequenceItems[0] = new CanPlaceX(BuildingCode.FOUNDRY, computerState);
+    placeFoundrySequenceItems[1] = new PlaceX(BuildingCode.FOUNDRY, computerState, cellsNearbyTownSquare);
+    HalTask placeFoundrySequence = new HalSequence(placeFoundrySequenceItems);
 
-    HalTask[] placeBarracksSelectorItems = new HalTask[3];
+    HalTask[] placeFoundrySelectorItems = new HalTask[2];
+    placeFoundrySelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.FOUNDRY);
+    placeFoundrySelectorItems[1] = placeFoundrySequence;
+    HalTask placeFoundrySelector = new HalSelector(placeFoundrySelectorItems);
+
+    HalTask[] placeBarracksSequenceItems = new HalTask[2];
+    placeBarracksSequenceItems[0] = new CanPlaceX(BuildingCode.BARRACKS, computerState);
+    placeBarracksSequenceItems[1] = new PlaceX(BuildingCode.BARRACKS, computerState, cellsNearbyTownSquare);
+    HalTask placeBarracksSequence = new HalSequence(placeBarracksSequenceItems);
+
+    HalTask[] placeBarracksSelectorItems = new HalTask[2];
     placeBarracksSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.BARRACKS);
-    placeBarracksSelectorItems[1] = new CanPlaceX(BuildingCode.BARRACKS, computerState);
-    placeBarracksSelectorItems[2] = new PlaceX(BuildingCode.BARRACKS, computerState, cellsNearbyTownSquare);
+    placeBarracksSelectorItems[1] = placeBarracksSequence;
     HalTask placeBarracksSelector = new HalSelector(placeBarracksSelectorItems);
 
-    HalTask[] placeStockpileSelectorItems = new HalTask[3];
+    HalTask[] placeStockpileSequenceItems = new HalTask[2];
+    placeStockpileSequenceItems[0] = new CanPlaceX(BuildingCode.STOCKPILE, computerState);
+    placeStockpileSequenceItems[1] = new PlaceX(BuildingCode.STOCKPILE, computerState, cellsNearbyTownSquare);
+    HalTask placeStockpileSequence = new HalSequence(placeStockpileSequenceItems);
+
+    HalTask[] placeStockpileSelectorItems = new HalTask[2];
     placeStockpileSelectorItems[0] = new CheckHaveBuilding(computerState, BuildingCode.STOCKPILE);
-    placeStockpileSelectorItems[1] = new CanPlaceX(BuildingCode.STOCKPILE, computerState);
-    placeStockpileSelectorItems[2] = new PlaceX(BuildingCode.STOCKPILE, computerState, cellsNearbyTownSquare);
+    placeStockpileSelectorItems[1] = placeStockpileSequence;
     HalTask placeStockpileSelector = new HalSelector(placeStockpileSelectorItems);
 
     HalTask[] assignFarmerSequenceItems = new HalTask[3];
@@ -77,7 +102,7 @@ class Hal {
 
     HalTask[] assignMinerSelectorItems = new HalTask[3];
     assignMinerSelectorItems[0] = new CheckBelowGoldenRatio(computerState, HumanCode.MINER, this.goldenRatio);
-    assignMinerSelectorItems[1] = placeFoundarySelector;
+    assignMinerSelectorItems[1] = placeFoundrySelector;
     assignMinerSelectorItems[2] = new AssignCitizen(computerState, HumanCode.MINER);
     HalTask assignMinerSequence = new HalSequence(assignMinerSelectorItems);
 
@@ -139,7 +164,7 @@ class NeedMoreCitizens extends HalTask {
   }
 
   boolean execute() {
-    return this.state.getAllHumans().size() >= this.state.populationCapacity;
+    return this.state.getAllHumans().size() >= this.state.populationCapacity && this.state.humans.get(HumanCode.FREE).size() == 0;
   }
 }
 
@@ -282,8 +307,8 @@ class CanPlaceX extends HalTask {
     HashMap<BuildingCode, HashMap<ResourceCode, Integer>> allCosts = this.state.BUILDING_COSTS;
     HashMap<ResourceCode, Integer> buildingCost = allCosts.get(this.buildingType);
 
-    return state.resourceSupply.get(ResourceCode.LUMBER) < buildingCost.get(ResourceCode.LUMBER) ||
-      state.resourceSupply.get(ResourceCode.METAL) < buildingCost.get(ResourceCode.METAL);
+    return state.resourceSupply.get(ResourceCode.LUMBER) >= buildingCost.get(ResourceCode.LUMBER) &&
+      state.resourceSupply.get(ResourceCode.METAL) >= buildingCost.get(ResourceCode.METAL);
   }
 }
 

@@ -63,7 +63,9 @@ void mouseClicked() {
       Cell hoveredCell = boardMap.getHoveredCell();
       if (boardMap.validBuildingSpot(hoveredCell)) {
         state.humanPlayer.placeBuilding(hoveredCell);
-        buildingSound.play();
+        if (musicPlaying) {
+          buildingSound.play();
+        }
       } else {
         userInterface.messageQueue.add(new Message("Cannot place " + pB.toString() + " there!", state.gameStateIndex+FRAME_RATE*5));
       }
