@@ -353,7 +353,7 @@ class TargetEnemy extends Task {
     // Already have a live target?
     Human mark = (Human) s.blackboard.get("Mark");
     if (mark != null && mark.health > 0) {
-      if (state.humanPlayer.combatMode == CombatMode.DEFENSIVE && s.assignedBuilding.loc.euclideanDistanceTo(mark.loc) > r) {
+      if (s.ownerState.combatMode == CombatMode.DEFENSIVE && s.assignedBuilding.loc.euclideanDistanceTo(mark.loc) > r) {
         s.blackboard.put("Mark", null);
       }
 
@@ -363,8 +363,16 @@ class TargetEnemy extends Task {
     mark = null;
 
     // Picking an enemy prioritizes soldiers over citizens, closest first
-    ArrayList<Human> enemySoldiers = state.computerPlayer.getSoldiers();
-    ArrayList<Human> enemyCitizens = state.computerPlayer.getCitizens();
+    ArrayList<Human> enemySoldiers;
+    ArrayList<Human> enemyCitizens;
+
+    if (s.ownerState == state.humanPlayer) {
+      enemySoldiers = state.computerPlayer.getSoldiers();
+      enemyCitizens = state.computerPlayer.getCitizens();
+    } else {
+      enemySoldiers = state.humanPlayer.getSoldiers();
+      enemyCitizens = state.humanPlayer.getCitizens();
+    }
 
     float shortestDistance = 99999;
 
@@ -379,7 +387,7 @@ class TargetEnemy extends Task {
       }
     }
 
-    if (state.humanPlayer.combatMode == CombatMode.DEFENSIVE && shortestDistance > r) {
+    if (s.ownerState.combatMode == CombatMode.DEFENSIVE && shortestDistance > r) {
       mark = null;
     }
 
@@ -394,7 +402,7 @@ class TargetEnemy extends Task {
       }
     }
 
-    if (state.humanPlayer.combatMode == CombatMode.DEFENSIVE && shortestDistance > r) {
+    if (s.ownerState.combatMode == CombatMode.DEFENSIVE && shortestDistance > r) {
       mark = null;
     }
 

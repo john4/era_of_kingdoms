@@ -5,14 +5,16 @@ class Panel  {
   boolean isVisible;
   ArrayList<ATarget> targets;
   int[] c = new int[3];
+  PImage img;
 
-  Panel(float x, float y, float width, ArrayList<ATarget> targets, int r, int g, int b) {
+  Panel(float x, float y, float width, ArrayList<ATarget> targets, int r, int g, int b, PImage img) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.isVisible = false;
     this.targets = targets;
     this.c = new int[] { r, g, b };
+    this.img = img;
   }
 
   void draw() {
@@ -37,6 +39,7 @@ class Panel  {
 
     fill(this.c[0], this.c[1], this.c[2]);
     rect(this.x - boardMap.xo, boardMap.numCols * boardMap.gridsize - 20 - boardMap.yo, 20, 20);
+    image(this.img, this.x - boardMap.xo, boardMap.numCols * boardMap.gridsize - 20 - boardMap.yo);
   }
 
   void click() {

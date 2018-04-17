@@ -58,6 +58,37 @@ class Hal {
       }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // COMBAT MODE ////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    HalTask becomeOffensive = new ChangeCombatMode(computerState, CombatMode.OFFENSIVE);
+    HalTask becomeDefensive = new ChangeCombatMode(computerState, CombatMode.DEFENSIVE);
+
+    HalTask[] shouldBecomeOffensiveSelectorItems = new HalTask[2];
+    shouldBecomeOffensiveSelectorItems[0] = new EnemyArmyWeak(computerState, humanState);
+    shouldBecomeOffensiveSelectorItems[1] = new HaveLargeArmy(computerState);
+    HalTask shouldBecomeOffensiveSelector = new HalSelector(shouldBecomeOffensiveSelectorItems);
+
+    HalTask[] becomeOffensiveSequenceItems = new HalTask[2];
+    becomeOffensiveSequenceItems[0] = shouldBecomeOffensiveSelector;
+    becomeOffensiveSequenceItems[1] = becomeOffensive;
+    HalTask becomeOffensiveSequence = new HalSequence(becomeOffensiveSequenceItems);
+
+    HalTask[] shouldBecomeDefensiveSelectorItems = new HalTask[2];
+    shouldBecomeDefensiveSelectorItems[0] = new EnemyTroopsNearby(townSquare.loc, humanState);
+    shouldBecomeDefensiveSelectorItems[1] = new HaveSmallArmy(computerState);
+    HalTask shouldBecomeDefensiveSelector = new HalSelector(shouldBecomeDefensiveSelectorItems);
+
+    HalTask[] becomeDefensiveSequenceItems = new HalTask[2];
+    becomeDefensiveSequenceItems[0] = shouldBecomeDefensiveSelector;
+    becomeDefensiveSequenceItems[1] = becomeDefensive;
+    HalTask becomeDefensiveSequence = new HalSequence(becomeDefensiveSequenceItems);
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // PLACE BUILDING ////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+
     HalTask[] placeHovelSequenceItems = new HalTask[2];
     placeHovelSequenceItems[0] = new CanPlaceX(BuildingCode.HOVEL, computerState);
     placeHovelSequenceItems[1] = new PlaceX(BuildingCode.HOVEL, computerState, potentialGeneralCells);
@@ -122,6 +153,10 @@ class Hal {
     placeProximityStockpileSelectorItems[0] = new PlaceProximityStockpile(BuildingCode.STOCKPILE, computerState, potentialStockpileProximityCells, newStockpileBuilt);
     HalTask placeProximityStockpileSelector = new HalSelector(placeProximityStockpileSelectorItems);
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // ASSIGN CITIZENS ////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+
     HalTask[] assignFarmerSequenceItems = new HalTask[3];
     assignFarmerSequenceItems[0] = new CheckBelowGoldenRatio(computerState, HumanCode.FARMER, this.goldenRatio);
     assignFarmerSequenceItems[1] = placeFarmSelector;
@@ -146,6 +181,10 @@ class Hal {
     assignSoldierSelectorItems[2] = new AssignCitizen(computerState, HumanCode.SOLDIER);
     HalTask assignSoldierSequence = new HalSequence(assignSoldierSelectorItems);
 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // ORACLE ////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     HalTask[] oracleAssignSelectorItems = new HalTask[5];
     oracleAssignSelectorItems[0] = assignFarmerSequence;
     oracleAssignSelectorItems[1] = assignLumberjackSequence;
@@ -163,8 +202,26 @@ class Hal {
     HalTask[] oracleItems = new HalTask[2];
     oracleItems[0] = increasePopulationSequence;
     oracleItems[1] = oracleAssignSequence;
+    HalTask oracle = new HalSelector(oracleItems);
 
-    behaviorTree = new HalSelector(oracleItems);
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // WAR TABLE /////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    HalTask[] combatModeDecisionSelectorItems = new HalTask[2];
+    combatModeDecisionSelectorItems[0] = becomeDefensiveSequence;
+    combatModeDecisionSelectorItems[1] = becomeOffensiveSequence;
+    HalTask combatModeDecisionSelector = new HalSelector(combatModeDecisionSelectorItems);
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // TOP LEVEL /////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    HalTask[] btreeItems = new HalTask[2];
+    btreeItems[0] = combatModeDecisionSelector;
+    btreeItems[1] = oracle;
+
+    behaviorTree = new HalSequence(btreeItems);
   }
 
   void recalculateNearbyStockpileCells() {
@@ -232,66 +289,6 @@ abstract class HalTask {
   boolean verbose = true;
 }
 
-class NeedMoreCitizens extends HalTask {
-  PlayerState state;
-
-  NeedMoreCitizens(PlayerState state) {
-    this.state = state;
-  }
-
-  boolean execute() {
-    return this.state.getAllHumans().size() >= this.state.populationCapacity && this.state.humans.get(HumanCode.FREE).size() == 0;
-  }
-}
-
-class HaveFreeCitizen extends HalTask {
-  PlayerState state;
-
-  HaveFreeCitizen(PlayerState state) {
-    this.state = state;
-  }
-
-  boolean execute() {
-    return this.state.humans.get(HumanCode.FREE).size() > 0;
-  }
-}
-
-class CheckBelowGoldenRatio extends HalTask {
-  PlayerState state;
-  HumanCode type;
-  HashMap<HumanCode, Float> goldenRatio;
-
-  CheckBelowGoldenRatio(PlayerState state, HumanCode type, HashMap<HumanCode, Float> goldenRatio) {
-    this.state = state;
-    this.type = type;
-    this.goldenRatio = goldenRatio;
-  }
-
-  boolean execute() {
-    float goal = this.goldenRatio.get(this.type);
-    float current = (float) this.state.humans.get(this.type).size() / (float) this.state.getAllHumans().size();
-    return current < goal;
-  }
-}
-
-class CheckHaveBuilding extends HalTask {
-  PlayerState state;
-  BuildingCode type;
-
-  CheckHaveBuilding(PlayerState state, BuildingCode type) {
-    this.state = state;
-    this.type = type;
-  }
-
-  boolean execute() {
-    Building targetBuilding = this.state.getLeastAssigned(this.type);
-    if (targetBuilding == null || targetBuilding.numFreeAssignments() == 0) {
-      return false;
-    }
-    return true;
-  }
-}
-
 class AssignCitizen extends HalTask {
   PlayerState state;
   HumanCode type;
@@ -334,20 +331,93 @@ class AssignCitizen extends HalTask {
   }
 }
 
-class RiskOfStarving extends HalTask {
+class CanPlaceX extends HalTask {
+  BuildingCode buildingType;
   PlayerState state;
 
-  RiskOfStarving(PlayerState state) {
+  CanPlaceX(BuildingCode buildingType, PlayerState state) {
+    this.buildingType = buildingType;
     this.state = state;
   }
 
   boolean execute() {
-    int foodNeed = state.getCitizens().size() + (state.getSoldiers().size() * 2);
-    if (foodNeed == 0) {
+    HashMap<BuildingCode, HashMap<ResourceCode, Integer>> allCosts = this.state.BUILDING_COSTS;
+    HashMap<ResourceCode, Integer> buildingCost = allCosts.get(this.buildingType);
+
+    return state.resourceSupply.get(ResourceCode.LUMBER) >= buildingCost.get(ResourceCode.LUMBER) &&
+      state.resourceSupply.get(ResourceCode.METAL) >= buildingCost.get(ResourceCode.METAL);
+  }
+}
+
+class ChangeCombatMode extends HalTask {
+  PlayerState state;
+  CombatMode mode;
+
+  ChangeCombatMode(PlayerState state, CombatMode mode) {
+    this.state = state;
+    this.mode = mode;
+  }
+
+  boolean execute() {
+    this.state.setCombatMode(this.mode);
+    return true;
+  }
+}
+
+class CheckBelowGoldenRatio extends HalTask {
+  PlayerState state;
+  HumanCode type;
+  HashMap<HumanCode, Float> goldenRatio;
+
+  CheckBelowGoldenRatio(PlayerState state, HumanCode type, HashMap<HumanCode, Float> goldenRatio) {
+    this.state = state;
+    this.type = type;
+    this.goldenRatio = goldenRatio;
+  }
+
+  boolean execute() {
+    float goal = this.goldenRatio.get(this.type);
+    float current = (float) this.state.humans.get(this.type).size() / (float) this.state.getAllHumans().size();
+    return current < goal;
+  }
+}
+
+class CheckHaveBuilding extends HalTask {
+  PlayerState state;
+  BuildingCode type;
+
+  CheckHaveBuilding(PlayerState state, BuildingCode type) {
+    this.state = state;
+    this.type = type;
+  }
+
+  boolean execute() {
+    Building targetBuilding = this.state.getLeastAssigned(this.type);
+    if (targetBuilding == null || targetBuilding.numFreeAssignments() == 0) {
       return false;
     }
-    int projection = state.foodSupply / foodNeed;
-    return projection < 2;
+    return true;
+  }
+}
+
+class EnemyArmyWeak extends HalTask {
+  PlayerState state;
+  PlayerState humanState;
+
+  EnemyArmyWeak(PlayerState state, PlayerState humanState) {
+    this.state = state;
+    this.humanState = humanState;
+  }
+
+  boolean execute() {
+    float humanArmySize = (float) this.humanState.humans.get(HumanCode.SOLDIER).size();
+    float myArmySize = (float) this.state.humans.get(HumanCode.SOLDIER).size();
+
+    if (myArmySize == 0) {
+      return false;
+    }
+
+    return humanArmySize / myArmySize < 0.6;
   }
 }
 
@@ -370,21 +440,69 @@ class EnemyTroopsNearby extends HalTask {
   }
 }
 
-class CanPlaceX extends HalTask {
-  BuildingCode buildingType;
+class HaveFreeCitizen extends HalTask {
   PlayerState state;
 
-  CanPlaceX(BuildingCode buildingType, PlayerState state) {
-    this.buildingType = buildingType;
+  HaveFreeCitizen(PlayerState state) {
     this.state = state;
   }
 
   boolean execute() {
-    HashMap<BuildingCode, HashMap<ResourceCode, Integer>> allCosts = this.state.BUILDING_COSTS;
-    HashMap<ResourceCode, Integer> buildingCost = allCosts.get(this.buildingType);
+    return this.state.humans.get(HumanCode.FREE).size() > 0;
+  }
+}
 
-    return state.resourceSupply.get(ResourceCode.LUMBER) >= buildingCost.get(ResourceCode.LUMBER) &&
-      state.resourceSupply.get(ResourceCode.METAL) >= buildingCost.get(ResourceCode.METAL);
+class HaveSmallArmy extends HalTask {
+  PlayerState state;
+
+  HaveSmallArmy(PlayerState state) {
+    this.state = state;
+  }
+
+  boolean execute() {
+    return this.state.humans.get(HumanCode.SOLDIER).size() < 10;
+  }
+}
+
+class HaveLargeArmy extends HalTask {
+  PlayerState state;
+
+  HaveLargeArmy(PlayerState state) {
+    this.state = state;
+  }
+
+  boolean execute() {
+    return this.state.humans.get(HumanCode.SOLDIER).size() >= 10;
+  }
+}
+
+class NeedMoreCitizens extends HalTask {
+  PlayerState state;
+
+  NeedMoreCitizens(PlayerState state) {
+    this.state = state;
+  }
+
+  boolean execute() {
+    return this.state.getAllHumans().size() >= this.state.populationCapacity && this.state.humans.get(HumanCode.FREE).size() == 0;
+  }
+}
+
+class PlaceProximityStockpile extends PlaceX {
+  PlaceProximityStockpile(BuildingCode buildingType, PlayerState state, PotentialCells potentialCells, CallbackMarker callbackMarker) {
+    super(buildingType, state, potentialCells, callbackMarker);
+  }
+
+  // if we succeed in placing a proximity stockpile,
+  // we want to clear the potential cells because that's
+  // our behavior tree's signal that it needs to try to
+  // build a proximity stockpile
+  boolean execute() {
+    boolean result = super.execute();
+    if (result) {
+      this.potentialCells.primary.clear();
+    }
+    return result;
   }
 }
 
@@ -419,21 +537,20 @@ class PlaceX extends HalTask {
   }
 }
 
-class PlaceProximityStockpile extends PlaceX {
-  PlaceProximityStockpile(BuildingCode buildingType, PlayerState state, PotentialCells potentialCells, CallbackMarker callbackMarker) {
-    super(buildingType, state, potentialCells, callbackMarker);
+class RiskOfStarving extends HalTask {
+  PlayerState state;
+
+  RiskOfStarving(PlayerState state) {
+    this.state = state;
   }
 
-  // if we succeed in placing a proximity stockpile,
-  // we want to clear the potential cells because that's
-  // our behavior tree's signal that it needs to try to
-  // build a proximity stockpile
   boolean execute() {
-    boolean result = super.execute();
-    if (result) {
-      this.potentialCells.primary.clear();
+    int foodNeed = state.getCitizens().size() + (state.getSoldiers().size() * 2);
+    if (foodNeed == 0) {
+      return false;
     }
-    return result;
+    int projection = state.foodSupply / foodNeed;
+    return projection < 2;
   }
 }
 

@@ -95,7 +95,7 @@ class BuildingCosts {
 
     HashMap<ResourceCode, Integer> barracks = new HashMap<ResourceCode, Integer>();
     barracks.put(ResourceCode.LUMBER, 32);
-    barracks.put(ResourceCode.METAL, 16);
+    barracks.put(ResourceCode.METAL, 32);
 
     HashMap<ResourceCode, Integer> foundry = new HashMap<ResourceCode, Integer>();
     foundry.put(ResourceCode.LUMBER, 24);
