@@ -171,7 +171,7 @@ class BuildBarracksTarget extends ATarget {
   }
 
   void clicked() {
-    state.humanPlayer.placingBuilding = BuildingCode.BARRACKS;
+    state.humanPlayer.requestPlacingBuilding(BuildingCode.BARRACKS);
   }
 }
 
@@ -181,6 +181,6 @@ class BuildFoundryTarget extends ATarget {
   }
 
   void clicked() {
-    state.humanPlayer.placingBuilding = BuildingCode.FOUNDRY;
+    state.humanPlayer.requestPlacingBuilding(BuildingCode.FOUNDRY);
   }
 }
