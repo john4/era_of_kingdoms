@@ -1,9 +1,12 @@
+// This is the continued development of an academic project for
+//
 // Game Artificial Intelligence
 // Professor Gold
 // Spring 2018
-// Final Project
 //
-// John Martin, Arianna Tang, Nicholas Lailler
+// The original game can be found at
+// https://github.com/john4/game_ai_project
+// 
 
 import java.util.Random;
 import java.util.Collections;
