@@ -1,4 +1,6 @@
-# game-ai-project
+# Era of Kingdoms
+### The continuation of [an academic artificial intelligence project](https://github.com/john4/game_ai_project).
+
 
 ## If you don't have the sound library installed in Procesing:
 `Processing > Sketch > Import Library > Add Library > Sound | Sound library based on...`
