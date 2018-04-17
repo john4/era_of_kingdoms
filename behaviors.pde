@@ -39,12 +39,7 @@ class Move extends Task {
     if (node.cell.i == h.loc.i && node.cell.j == h.loc.j && node.parent != null) {
       followPath(node.parent, h);
     } else {
-      // if(node != null) {
-      //   node.draw();
-      // }
-      h.vel = new PVector(0,0);
-      h.vel.setMag(.1);
-      h.moveTo(node.cell.pos.x, node.cell.pos.y, true);
+      h.moveTo(node.cell.pos.x, node.cell.pos.y, true); // use moveToto follow nodes
     }
   }
 }

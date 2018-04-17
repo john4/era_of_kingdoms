@@ -15,7 +15,7 @@ UserInterface userInterface;
 boolean showControlPanel = true;
 final int CELL_SIZE = 10;
 final int FRAME_RATE = 60;
-final int MAX_COLLISIONS = 20;
+final int MAX_COLLISIONS = 10;
 
 SoundFile bgmFile;
 SoundFile buildingSound;

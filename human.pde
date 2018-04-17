@@ -70,6 +70,11 @@ abstract class Human extends WorldlyObject {
     PVector direction = target.sub(pos);
     float distance = direction.mag();
 
+    if (!withAvoidance) { // force human to go to passable node
+      this.vel.rotate(PVector.angleBetween(target, this.vel));
+      this.vel.setMag(.25);
+    }
+
     // Check if we are there, no steering
     if (distance < TARGET_RADIUS) {
       return;
@@ -96,10 +101,7 @@ abstract class Human extends WorldlyObject {
       acceleration.normalize();
       acceleration.mult(MAX_ACCELERATION);
     }
-    if (!withAvoidance) { // if without avoidance, reset velocity
-      this.vel = new PVector(0, 0);
-      this.vel.setMag(.1);
-    }
+
     // Calculate new character velocity
     this.vel.add(acceleration);
     // Calculate new position
@@ -114,8 +116,6 @@ abstract class Human extends WorldlyObject {
       avoid(x, y);
     } else {
       // Move the character
-      // println("mag: " + this.vel.mag());
-      //  println("head: " + this.vel.heading());
       this.pos.add(this.vel);
       // Update this character's cell location
       this.loc = boardMap.cellAtPos(this.pos);
@@ -136,6 +136,7 @@ abstract class Human extends WorldlyObject {
         }
       }
     }
+
     if (closestCell != null) { // move to closest passable cell
       moveTo(closestCell.pos.x, closestCell.pos.y, false);
     }
