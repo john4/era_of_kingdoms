@@ -30,9 +30,8 @@ abstract class Human extends WorldlyObject {
     Task[] wanderSequence = new Task[2];
     wanderSequence[0] = new Wander(this.blackboard, 25);
     wanderSequence[1] = new Move(this.blackboard);
-    Task wander = new Sequence(this.blackboard, wanderSequence);
 
-    this.btree = wander;
+    this.btree = new Sequence(this.blackboard, wanderSequence);
   }
 
   void unassignFromBuilding() {
@@ -115,8 +114,8 @@ abstract class Human extends WorldlyObject {
       avoid(x, y);
     } else {
       // Move the character
-      println("mag: " + this.vel.mag());
-       println("head: " + this.vel.heading());
+      // println("mag: " + this.vel.mag());
+      //  println("head: " + this.vel.heading());
       this.pos.add(this.vel);
       // Update this character's cell location
       this.loc = boardMap.cellAtPos(this.pos);
